@@ -1,0 +1,25 @@
+[package]
+license = "MIT"
+name = "compare-harness"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[dependencies]
+compare-program = { path = "../program" }
+blubber-model = { path = "../../../crates/blubber-model" }
+blubber-cu-fixture = { path = "../../../programs/cu-fixture", features = ["matrix", "alloc"] }
+mollusk-svm = { version = "0.16.2", features = ["inner-instructions"] }
+solana-account = "4.5.0"
+solana-instruction = "3.5.1"
+solana-pubkey = "4.4.0"
+borsh = "1.8.1"
+serde_json = "1.0.154"
+# Match the published fixture's Agave cohort, including optional trace types.
+solana-transaction-status-client-types = "4.3.0"
+solana-svm = { version = "4.3.0", features = ["agave-unstable-api"] }
+
+blubber-mollusk = { path = "../../../tests/mollusk" }
+
+[features]
+competitors = ["compare-program/manifest", "compare-program/anchor-slab", "compare-program/baselines", "compare-program/zeropod", "compare-program/wincode", "compare-program/pinapod", "compare-program/light"]

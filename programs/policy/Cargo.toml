@@ -1,0 +1,23 @@
+[package]
+license = "MIT"
+name = "blubber-policy"
+description = "Authenticated Pinocchio point-access acceptance fixtures"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+publish = false
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[features]
+verify-on-load = ["blubber/verify-on-load"]
+corrupt = []
+
+[dependencies]
+blubber = { workspace = true, features = ["derive", "pinocchio"] }
+pinocchio.workspace = true
+blubber-core.workspace = true
+
+[lints]
+workspace = true

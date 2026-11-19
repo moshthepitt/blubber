@@ -1,0 +1,30 @@
+[package]
+repository.workspace = true
+license = "MIT"
+name = "blubber-core"
+description = "Checked wire-format kernel for Blubber"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+readme = "README.md"
+include = ["/Cargo.toml", "/README.md", "/LICENSE", "/src/**/*.rs"]
+keywords = ["solana", "serialization", "verification"]
+categories = ["no-std", "encoding"]
+
+[features]
+default = []
+max-depth-16 = []
+program-error = ["dep:solana-program-error"]
+
+[dependencies]
+vstd.workspace = true
+solana-program-error = { workspace = true, optional = true }
+
+[package.metadata.verus]
+verify = true
+
+[lints]
+workspace = true
+
+[dev-dependencies]
+blubber-model.workspace = true

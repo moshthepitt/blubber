@@ -1,0 +1,132 @@
+metadata/aliases_and_renamed_dependency.rs	-
+metadata/variable_field_is_absent.rs	no field `text`
+metadata/aliased_variable_field_is_absent.rs	no field `values`
+metadata/prefix_type_and_binding_hygiene.rs	-
+metadata/wide_prefix_rejected.rs	copied constraint prefix exceeds 1024 bytes
+metadata/native_padding_rejected.rs	copied constraint prefix exceeds 1024 bytes
+metadata/wide_opt_out.rs	-
+metadata/opt_out_field_is_absent.rs	no field `counter`
+metadata/private_prefix_field.rs	field `secret`
+metadata/requires_account.rs	constraint_fields requires account
+metadata/duplicate_option.rs	without duplicates
+metadata/non_boolean_option.rs	constraint_fields requires true or false
+readers/primitive_alias_and_helper_const_hygiene.rs	-
+readers/review_hygiene.rs	-
+readers/schema_macro_self.rs	Self inside a field macro cannot be relocated; use the explicit owner type `Owner` instead
+readers/fixed_macro_self.rs	Self inside a field macro cannot be relocated; use the explicit owner type `Owner` instead
+readers/hidden_macro_generated_self.rs	error[E0220]	associated type `Field0` not found for `Self`
+readers/hidden_macro_generated_generic_self.rs	error[E0220]	associated type `Field0` not found for `Self`
+readers/companion_type.rs	generic `CapturedRef` conflicts with generated item `CapturedRef`; rename the consumer generic parameter
+readers/companion_const.rs	generic `CapturedInit` conflicts with generated item `CapturedInit`; rename the consumer generic parameter
+readers/companion_lifetime.rs	generic `CapturedMut` conflicts with generated item `CapturedMut`; rename the consumer generic parameter
+readers/companion_opaque_macro.rs	generic `CapturedRef` conflicts with generated item `CapturedRef`; rename the consumer generic parameter
+readers/marker_collision.rs	generic `Captured` conflicts with generated item `Captured`; rename the consumer generic parameter
+readers/reborrow.rs	accessor collision
+readers/validate.rs	accessor collision
+readers/commit.rs	accessor collision
+readers/used_len.rs	accessor collision
+readers/storage_len.rs	accessor collision
+readers/reserve.rs	accessor collision
+readers/shrink_to_fit.rs	accessor collision
+readers/to_owned.rs	accessor collision
+readers/try_used_len.rs	accessor collision
+readers/try_storage_len.rs	accessor collision
+readers/try_collision.rs	accessor collision
+readers/try_reverse.rs	accessor collision
+readers/mut_collision.rs	accessor collision
+readers/mut_reverse.rs	accessor collision
+readers/raw_collision.rs	accessor collision
+readers/renamed_collision.rs	accessor collision
+readers/renamed_reserved.rs	accessor collision
+readers/invalid_identifier.rs	accessor must be a Rust identifier
+readers/self_identifier.rs	accessor must be a Rust identifier
+readers/unknown_attribute.rs	expected accessor
+readers/empty_attribute.rs	expected accessor
+readers/duplicate_attribute.rs	without duplicates
+readers/separate_duplicate_attributes.rs	without duplicates
+readers/renamed_raw_visibility_inherent_cross_crate.rs	-
+readers/private_field_accessor.rs	method `hidden` is private
+readers/reserve_after_last_read.rs	-
+readers/init_lifetime_independent_of_store.rs	-
+readers/reserve_with_live_read.rs	cannot borrow `account` as mutable
+readers/commit_with_live_read.rs	cannot move out of `account`
+readers/read_cannot_escape_mutable_root.rs	cannot return value referencing local variable `account`
+readers/borrowed_cross_crate_mutable_projections.rs	-
+readers/renamed_alias_raw_mutable_accessors.rs	-
+readers/private_mutable_field_accessor.rs	method `hidden_mut` is private
+readers/stale_root_field_read.rs	cannot borrow `account` as mutable
+readers/stale_nested_read_after_reborrow.rs	cannot borrow `record` as mutable
+readers/stale_nested_read_after_field_projection.rs	error[E0502]
+readers/retained_sibling_exclusivity.rs	cannot borrow `account` as mutable more than once
+readers/live_child_prevents_parent_read.rs	error[E0502]
+readers/live_child_prevents_second_projection.rs	error[E0499]
+readers/live_child_prevents_root_read.rs	error[E0502]
+readers/stale_string_read.rs	cannot borrow `text` as mutable
+readers/reborrowed_root_reserve_with_child.rs	cannot borrow `borrowed` as mutable more than once
+readers/commit_with_live_projection.rs	cannot move out of `account`
+readers/list_read_iterator_prevents_mutation.rs	cannot borrow `rows` as mutable
+readers/map_read_prevents_mutation.rs	cannot borrow `map` as mutable
+readers/option_child_retains_root_exclusivity.rs	cannot borrow `account` as mutable more than once
+readers/entry_excludes_second_root_edit.rs	error[E0499]
+readers/entry_excludes_parent_map_read.rs	error[E0502]
+readers/entry_excludes_second_entry.rs	error[E0499]
+readers/into_entry_consumes_map.rs	error[E0382]
+readers/temporary_borrowed_entry_cannot_be_retained.rs	error[E0716]
+readers/borrowed_get_excludes_second_selection.rs	error[E0499]
+readers/temporary_borrowed_get_cannot_be_retained.rs	error[E0716]
+readers/into_get_consumes_map.rs	error[E0382]
+readers/borrowed_entry_excludes_map_read.rs	error[E0502]
+readers/entry_read_prevents_value_edit.rs	error[E0502]
+readers/entry_methods_consume_handle.rs	error[E0382]
+readers/entry_modify_child_cannot_escape.rs	error[E0521]
+readers/entry_modify_read_cannot_escape.rs	error[E0521]
+readers/entry_factory_cannot_return_local_initializer.rs	error[E0515]
+readers/entry_combinators_foreign_chain_and_caller_init.rs	-
+readers/generic_reader_metadata_traits_without_child_bounds.rs	-
+readers/borrowed_map_child_cannot_escape_local_handle.rs	error[E0515]
+readers/entry_generated_foreign_value_chain.rs	-
+readers/entry_init_borrow_does_not_escape_encoding.rs	-
+readers/cursor_and_scoped_foreign_projections.rs	-
+readers/list_cursor_cannot_advance_with_live_child.rs	error[E0499]
+readers/map_cursor_cannot_advance_with_live_child.rs	error[E0499]
+readers/list_cursor_read_prevents_advance.rs	error[E0499]
+readers/map_cursor_read_prevents_advance.rs	error[E0499]
+readers/list_cursor_consumes_collection.rs	error[E0382]
+readers/map_cursor_consumes_collection.rs	error[E0382]
+readers/cursor_excludes_parent_read.rs	error[E0502]
+readers/cursor_excludes_root_mutation.rs	error[E0499]
+readers/scoped_list_read_cannot_escape_callback.rs	error[E0521]
+readers/scoped_map_read_cannot_escape_callback.rs	error[E0521]
+readers/scoped_child_cannot_escape_callback.rs	error[E0521]
+readers/scoped_list_callback_cannot_edit_outer_count.rs	error[E0499]
+readers/scoped_map_callback_cannot_edit_outer_keys.rs	error[E0499]
+readers/shared_host_msrv_sbf_source.rs	-
+readers/fixed_explicit_types_generics_and_temporary_chains.rs	-
+readers/fixed_child_excludes_cursor_advance.rs	error[E0499]
+readers/fixed_child_excludes_root_reserve.rs	error[E0499]
+readers/fixed_callback_child_cannot_escape.rs	error[E0521]
+readers/generated_fixed_field_excludes_next_child.rs	error[E0499]
+readers/fixed_field_cannot_escape_callback.rs	error[E0521]
+readers/fixed_field_excludes_sibling_projection.rs	error[E0499]
+readers/exact_count_public_types_and_borrowed_inputs.rs	-
+readers/leaf_reads_and_bulk_init_lifetimes.rs	-
+readers/ref_and_shared_mut_iteration.rs	-
+readers/list_shared_iterator_excludes_edit.rs	error[E0502]
+readers/map_shared_iterator_excludes_edit.rs	error[E0502]
+readers/shared_list_item_excludes_bulk_edit.rs	error[E0502]
+readers/shared_map_item_excludes_edit.rs	error[E0502]
+readers/bulk_input_cannot_alias_destination.rs	error[E0502]
+readers/rewrite_input_cannot_alias_destination.rs	error[E0502]
+readers/fill_input_cannot_alias_destination.rs	error[E0502]
+readers/map_rewrite_input_cannot_alias_destination.rs	error[E0502]
+readers/keyless_map_rewrite_input_cannot_alias_destination.rs	error[E0502]
+readers/map_fill_input_cannot_alias_destination.rs	error[E0502]
+readers/bound_parent_allows_nested_list.rs	-
+readers/temporary_parent_projection.rs	error[E0716]	temporary value dropped while borrowed	consider using a `let` binding
+readers/unsupported_field_type_span.rs	f64: Schema	@primary E0277 unsupported_field_type_span.rs:7:16
+readers/mutable_reference_cannot_escape_local_editor.rs	cannot return value referencing local variable
+scoped/child_across_resize.rs	error[E0499]
+scoped/child_escape.rs	lifetime may not live long enough
+scoped/parent_across_callback.rs	error[E0501]	error[E0500]
+scoped/read_across_edit.rs	error[E0502]
+scoped/read_escape.rs	lifetime may not live long enough

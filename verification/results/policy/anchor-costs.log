@@ -1,0 +1,27 @@
+T5b: Rust1.97.1/MSRV1.89; SBF platform-tools1.53 v0/v3; Mollusk0.16.2
+PASS432 FAIL0 whole ergonomics byte/rent oracles; every native/control row measured
+All 41 former A02/A17 rows: enforced at their original post-rent caps
+Native lazy init <= fresh matched Borsh: PASS6 (v0/v3, all three mappings)
+PASS72 FAIL0 calibrated diagnostic calls; exact phase and ELF/register inventories
+216 policy/control ceilings: enforced; historical M7c attribution retained
+Scratch safe-SDK markers: inclusive brackets subtract calibration/nested markers; never whole-call ceilings
+VM framework/blubber/unattributed instruction counts retained separately; syscall charges are not VM instructions
+sources-sha256=8d9f752a0e8e232752b9c7929f02a0f0176405383ec160f794bca34a0b1f0da3
+v0 lazy n100 init=8639 Borsh=12743; all mappings checked
+v0/native_lazy_off whole-ELF-sha256=e9577994374751d794d8d403247cf3241f6933dd6122099915567375c008aebf
+v0/native_checked_off whole-ELF-sha256=10afde04e423b2ed2bf25101c7fed5039713c1d6acf2a234741c6cad953962a2
+v0/native_lazy_on whole-ELF-sha256=8e544c2a2e4878bb3654ea7842f916251422431139735f99dcd07c94bcf26c92
+v0/native_checked_on whole-ELF-sha256=9e9d4dfa828217265398469f52810eb06819137a4ef9f4bcb3500a66c29826be
+v0/slab whole-ELF-sha256=3e53aa4dd6d42f9eacfb4544fe62fe18f6fde2c911c2c9fd3f20dd424c2331fd
+v0/borsh whole-ELF-sha256=886162e4481cf466cd271993763917d45260356931dbcabb3d3721b495896b67
+v0 phase-ELF-sha256=7bec594a0c9eb7922fff3649c81a0b5d03227ff53ffa04c71db7068c3b1b62cb
+v3 lazy n100 init=8635 Borsh=12738; all mappings checked
+v3/native_lazy_off whole-ELF-sha256=06acbb963c81b35955addd5750a27a30be9ade1ca6f4f34177dea34e49afdabd
+v3/native_checked_off whole-ELF-sha256=82be89674d87c24c8d254b53cf8a06f5ee22e15caad108f8e98dbe9f06936ba3
+v3/native_lazy_on whole-ELF-sha256=f159bde2c1049d00f3d694c9745adae02e8272ead20feff11609b9d99ecfef49
+v3/native_checked_on whole-ELF-sha256=e8fbc4266955bc7540a2955018b9d0dfd14c9786d8918ea68345fc674f843ed0
+v3/slab whole-ELF-sha256=27d13606e284340db233307a788f9d711592b1dbcb6ae28e7b87a76f9fad549f
+v3/borsh whole-ELF-sha256=bc7560292a46269915fc07f399c0b6a13258c92b677b9a8c5a9f8443ba5bee74
+v3 phase-ELF-sha256=5067b9d6888cc6f1942ded142e873db40934937d172defcc99ad553b440100cb
+benchmarks/anchor-v2-t5b-ceilings.csv sha256=d7d6190736d5367fee66fd3963585717a44a9c8a47466ac4d58eeaef0b997e8a
+.tmp/d21-anchor/phases.json sha256=3448081be937a8225b0ffe2f1626d0ce66255e43498a282bac775850432cee2d

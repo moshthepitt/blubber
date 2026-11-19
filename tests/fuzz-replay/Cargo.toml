@@ -1,0 +1,29 @@
+[package]
+license = "MIT"
+name = "blubber-fuzz-replay"
+description = "Host replay of the shared fuzz oracles and small committed corpus"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+publish = false
+
+[lib]
+path = "../../fuzz/src/lib.rs"
+
+[features]
+sdk-fuzz = ["dep:mollusk-svm", "dep:solana-account", "dep:solana-instruction", "dep:solana-pubkey", "dep:blubber-policy"]
+verify-on-load = ["blubber/verify-on-load", "blubber-policy?/verify-on-load"]
+
+[dependencies]
+mollusk-svm = { version = "0.16.2", optional = true }
+solana-account = { version = "4.5.0", optional = true }
+solana-instruction = { version = "3.5.1", optional = true }
+solana-pubkey = { version = "4.4.0", optional = true }
+blubber-policy = { path = "../../programs/policy", features = ["corrupt"], optional = true }
+blubber = { workspace = true, features = ["alloc", "derive"] }
+blubber-core.workspace = true
+blubber-model.workspace = true
+bumpalo = "3.20.3"
+
+[lints]
+workspace = true

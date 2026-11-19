@@ -1,0 +1,11 @@
+[package]
+license = "MIT"
+name = "blubber-model"
+description = "Independent host reference model for Blubber tests"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+publish = false
+
+[lints]
+workspace = true

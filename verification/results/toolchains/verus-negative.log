@@ -1,0 +1,4 @@
+Verus 0.2026.10.18.7d82994; isolated Rust 1.99.1
+diagnostic-sha256=e5b444f7b9aa942fe80f4f60e601101f033469c6d5296d2878c9ab7b24578df0
+verification results:: 2 verified, 1 errors
+Expected failure: shift_suffix_memmove postcondition; wrong-source overlap control.

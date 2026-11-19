@@ -1,0 +1,13 @@
+[package]
+license = "MIT"
+name = "blubber-encoder-traits"
+version = "0.0.0"
+edition = "2021"
+rust-version = "1.89.0"
+publish = false
+
+[workspace]
+
+[dependencies]
+blubber = { path = "../../crates/blubber", default-features = false, features = ["derive"] }
+blubber-core = { path = "../../crates/blubber-core", default-features = false }

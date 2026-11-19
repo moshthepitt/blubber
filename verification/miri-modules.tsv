@@ -1,0 +1,93 @@
+crate	module	classification	skip_tests	reason
+blubber	ancestor_pass	included	-	Both alias models; safe host fixtures.
+blubber-anchor	anchor	excluded	-	Requires adapter fixtures; production session code runs in the separate Miri anchor lane.
+blubber-anchor	anchor_cohort	excluded	-	Requires adapter SDK probes; native feature lanes run this fixture; Miri uses the production session subset.
+blubber-anchor	anchor_errors	excluded	-	Requires adapter SDK error fixtures; native feature lanes; Miri uses the production session subset.
+blubber-anchor	anchor_init	excluded	-	Requires adapter initialization fixtures; native feature lanes; Miri uses the production session subset.
+blubber-anchor	anchor_schema	excluded	-	Macro schema and wire fixtures run in workspace/all-features; the bounded Miri derive/storage cohort covers generated memory paths.
+blubber	codecs	included	-	Both alias models; safe host fixtures.
+blubber	corrupt_histories	included	-	Both alias models; safe host fixtures.
+blubber	corrupt_reads	included	-	Both alias models; safe host fixtures.
+blubber	cursor	included	-	Both alias models; safe host fixtures.
+blubber	derive_hygiene	excluded	-	Macro name and generic fixtures run in workspace/UI; the bounded Miri cohort exercises generated readers and writers.
+blubber	differential	excluded	-	Native property sweep; differential lane runs the full input matrix.
+blubber	encoder_primitives	included	-	Both alias models; safe host fixtures.
+blubber	entry	included	-	Both alias models; safe host fixtures.
+blubber	exhaustive_nested	included	-	Both alias models; safe host fixtures.
+blubber	exhaustive_record	excluded	-	Large bounded state matrix; dedicated exhaustive record lane; Miri uses the bounded storage/edit modules.
+blubber	exhaustive_typed_plan	excluded	-	Large bounded plan matrix; dedicated exhaustive typed_plan lane; Miri uses prepared/edit modules.
+blubber	fast_edits	included	-	Both alias models; safe host fixtures.
+blubber	fixed_derive	included	-	Both alias models; safe host fixtures.
+blubber	flat_schema	included	-	Both alias models; safe host fixtures.
+blubber	golden_demo	excluded	-	Wire fixture comparison in workspace; bounded Miri readers/storage cover the memory operations.
+blubber	identity	excluded	-	Native wire identity vectors; workspace lane.
+blubber	list_edits	included	-	Both alias models; safe host fixtures.
+blubber	map_edits	included	-	Both alias models; safe host fixtures.
+blubber	map_patch	included	-	Both alias models; safe host fixtures.
+blubber	migration	excluded	-	Migration fixture in workspace; bounded Miri relocation/storage cover the underlying buffers.
+blubber	owned	included	-	Both alias models; safe host fixtures.
+blubber	pinocchio_ui	excluded	-	Compiler fixtures launch subprocesses; Pinocchio UI and MSRV lanes.
+blubber	prepared	included	-	Both alias models; safe host fixtures.
+blubber	projections	included	-	Both alias models; safe host fixtures.
+blubber	readers	included	-	Both alias models; safe host fixtures.
+blubber	relocation	included	-	Both alias models; safe host fixtures.
+blubber	remove_into	included	-	Both alias models; safe host fixtures.
+blubber	review_hygiene	included	-	Both alias models; safe host fixtures.
+blubber	rewrite_kernel	included	-	Both alias models; safe host fixtures.
+blubber	schema_encode	included	-	Both alias models; safe host fixtures.
+blubber	schema_read	included	-	Both alias models; safe host fixtures.
+blubber	source_poison	included	invalid_byte_sweep_contains_writes_and_never_unwinds,envelope_byte_sweep_preserves_rejected_ingress	Directed source poison tests in both models; byte sweeps remain in the native workspace lane.
+blubber	storage	included	-	Both alias models; safe host fixtures.
+blubber	tour	excluded	-	Documentation and example comparisons in workspace/tour lanes; bounded Miri modules cover their storage operations.
+blubber	ui	excluded	-	Runs the compiler and reads diagnostic files; UI lane.
+blubber	verification_policy	included	-	Both alias models; safe host fixtures.
+blubber	writer_authority	excluded	-	Compiler subprocess fixture is disabled under Miri; workspace/UI lanes.
+blubber	writer_surface	included	-	Both alias models; safe host fixtures.
+blubber-core	directory	excluded	-	Native and Verus byte-algorithm controls; Miri cohort exercises storage/session ownership through blubber.
+blubber-core	directory_suffix	excluded	-	Native and Verus byte-algorithm controls; Miri cohort exercises storage/session ownership through blubber.
+blubber-core	encoder_replay	excluded	-	Native and Verus byte-algorithm controls; Miri cohort exercises storage/session ownership through blubber.
+blubber-core	fixed_list	excluded	-	Native and Verus byte-algorithm controls; Miri cohort exercises storage/session ownership through blubber.
+blubber-core	fixed_map	excluded	-	Native and Verus byte-algorithm controls; Miri cohort exercises storage/session ownership through blubber.
+blubber-core	fixed_walk	excluded	-	Native and Verus byte-algorithm controls; Miri cohort exercises storage/session ownership through blubber.
+blubber-core	indexed_insert	excluded	-	Native and Verus byte-algorithm controls; Miri cohort exercises storage/session ownership through blubber.
+blubber-core	indexed_map	excluded	-	Native and Verus byte-algorithm controls; Miri cohort exercises storage/session ownership through blubber.
+blubber-core	indexed_remove	excluded	-	Native and Verus byte-algorithm controls; Miri cohort exercises storage/session ownership through blubber.
+blubber-core	leaves	excluded	-	Native and Verus byte-algorithm controls; Miri cohort exercises storage/session ownership through blubber.
+blubber-core	list_layout	excluded	-	Native and Verus byte-algorithm controls; Miri cohort exercises storage/session ownership through blubber.
+blubber-core	map_layout	excluded	-	Native and Verus byte-algorithm controls; Miri cohort exercises storage/session ownership through blubber.
+blubber-core	moves	excluded	-	Native and Verus byte-algorithm controls; Miri cohort exercises storage/session ownership through blubber.
+blubber-core	patch_pass	excluded	-	Native and Verus byte-algorithm controls; Miri cohort exercises storage/session ownership through blubber.
+blubber-core	path_capacity	excluded	-	Native and Verus byte-algorithm controls; Miri cohort exercises storage/session ownership through blubber.
+blubber-core	prepared	excluded	-	Native and Verus byte-algorithm controls; Miri cohort exercises storage/session ownership through blubber.
+blubber-core	program_error	excluded	-	Native and Verus byte-algorithm controls; Miri cohort exercises storage/session ownership through blubber.
+blubber-core	replace_apply	excluded	-	Native and Verus byte-algorithm controls; Miri cohort exercises storage/session ownership through blubber.
+blubber-core	replace_plan	excluded	-	Native and Verus byte-algorithm controls; Miri cohort exercises storage/session ownership through blubber.
+blubber-core	rewrite	excluded	-	Native and Verus byte-algorithm controls; Miri cohort exercises storage/session ownership through blubber.
+blubber-core	search	excluded	-	Native and Verus byte-algorithm controls; Miri cohort exercises storage/session ownership through blubber.
+blubber-core	struct_layout	excluded	-	Native and Verus byte-algorithm controls; Miri cohort exercises storage/session ownership through blubber.
+blubber-core	utf8	excluded	-	Native and Verus byte-algorithm controls; Miri cohort exercises storage/session ownership through blubber.
+blubber-core	validation	excluded	-	Native and Verus byte-algorithm controls; Miri cohort exercises storage/session ownership through blubber.
+blubber-core	words	excluded	-	Native and Verus byte-algorithm controls; Miri cohort exercises storage/session ownership through blubber.
+blubber-derive	fixed	excluded	-	Native consumer compile checks execute cargo/rustc subprocesses.
+blubber-derive	schema_input	excluded	-	Native consumer compile checks execute cargo/rustc subprocesses.
+blubber-fuzz-replay	corrupt	excluded	-	Corpus replay runs in the native replay lane; Miri uses directed storage controls.
+blubber-fuzz-replay	replay	excluded	-	Corpus replay runs in the native replay lane; Miri uses directed storage controls.
+blubber-model	codec	excluded	-	Native property-based model oracle; Miri uses directed production storage controls.
+blubber-model	edits	excluded	-	Native property-based model oracle; Miri uses directed production storage controls.
+blubber-model	golden	excluded	-	Native property-based model oracle; Miri uses directed production storage controls.
+blubber-mollusk	borrow_resize	excluded	-	SBF ELF/runtime fixtures execute in the native Mollusk lanes.
+blubber-mollusk	bulk_copy	excluded	-	SBF ELF/runtime fixtures execute in the native Mollusk lanes.
+blubber-mollusk	policy	excluded	-	SBF ELF/runtime fixtures execute in the native Mollusk lanes.
+blubber-mollusk	funding_preflight	excluded	-	SBF ELF/runtime fixtures execute in the native Mollusk lanes.
+blubber-mollusk	identity	excluded	-	SBF ELF/runtime fixtures execute in the native Mollusk lanes.
+blubber-mollusk	initialize	excluded	-	SBF ELF/runtime fixtures execute in the native Mollusk lanes.
+blubber-mollusk	invocation_boundaries	excluded	-	SBF ELF/runtime fixtures execute in the native Mollusk lanes.
+blubber-mollusk	rent	excluded	-	SBF ELF/runtime fixtures execute in the native Mollusk lanes.
+blubber-mollusk	runtime_edits	excluded	-	SBF ELF/runtime fixtures execute in the native Mollusk lanes.
+blubber-mollusk	schema_digest	excluded	-	SBF ELF/runtime fixtures execute in the native Mollusk lanes.
+blubber-mollusk	scoped	excluded	-	SBF ELF/runtime fixtures execute in the native Mollusk lanes.
+blubber-mollusk	stack_matrix	excluded	-	SBF ELF/runtime fixtures execute in the native Mollusk lanes.
+blubber-mollusk	tour	excluded	-	SBF ELF/runtime fixtures execute in the native Mollusk lanes.
+blubber-mollusk	verification_policy	excluded	-	SBF ELF/runtime fixtures execute in the native Mollusk lanes.
+blubber-anchor	ui	excluded	-	Runs the compiler and reads diagnostic files; adapter UI lane.
+blubber-model	api	excluded	-	Independent API oracle runs through native differential and workspace tests.

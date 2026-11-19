@@ -1,0 +1,8 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.05s
+     Running unittests src/lib.rs (target/miri/x86_64-unknown-linux-gnu/debug/deps/blubber_shift_proof_toy-7b8ecca5c9800381)
+
+running 1 test
+test tests::suffix_moves ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.32s
+

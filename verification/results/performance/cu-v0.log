@@ -1,0 +1,39 @@
+Mollusk 0.16.2; SBF v1.53; overflow checks enabled; v0
+stage=cu; all cases passed
+scope=uninstrumented instructions; typed=open/load/edit/commit; lease_*=raw storage; Patch100=borrow + both passes
+runtime=Mollusk default features/sysvars; typed=Prepaid with default UpTo(0) or explicit growth budget; raw lease=declared policy/funding/refund; no allocator; fat LTO; codegen-units=1
+platform=rustc 1.89.0-dev; LLVM 20.1.7; cargo-build-sbf 4.0.0; host Rust 1.97.1
+sources-sha256=8d9f752a0e8e232752b9c7929f02a0f0176405383ec160f794bca34a0b1f0da3
+blubber_borrow_resize.so sha256=24eb6e32d6f2ea3180e98a1057603fb3ebb15866886afa3dc562e9ec68384629
+blubber_borrow_resize_runtime.so sha256=f408564b464de621029a360af779d4856fc989054d3cc798e9907a826a001a89
+blubber_cu_fixture.so sha256=b4ce2a0de636fe61be6861b860fe91dab1fdff7f7292828dd73c6c6c27b73dd8
+blubber_cu_fixture_metrics.so sha256=e6e1317176dc01c14fad32d5aaa6bdeba5677f3c731376d850cac0a82c0a3e49
+blubber_cu_matrix.so sha256=23d0b7a0985428a6ff05478c40677eb0ac60ca10ca2c3b267daaf49db161a5c2
+blubber_cu_matrix_alloc.so sha256=ec60b4b3635bffa8687d25ab43331eca2821e46dadce073ca2fc214a55bd48f1
+blubber_cu_matrix_alloc_metrics.so sha256=149ed6b5b490627f24296f7a0d87a0a18323352c43275aace53579b1d3ec5382
+blubber_cu_matrix_metrics.so sha256=01efa7ad28a05d3dacdd400a0888b6efa94f61ece26727d53ac39acd78dd70f7
+blubber_demo.so sha256=9b63b28cafe4b94afea81a9b72f9afa8031ab84c4b4010364341ef45ea1ba0a9
+lease rent CPIs: prepaid_same=0, topup_grow200=1, refund_shrink64=0, retained32=1; direct refund has no CPI
+lease resize calls: open=1 (10240 zeroed bytes), commit=1; retained storage=used+32 only for retained32
+case,whole_instruction_cu,before_len,after_len
+scalar,625,20,20
+string_same8,531,20,20
+string_grow32,845,20,44
+string_shrink1,823,20,13
+list100_push,1174,816,824
+pubkey100_append,1589,4016,4056
+pubkey100_middle,2602,4016,4056
+pubkey100_front,2161,4016,4056
+pubkey100_common_prefix,1600,4016,4056
+address100_append,1590,4016,4056
+address100_middle,2603,4016,4056
+address100_front,2162,4016,4056
+address100_common_prefix,1601,4016,4056
+patch100,1845,400,400
+validated_scalar,975,20,20
+validated_string_same8,724,20,20
+lease_prepaid_same,785,128,128
+lease_topup_grow200,2329,128,328
+lease_refund_shrink64,1079,128,64
+lease_retained32,2369,128,160
+tour,140368,146,118

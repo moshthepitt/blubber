@@ -1,0 +1,413 @@
+{
+  "encoding_version": 1,
+  "vectors": [
+    {
+      "name": "default",
+      "namespace": "account:DefaultState",
+      "epoch": 0,
+      "wire": {
+        "struct": [
+          {
+            "unsigned": 8
+          }
+        ]
+      },
+      "descriptor_hex": "01000000090800000001000000000000000100000000000000000000000000000000050000000108000000",
+      "identity_hex": "8528cc8e43e9f8fb"
+    },
+    {
+      "name": "unsigned",
+      "namespace": "test:state",
+      "epoch": 0,
+      "wire": {
+        "struct": [
+          {
+            "unsigned": 8
+          }
+        ]
+      },
+      "descriptor_hex": "01000000090800000001000000000000000100000000000000000000000000000000050000000108000000",
+      "identity_hex": "86f0caead22b3d56"
+    },
+    {
+      "name": "signed",
+      "namespace": "test:state",
+      "epoch": 0,
+      "wire": {
+        "struct": [
+          {
+            "signed": 8
+          }
+        ]
+      },
+      "descriptor_hex": "01000000090800000001000000000000000100000000000000000000000000000000050000000208000000",
+      "identity_hex": "4e34f3668fad4f7c"
+    },
+    {
+      "name": "bool",
+      "namespace": "test:state",
+      "epoch": 0,
+      "wire": {
+        "struct": [
+          "bool"
+        ]
+      },
+      "descriptor_hex": "010000000901000000010000000000000001000000000000000000000000000000000100000003",
+      "identity_hex": "14d6a3c42b1092ba"
+    },
+    {
+      "name": "byte",
+      "namespace": "test:state",
+      "epoch": 0,
+      "wire": {
+        "struct": [
+          {
+            "unsigned": 1
+          }
+        ]
+      },
+      "descriptor_hex": "01000000090100000001000000000000000100000000000000000000000000000000050000000101000000",
+      "identity_hex": "21488a890eddcd1b"
+    },
+    {
+      "name": "raw",
+      "namespace": "test:state",
+      "epoch": 0,
+      "wire": {
+        "struct": [
+          {
+            "raw": 8
+          }
+        ]
+      },
+      "descriptor_hex": "01000000090800000001000000000000000100000000000000000000000000000000050000000408000000",
+      "identity_hex": "409f8ddf8b3a7b9e"
+    },
+    {
+      "name": "first",
+      "namespace": "test:state",
+      "epoch": 0,
+      "wire": {
+        "struct": [
+          "str",
+          {
+            "unsigned": 8
+          },
+          "bool"
+        ]
+      },
+      "descriptor_hex": "01000000090900000002000000010000000300000000000000010000000000000000010000000501000000000000000000000000050000000108000000020000000001000000080000000100000003",
+      "identity_hex": "a90e6167da5206a5"
+    },
+    {
+      "name": "second",
+      "namespace": "test:state",
+      "epoch": 0,
+      "wire": {
+        "struct": [
+          {
+            "unsigned": 8
+          },
+          "str",
+          "bool"
+        ]
+      },
+      "descriptor_hex": "01000000090900000002000000010000000300000000000000000000000000000000050000000108000000010000000100000000000000000100000005020000000001000000080000000100000003",
+      "identity_hex": "a84b9a15e3d89cdc"
+    },
+    {
+      "name": "unsigned_key",
+      "namespace": "test:state",
+      "epoch": 0,
+      "wire": {
+        "struct": [
+          {
+            "map": {
+              "key": {
+                "domain": "unsigned",
+                "width": 2
+              },
+              "value": "str"
+            }
+          }
+        ]
+      },
+      "descriptor_hex": "01000000090000000000000000010000000100000000000000010000000000000000110000000801060000000102000000000100000005",
+      "identity_hex": "3056107ffe75a690"
+    },
+    {
+      "name": "signed_key",
+      "namespace": "test:state",
+      "epoch": 0,
+      "wire": {
+        "struct": [
+          {
+            "map": {
+              "key": {
+                "domain": "signed",
+                "width": 2
+              },
+              "value": "str"
+            }
+          }
+        ]
+      },
+      "descriptor_hex": "01000000090000000000000000010000000100000000000000010000000000000000110000000801060000000202000000000100000005",
+      "identity_hex": "c58624513d15cc10"
+    },
+    {
+      "name": "bool_key",
+      "namespace": "test:state",
+      "epoch": 0,
+      "wire": {
+        "struct": [
+          {
+            "map": {
+              "key": {
+                "domain": "bool",
+                "width": 1
+              },
+              "value": {
+                "unsigned": 1
+              }
+            }
+          }
+        ]
+      },
+      "descriptor_hex": "0100000009000000000000000001000000010000000000000001000000000000000015000000080106000000030100000000050000000101000000",
+      "identity_hex": "49f5f8bda21043fd"
+    },
+    {
+      "name": "raw_key",
+      "namespace": "test:state",
+      "epoch": 0,
+      "wire": {
+        "struct": [
+          {
+            "map": {
+              "key": {
+                "domain": "raw",
+                "width": 2
+              },
+              "value": "str"
+            }
+          }
+        ]
+      },
+      "descriptor_hex": "01000000090000000000000000010000000100000000000000010000000000000000110000000801060000000402000000000100000005",
+      "identity_hex": "b330c2a216fe0e14"
+    },
+    {
+      "name": "nested",
+      "namespace": "test:state",
+      "epoch": 0,
+      "wire": {
+        "struct": [
+          {
+            "list": {
+              "option": "str"
+            }
+          }
+        ]
+      },
+      "descriptor_hex": "010000000900000000000000000100000001000000000000000100000000000000000d00000007010700000006010100000005",
+      "identity_hex": "c030c48c392d863c"
+    },
+    {
+      "name": "renamed",
+      "namespace": "test:state",
+      "epoch": 0,
+      "wire": {
+        "struct": [
+          {
+            "unsigned": 8
+          }
+        ]
+      },
+      "descriptor_hex": "01000000090800000001000000000000000100000000000000000000000000000000050000000108000000",
+      "identity_hex": "86f0caead22b3d56"
+    },
+    {
+      "name": "epoch",
+      "namespace": "test:state",
+      "epoch": 1,
+      "wire": {
+        "struct": [
+          {
+            "unsigned": 8
+          }
+        ]
+      },
+      "descriptor_hex": "01000000090800000001000000000000000100000000000000000000000000000000050000000108000000",
+      "identity_hex": "a197474c19ff1373"
+    },
+    {
+      "name": "unicode",
+      "namespace": "ledger:λ\u0000v1",
+      "epoch": 4294967295,
+      "wire": {
+        "struct": [
+          {
+            "unsigned": 8
+          }
+        ]
+      },
+      "descriptor_hex": "01000000090800000001000000000000000100000000000000000000000000000000050000000108000000",
+      "identity_hex": "8f246d9764603b5c"
+    },
+    {
+      "name": "override",
+      "namespace": "account:Override",
+      "epoch": 0,
+      "wire": {
+        "struct": [
+          {
+            "signed": 8
+          }
+        ]
+      },
+      "descriptor_hex": "01000000090800000001000000000000000100000000000000000000000000000000050000000208000000",
+      "identity_hex": "01020304050607ff",
+      "override": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        255
+      ]
+    },
+    {
+      "name": "alias",
+      "namespace": "test:state",
+      "epoch": 0,
+      "wire": {
+        "struct": [
+          {
+            "unsigned": 8
+          }
+        ]
+      },
+      "descriptor_hex": "01000000090800000001000000000000000100000000000000000000000000000000050000000108000000",
+      "identity_hex": "86f0caead22b3d56"
+    },
+    {
+      "name": "padded",
+      "namespace": "test:state",
+      "epoch": 0,
+      "wire": {
+        "struct": [
+          {
+            "struct": [
+              "bool",
+              {
+                "unsigned": 8
+              }
+            ]
+          }
+        ]
+      },
+      "descriptor_hex": "0100000009090000000100000000000000010000000000000000000000000000000039000000090900000002000000000000000200000000000000000000000000000000010000000301000000000100000001000000050000000108000000",
+      "identity_hex": "65e31a8780001966"
+    },
+    {
+      "name": "packed",
+      "namespace": "test:state",
+      "epoch": 0,
+      "wire": {
+        "struct": [
+          {
+            "struct": [
+              "bool",
+              {
+                "unsigned": 8
+              }
+            ]
+          }
+        ]
+      },
+      "descriptor_hex": "0100000009090000000100000000000000010000000000000000000000000000000039000000090900000002000000000000000200000000000000000000000000000000010000000301000000000100000001000000050000000108000000",
+      "identity_hex": "65e31a8780001966"
+    },
+    {
+      "name": "generic",
+      "namespace": "test:state",
+      "epoch": 0,
+      "wire": {
+        "struct": [
+          {
+            "struct": [
+              {
+                "unsigned": 8
+              }
+            ]
+          }
+        ]
+      },
+      "descriptor_hex": "0100000009080000000100000000000000010000000000000000000000000000000027000000090800000001000000000000000100000000000000000000000000000000050000000108000000",
+      "identity_hex": "a61953ebfb7127f2"
+    },
+    {
+      "name": "bytes",
+      "namespace": "test:state",
+      "epoch": 0,
+      "wire": {
+        "struct": [
+          {
+            "list": {
+              "unsigned": 1
+            }
+          }
+        ]
+      },
+      "descriptor_hex": "010000000900000000000000000100000001000000000000000100000000000000000b0000000701050000000101000000",
+      "identity_hex": "c5eaeac4c65a3cc2"
+    },
+    {
+      "name": "list",
+      "namespace": "test:state",
+      "epoch": 0,
+      "wire": {
+        "struct": [
+          {
+            "list": {
+              "unsigned": 1
+            }
+          }
+        ]
+      },
+      "descriptor_hex": "010000000900000000000000000100000001000000000000000100000000000000000b0000000701050000000101000000",
+      "identity_hex": "c5eaeac4c65a3cc2"
+    },
+    {
+      "name": "pubkey",
+      "namespace": "test:state",
+      "epoch": 0,
+      "wire": {
+        "struct": [
+          {
+            "raw": 32
+          }
+        ]
+      },
+      "descriptor_hex": "01000000092000000001000000000000000100000000000000000000000000000000050000000420000000",
+      "identity_hex": "9f9d2bf6c16701de"
+    },
+    {
+      "name": "array",
+      "namespace": "test:state",
+      "epoch": 0,
+      "wire": {
+        "struct": [
+          {
+            "raw": 32
+          }
+        ]
+      },
+      "descriptor_hex": "01000000092000000001000000000000000100000000000000000000000000000000050000000420000000",
+      "identity_hex": "9f9d2bf6c16701de"
+    }
+  ]
+}

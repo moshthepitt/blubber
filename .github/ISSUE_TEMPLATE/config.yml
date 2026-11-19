@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Private reporting
+    url: https://github.com/moshthepitt/blubber/blob/v0.1.0/SECURITY.md
+    about: Use GitHub private reporting for issues covered by this policy.

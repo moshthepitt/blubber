@@ -1,0 +1,24 @@
+[package]
+license = "MIT"
+name = "blubber-shift-proof-toy"
+version = "0.0.0"
+edition = "2021"
+rust-version = "1.89.0"
+publish = false
+
+# The smoke runner copies this standalone fixture under the root's .tmp/.
+[workspace]
+
+[lib]
+crate-type = ["rlib"]
+
+[dependencies]
+vstd = { version = "0.0.0-2026-10-18-0147", default-features = false }
+
+[package.metadata.verus]
+verify = true
+
+[lints.rust]
+unsafe_code = "deny"
+missing_docs = "deny"
+unexpected_cfgs = { level = "warn", check-cfg = ["cfg(verus_only)"] }

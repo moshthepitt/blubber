@@ -1,0 +1,15 @@
+name: Proof or assurance gap
+description: Report a claim that needs a check or a correction
+body:
+  - type: input
+    id: claim
+    attributes:
+      label: Claim in ASSURANCE.md
+    validations:
+      required: true
+  - type: textarea
+    id: example
+    attributes:
+      label: Counterexample or missing case
+    validations:
+      required: true

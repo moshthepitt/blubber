@@ -1,0 +1,2 @@
+Toolchain kani-arithmetic; lane exit=0; checked by scripts/check-toolchains.sh
+raw-sha256=1bf93677b991873bbb7d4eb335e26538b3e3249af367ca5a9d92f186a03c262f

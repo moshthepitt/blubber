@@ -1,0 +1,14 @@
+adapter/scoped_copies.rs	-
+adapter/read_escape.rs	lifetime may not live long enough
+adapter/edit_escape.rs	lifetime may not live long enough
+adapter/prefix_across_edit.rs	cannot borrow `*state` as mutable
+adapter/read_across_edit.rs	requires unique access
+adapter/variable_constraint.rs	no field `text`
+adapter/no_deref_mut.rs	cannot assign to data in dereference
+adapter/no_guard_escape.rs	lifetime may not live long enough
+adapter/cpi_handles_are_scoped.rs	-
+adapter/cpi_mut_handle_escape.rs	not general enough
+adapter/cpi_read_handle_escape.rs	not general enough
+adapter/prefix_across_cpi.rs	cannot borrow `*state` as mutable
+adapter/read_during_cpi.rs	cannot borrow `*state` as mutable
+adapter/edit_during_cpi.rs	requires unique access

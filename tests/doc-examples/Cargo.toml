@@ -1,0 +1,18 @@
+[package]
+name = "blubber-doc-examples"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish = false
+
+[features]
+default = ["derive", "pinocchio"]
+derive = ["blubber/derive"]
+pinocchio = ["blubber/pinocchio"]
+
+[dependencies]
+blubber = { workspace = true, features = ["alloc"] }
+
+[lints]
+workspace = true

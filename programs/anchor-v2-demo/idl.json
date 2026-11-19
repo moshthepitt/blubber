@@ -1,0 +1,321 @@
+{
+  "address": "Gue5TpR6sstSyGhSvmVeH2TeKqBYYqmXpRCacB9jAk8u",
+  "metadata": {
+    "name": "blubber_anchor_v2_demo",
+    "version": "0.1.0",
+    "spec": "0.1.0"
+  },
+  "instructions": [
+    {
+      "name": "allocation",
+      "docs": [
+        "Reserves or explicitly trims using the explicit funding API."
+      ],
+      "discriminator": [
+        3
+      ],
+      "accounts": [
+        {
+          "name": "state",
+          "docs": [
+            "Authenticated mutable state without retained funding bindings."
+          ],
+          "writable": true
+        },
+        {
+          "name": "authority",
+          "docs": [
+            "Authorizes edits and any net rent transfer."
+          ],
+          "writable": true,
+          "signer": true,
+          "relations": [
+            "state"
+          ]
+        },
+        {
+          "name": "system_program",
+          "docs": [
+            "Executable System Program passed explicitly to Store."
+          ],
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "reserve",
+          "type": "u32"
+        },
+        {
+          "name": "trim",
+          "type": "bool"
+        }
+      ]
+    },
+    {
+      "name": "append",
+      "docs": [
+        "Appends with explicit headroom, TopUp funding and one commit."
+      ],
+      "discriminator": [
+        2
+      ],
+      "accounts": [
+        {
+          "name": "state",
+          "docs": [
+            "Authenticated state with genuine exclusive SDK exclusion."
+          ],
+          "writable": true
+        },
+        {
+          "name": "authority",
+          "docs": [
+            "Copied fixed-prefix address constraint authenticates this signer."
+          ],
+          "writable": true,
+          "signer": true,
+          "relations": [
+            "state"
+          ]
+        },
+        {
+          "name": "system_program",
+          "docs": [
+            "Executable System Program for a possible final rent deficit."
+          ],
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "text",
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "name": "initialize",
+      "docs": [
+        "Initializes borrowed input after Anchor has allocated the signer target."
+      ],
+      "discriminator": [
+        0
+      ],
+      "accounts": [
+        {
+          "name": "payer",
+          "docs": [
+            "Pays creation rent and becomes the stored authority."
+          ],
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "state",
+          "docs": [
+            "New until the handler supplies its borrowed initializer."
+          ],
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "docs": [
+            "Executable System Program used by creation."
+          ],
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "reserve",
+          "type": "u32"
+        }
+      ]
+    },
+    {
+      "name": "read",
+      "docs": [
+        "Checks a scalar and validates the variable children through a read scope."
+      ],
+      "discriminator": [
+        4
+      ],
+      "accounts": [
+        {
+          "name": "state",
+          "docs": [
+            "Shared SDK exclusion lasts until this wrapper is dropped."
+          ]
+        }
+      ],
+      "args": [
+        {
+          "name": "expected",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "relay",
+      "docs": [
+        "Completes an edit before invoking the generated readonly callee."
+      ],
+      "discriminator": [
+        5
+      ],
+      "accounts": [
+        {
+          "name": "state",
+          "docs": [
+            "Exclusive guard is released only during the scoped CPI."
+          ],
+          "writable": true
+        },
+        {
+          "name": "authority",
+          "docs": [
+            "Authorizes the edit before CPI."
+          ],
+          "signer": true,
+          "relations": [
+            "state"
+          ]
+        },
+        {
+          "name": "program",
+          "docs": [
+            "Executable callee, supplied in the transaction's account list."
+          ]
+        }
+      ],
+      "args": [
+        {
+          "name": "expected",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "reuse",
+      "docs": [
+        "Creates the PDA or preserves the selected policy on reuse."
+      ],
+      "discriminator": [
+        1
+      ],
+      "accounts": [
+        {
+          "name": "payer",
+          "docs": [
+            "Authorizes reuse as well as creation."
+          ],
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "state",
+          "docs": [
+            "Existing state must have this exact physical allocation on reuse."
+          ],
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  115,
+                  116,
+                  97,
+                  116,
+                  101
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "payer"
+              }
+            ]
+          }
+        },
+        {
+          "name": "system_program",
+          "docs": [
+            "Executable System Program used only when creation is needed."
+          ],
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "reserve",
+          "type": "u32"
+        }
+      ]
+    }
+  ],
+  "events": [
+    {
+      "name": "Settled",
+      "discriminator": [
+        232,
+        210,
+        40,
+        17,
+        142,
+        124,
+        145,
+        238
+      ]
+    }
+  ],
+  "errors": [
+    {
+      "code": 6000,
+      "name": "UnexpectedCounter",
+      "msg": "Unexpected state counter"
+    }
+  ],
+  "types": [
+    {
+      "name": "Settled",
+      "docs": [
+        "Actual allocation and net rent settlement from one successful edit."
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "used",
+            "docs": [
+              "Canonical envelope and root length."
+            ],
+            "type": "u32"
+          },
+          {
+            "name": "storage",
+            "docs": [
+              "Actual physical length after best-effort trim."
+            ],
+            "type": "u32"
+          },
+          {
+            "name": "topped_up",
+            "docs": [
+              "Lamports transferred by the final funding CPI."
+            ],
+            "type": "u64"
+          },
+          {
+            "name": "refunded",
+            "docs": [
+              "Lamports returned to an explicitly selected recipient."
+            ],
+            "type": "u64"
+          }
+        ]
+      }
+    }
+  ]
+}

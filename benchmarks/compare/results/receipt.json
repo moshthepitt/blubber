@@ -1,0 +1,581 @@
+{
+  "artifacts": {
+    "target/release-prep-checks/calibration-v0/blubber_cu_fixture.so": "debca2695adf0d09d0b8425ca6db2ef4a7ef096a6760f478dda5f4b00741d5e6",
+    "target/release-prep-checks/calibration-v3/blubber_cu_fixture.so": "1a01cfe5185ed57914bd8d50a74e329305d27294da06546b71548d01ca8c6fbc",
+    "target/release-prep-checks/heap-v0/compare_program.so": "58c9f7a7542468e74e81b8fdbaf5e6ce6cca9b180d3a98842ee5c9a5a03bcd54",
+    "target/release-prep-checks/heap-v0/compare_star.so": "bbb89ca26071655cbfb6dd66bbb4b8c73f8f80088742f4dbda7a9498278b1cee",
+    "target/release-prep-checks/heap-v3/compare_program.so": "a473eb144287a42409d1b949bd4770f5382fa9fe596d2551c296cc4798066ccf",
+    "target/release-prep-checks/heap-v3/compare_star.so": "0b8849a0258a6d0a2572406e831ea8aad28c80686b3bbfe74f809dcbba345835",
+    "target/release-prep-checks/v0/compare_program.so": "0179fd9e3323718a32f9e773bfb2f11752e4e7e3ace800441e88d067bd2b1479",
+    "target/release-prep-checks/v0/compare_star.so": "f41009fc51c0aa943131ef8baa69067f635ea3b88ed6d11ba0d330333377932b",
+    "target/release-prep-checks/v3/compare_program.so": "f990f5655ffa8fd042ef057543f807667243610f6d89a65ddb105af42fe7deeb",
+    "target/release-prep-checks/v3/compare_star.so": "51d12172e27f2e824f6de19d4cadb1dfc6cb927e9fea24e4dfd9b0a253238f50"
+  },
+  "competitors": {
+    "anchor_slab": {
+      "capabilities": {
+        "formal": "Kani capacity/length harnesses and Miri regression suites present; not rerun",
+        "pinocchio_anchor_v2": "native SDK / native Slab<H,T>",
+        "realloc": "resize_to_capacity(n+1) before push; truncate retains capacity; rent prepaid",
+        "storage": "growable contiguous slab of fixed-size entries",
+        "validation": "owner, discriminator, header/tail extent and alignment, len<=capacity; genuine SDK exclusion; default guardrails on"
+      },
+      "commit": "7d68eb325f297013a5e0903ddd698fe26218f5a3",
+      "commit_date": "2026-10-22",
+      "license": "Apache-2.0",
+      "package": "anchor-lang",
+      "source_sha256": "c541acd8535b1c47a38624d10a3c90ed2356ece172c4da04ac7fabd2a1909355",
+      "unsafe_syntax": {
+        "count": 112,
+        "files": {
+          "src/accounts/serialized_account.rs": 7,
+          "src/accounts/signer.rs": 2,
+          "src/accounts/slab.rs": 34,
+          "src/accounts/slab_hooks.rs": 1,
+          "src/accounts/sysvar.rs": 2,
+          "src/context.rs": 1,
+          "src/context_cpi.rs": 8,
+          "src/cpi.rs": 20,
+          "src/cursor.rs": 3,
+          "src/event.rs": 1,
+          "src/hash.rs": 1,
+          "src/loader.rs": 4,
+          "src/pod.rs": 6,
+          "src/program.rs": 9,
+          "src/testing/account_buffer.rs": 9,
+          "src/testing/sbf_input_buffer.rs": 2,
+          "src/traits.rs": 2
+        }
+      },
+      "upstream_head": {
+        "api": "https://api.github.com/repos/otter-sec/anchor/commits?sha=anchor-next&per_page=1",
+        "branch": "anchor-next",
+        "commit": "602813667faa88d1c31b554a018a3fcc1b21e548",
+        "date": "2026-10-30T12:56:03Z",
+        "url": "https://github.com/otter-sec/anchor/commit/602813667faa88d1c31b554a018a3fcc1b21e548"
+      },
+      "url": "https://github.com/otter-sec/anchor/tree/7d68eb325f297013a5e0903ddd698fe26218f5a3",
+      "version": "2.0.0-rc.2"
+    },
+    "blubber": {
+      "capabilities": {
+        "formal": "Verus kernel; bounded Kani typed checks (repository gates)",
+        "pinocchio_anchor_v2": "native Pinocchio / Anchor v2 lazy and checked managed lifecycle (git pin; T5/T5b receipts)",
+        "realloc": "default Max lease (+10240), commit trims",
+        "storage": "unsized borrowed",
+        "validation": "raw reads: whole root including key order; authenticated mutable Store loads: lazy touched checks (D21 default)"
+      },
+      "commit": "cecc6280885b62abd225c566b1f57a836f169d51",
+      "commit_date": "2026-11-14",
+      "license": null,
+      "package": "blubber",
+      "source_sha256": "959f69b7f87aaf97f22a69a2ef277855e01aeecb5af4ae050050009ae8471779",
+      "unsafe_syntax": {
+        "count": 0,
+        "files": {}
+      },
+      "url": "../README.md",
+      "version": "0.1.0"
+    },
+    "blubber_checked": {
+      "capabilities": {
+        "formal": "Verus kernel; bounded Kani typed checks (repository gates)",
+        "pinocchio_anchor_v2": "native Pinocchio / Anchor v2 lazy and checked managed lifecycle (git pin; T5/T5b receipts)",
+        "realloc": "default Max lease (+10240), commit trims",
+        "storage": "unsized borrowed",
+        "validation": "explicit checked reads and mutable ingress: complete root, strict keys and UTF-8"
+      },
+      "commit": "cecc6280885b62abd225c566b1f57a836f169d51",
+      "commit_date": "2026-11-14",
+      "license": null,
+      "package": "blubber",
+      "source_sha256": "959f69b7f87aaf97f22a69a2ef277855e01aeecb5af4ae050050009ae8471779",
+      "unsafe_syntax": {
+        "count": 0,
+        "files": {}
+      },
+      "url": "../README.md",
+      "version": "0.1.0"
+    },
+    "blubber_trusted": {
+      "capabilities": {
+        "formal": "Verus kernel; bounded Kani typed checks (repository gates)",
+        "pinocchio_anchor_v2": "native Pinocchio / Anchor v2 lazy and checked managed lifecycle (git pin; T5/T5b receipts)",
+        "realloc": "default Max lease (+10240), commit trims",
+        "storage": "unsized borrowed",
+        "validation": "O(1) envelope/discriminator; caller guarantees valid program-written bytes; touched paths checked lazily"
+      },
+      "commit": "cecc6280885b62abd225c566b1f57a836f169d51",
+      "commit_date": "2026-11-14",
+      "license": null,
+      "package": "blubber",
+      "source_sha256": "959f69b7f87aaf97f22a69a2ef277855e01aeecb5af4ae050050009ae8471779",
+      "unsafe_syntax": {
+        "count": 0,
+        "files": {}
+      },
+      "url": "../README.md",
+      "version": "0.1.0"
+    },
+    "borsh": {
+      "capabilities": {
+        "formal": "No proof inventory found in inspected crate",
+        "pinocchio_anchor_v2": "raw bytes / raw bytes",
+        "realloc": "exact resize, encode on mutation",
+        "storage": "dynamic owned",
+        "validation": "whole decode; lengths and UTF-8; default BTreeMap does not enforce input key order"
+      },
+      "commit": "fe778bec428d5b44cd4922c896af0a7c39a863dd",
+      "commit_date": "2026-08-26",
+      "license": "MIT OR Apache-2.0",
+      "package": "borsh",
+      "source_sha256": "bb32d70ec6e4c11b617ebf4959724981f830a36e99e2edb9d0288185c376fc8f",
+      "unsafe_syntax": {
+        "count": 6,
+        "files": {
+          "src/de/mod.rs": 4,
+          "src/schema/container_ext/max_size.rs": 2
+        }
+      },
+      "upstream_head": {
+        "api": "https://api.github.com/repos/near/borsh-rs/commits?per_page=1",
+        "commit": "0baa89c98d90d26f185801708469e0a81f78aaf5",
+        "date": "2026-10-23T00:44:44Z",
+        "url": "https://github.com/near/borsh-rs/commit/0baa89c98d90d26f185801708469e0a81f78aaf5"
+      },
+      "url": "https://github.com/near/borsh-rs/tree/fe778bec428d5b44cd4922c896af0a7c39a863dd",
+      "version": "1.8.1"
+    },
+    "bytemuck": {
+      "capabilities": {
+        "formal": "No formal proof inventory found in inspected crate",
+        "pinocchio_anchor_v2": "raw bytes / raw bytes",
+        "realloc": "none; full capacity reserved",
+        "storage": "fixed 1000",
+        "validation": "POD size/alignment; adapter length<=1000; u64 has no invalid bit patterns"
+      },
+      "commit": "f363643e951a7ac9e4b9921de982f2b0918902e3",
+      "commit_date": "2026-07-19",
+      "license": "Zlib OR Apache-2.0 OR MIT",
+      "package": "bytemuck",
+      "source_sha256": "754b36255689091cb3c642b90749c8a4a85aab2cd36d15e54616166a6b409eeb",
+      "unsafe_syntax": {
+        "count": 332,
+        "files": {
+          "src/allocation.rs": 41,
+          "src/anybitpattern.rs": 4,
+          "src/checked.rs": 16,
+          "src/contiguous.rs": 4,
+          "src/internal.rs": 29,
+          "src/lib.rs": 35,
+          "src/must.rs": 5,
+          "src/no_uninit.rs": 30,
+          "src/pod.rs": 37,
+          "src/pod_in_option.rs": 14,
+          "src/transparent.rs": 14,
+          "src/zeroable.rs": 67,
+          "src/zeroable_in_option.rs": 36
+        }
+      },
+      "upstream_head": {
+        "api": "https://api.github.com/repos/Lokathor/bytemuck/commits?per_page=1",
+        "commit": "ea3616110b0134e9991fdb66be8892dbc427c5ac",
+        "date": "2026-09-11T20:47:50Z",
+        "url": "https://github.com/Lokathor/bytemuck/commit/ea3616110b0134e9991fdb66be8892dbc427c5ac"
+      },
+      "url": "https://github.com/Lokathor/bytemuck/tree/f363643e951a7ac9e4b9921de982f2b0918902e3",
+      "version": "1.25.2"
+    },
+    "critbit": {
+      "capabilities": {
+        "formal": "Fuzz targets present; no formal proof inventory found",
+        "pinocchio_anchor_v2": "raw bytes / raw bytes",
+        "realloc": "none; full capacity reserved",
+        "storage": "fixed 1000 leaves + 2000 tree nodes; projected 128-bit keys",
+        "validation": "configured POD size/alignment; short inputs can panic; links and prefixes unchecked"
+      },
+      "commit": "f8ecce2c50c12e6b8731b59ecdb3a1f43769a094",
+      "commit_date": "2024-08-23",
+      "license": "MIT OR Apache-2.0",
+      "package": "lib-sokoban",
+      "source_sha256": "a6822c80293207316289d55d1fc4dac19644b62e5687f7ca2ecd8cba3cb3ede0",
+      "unsafe_syntax": {
+        "count": 29,
+        "files": {
+          "src/avl_tree.rs": 6,
+          "src/critbit.rs": 6,
+          "src/deque.rs": 4,
+          "src/hash_table.rs": 5,
+          "src/node_allocator.rs": 2,
+          "src/red_black_tree.rs": 6
+        }
+      },
+      "upstream_head": {
+        "api": "https://api.github.com/repos/Ellipsis-Labs/sokoban/commits?per_page=1",
+        "commit": "f8ecce2c50c12e6b8731b59ecdb3a1f43769a094",
+        "date": "2024-08-23T18:37:14Z",
+        "url": "https://github.com/Ellipsis-Labs/sokoban/commit/f8ecce2c50c12e6b8731b59ecdb3a1f43769a094"
+      },
+      "url": "https://github.com/Ellipsis-Labs/sokoban/tree/f8ecce2c50c12e6b8731b59ecdb3a1f43769a094",
+      "version": "0.3.3"
+    },
+    "light": {
+      "capabilities": {
+        "formal": "No container proof inventory found in inspected crate",
+        "pinocchio_anchor_v2": "raw bytes / raw bytes",
+        "realloc": "none; capacity fixed at initialization",
+        "storage": "fixed runtime 1000",
+        "validation": "extent/alignment and length<=capacity; u64 has no invalid bit patterns"
+      },
+      "commit": "b0fe3f2ed33acaf4b2ad7e025a2dccefdd0e0515",
+      "commit_date": "2026-01-20",
+      "license": "Apache-2.0",
+      "package": "light-zero-copy",
+      "source_sha256": "ce57deaf82663e32e3e520985af0100755d5bfce28f34d357a10e9cc9d767b6e",
+      "unsafe_syntax": {
+        "count": 0,
+        "files": {}
+      },
+      "upstream_head": {
+        "api": "https://api.github.com/repos/Lightprotocol/light-protocol/commits?per_page=1",
+        "commit": "bec7b830250126e1f6a2993872599f45af6e0aa0",
+        "date": "2026-10-14T19:44:12Z",
+        "url": "https://github.com/Lightprotocol/light-protocol/commit/bec7b830250126e1f6a2993872599f45af6e0aa0"
+      },
+      "url": "https://github.com/Lightprotocol/light-protocol/tree/b0fe3f2ed33acaf4b2ad7e025a2dccefdd0e0515",
+      "version": "0.6.0"
+    },
+    "manifest": {
+      "capabilities": {
+        "formal": "Certora hypertree/RB specs with proof-build modeling; not rerun",
+        "pinocchio_anchor_v2": "raw bytes / raw bytes",
+        "realloc": "exact one-slot realloc on exhaustion; free-list reuse; no shrink; rent prepaid",
+        "storage": "growable arena; 56-byte slots, 32-byte caller header",
+        "validation": "caller header geometry only; native tree constructor assumes a well-formed graph"
+      },
+      "commit": "5f4272ec067459dc6ed761331319678edcd25f51",
+      "commit_date": "2026-10-22",
+      "license": "GPLv3 (repository LICENSE; declared lib/LICENSE absent)",
+      "license_sha256": "8b1ba204bb69a0ade2bfcf65ef294a920f6bb361b317dba43c7ef29d96332b9b",
+      "package": "hypertree",
+      "source_sha256": "355688ae85c10bfb225d081b947cad33dec33efd0817e4de66373b5a79564fad",
+      "unsafe_syntax": {
+        "count": 7,
+        "files": {
+          "src/free_list.rs": 1,
+          "src/red_black_tree.rs": 1,
+          "src/utils.rs": 5
+        }
+      },
+      "upstream_head": {
+        "api": "https://api.github.com/repos/Bonasa-Tech/manifest/commits?per_page=1",
+        "commit": "ff62612100a82a46babb646fc312ab9ceea041db",
+        "date": "2026-10-29T00:47:16Z",
+        "url": "https://github.com/Bonasa-Tech/manifest/commit/ff62612100a82a46babb646fc312ab9ceea041db"
+      },
+      "url": "https://github.com/CKS-Systems/manifest/tree/5f4272ec067459dc6ed761331319678edcd25f51",
+      "version": "1.2.0"
+    },
+    "manifest_checked": {
+      "capabilities": {
+        "formal": "same Certora evidence; upstream graph validator measured",
+        "pinocchio_anchor_v2": "raw bytes / raw bytes",
+        "realloc": "same exact slot growth/free-list policy as native view",
+        "storage": "growable arena; 56-byte slots, 32-byte caller header",
+        "validation": "upstream reachable-graph bounds/alignment, cycles, parents, colors, black height, ordering and cached max; equal keys allowed; free list remains caller trust"
+      },
+      "commit": "5f4272ec067459dc6ed761331319678edcd25f51",
+      "commit_date": "2026-10-22",
+      "license": "GPLv3 (repository LICENSE; declared lib/LICENSE absent)",
+      "license_sha256": "8b1ba204bb69a0ade2bfcf65ef294a920f6bb361b317dba43c7ef29d96332b9b",
+      "package": "hypertree",
+      "source_sha256": "355688ae85c10bfb225d081b947cad33dec33efd0817e4de66373b5a79564fad",
+      "unsafe_syntax": {
+        "count": 7,
+        "files": {
+          "src/free_list.rs": 1,
+          "src/red_black_tree.rs": 1,
+          "src/utils.rs": 5
+        }
+      },
+      "upstream_head": {
+        "api": "https://api.github.com/repos/Bonasa-Tech/manifest/commits?per_page=1",
+        "commit": "ff62612100a82a46babb646fc312ab9ceea041db",
+        "date": "2026-10-29T00:47:16Z",
+        "url": "https://github.com/Bonasa-Tech/manifest/commit/ff62612100a82a46babb646fc312ab9ceea041db"
+      },
+      "url": "https://github.com/CKS-Systems/manifest/tree/5f4272ec067459dc6ed761331319678edcd25f51",
+      "version": "1.2.0"
+    },
+    "pinapod": {
+      "capabilities": {
+        "formal": "Kani including generated compact schemas; Miri present; not rerun",
+        "pinocchio_anchor_v2": "raw bytes / raw bytes",
+        "realloc": "count changes resize; W3 String<17> has a fixed 18-byte slot",
+        "storage": "compact vector bound 1001; W3 fixed 17-byte strings",
+        "validation": "whole compact schema: lengths, allocation geometry and UTF-8"
+      },
+      "commit": "c1b89cc19693f0952eb9990e23e48acbd992f2c7",
+      "commit_date": "2026-10-21",
+      "license": "Apache-2.0",
+      "package": "pinapod",
+      "source_sha256": "5ed7a2280d3ef5f594f2c577a2746f54ba47564ebdcc8389bc4e51fbc1dbc14e",
+      "unsafe_syntax": {
+        "count": 84,
+        "files": {
+          "src/pod/bool.rs": 1,
+          "src/pod/float.rs": 3,
+          "src/pod/option.rs": 8,
+          "src/pod/string.rs": 10,
+          "src/pod/vec.rs": 9,
+          "src/pod/wincode.rs": 13,
+          "src/traits.rs": 40
+        }
+      },
+      "upstream_head": {
+        "api": "https://api.github.com/repos/pina-rs/pinapod/commits?per_page=1",
+        "commit": "23ec6efe815ac5ebe2678be0fcc5db65c2b5d855",
+        "date": "2026-10-29T16:28:19Z",
+        "url": "https://github.com/pina-rs/pinapod/commit/23ec6efe815ac5ebe2678be0fcc5db65c2b5d855"
+      },
+      "url": "https://github.com/pina-rs/pinapod/tree/c1b89cc19693f0952eb9990e23e48acbd992f2c7",
+      "version": "0.4.7"
+    },
+    "sokoban": {
+      "capabilities": {
+        "formal": "No formal proof inventory found in inspected crate",
+        "pinocchio_anchor_v2": "raw bytes / raw bytes",
+        "realloc": "none; full capacity reserved",
+        "storage": "fixed 1000",
+        "validation": "POD size/alignment; no tree-link, color, or key-order validation"
+      },
+      "commit": "f8ecce2c50c12e6b8731b59ecdb3a1f43769a094",
+      "commit_date": "2024-08-23",
+      "license": "MIT OR Apache-2.0",
+      "package": "lib-sokoban",
+      "source_sha256": "a6822c80293207316289d55d1fc4dac19644b62e5687f7ca2ecd8cba3cb3ede0",
+      "unsafe_syntax": {
+        "count": 29,
+        "files": {
+          "src/avl_tree.rs": 6,
+          "src/critbit.rs": 6,
+          "src/deque.rs": 4,
+          "src/hash_table.rs": 5,
+          "src/node_allocator.rs": 2,
+          "src/red_black_tree.rs": 6
+        }
+      },
+      "upstream_head": {
+        "api": "https://api.github.com/repos/Ellipsis-Labs/sokoban/commits?per_page=1",
+        "commit": "f8ecce2c50c12e6b8731b59ecdb3a1f43769a094",
+        "date": "2024-08-23T18:37:14Z",
+        "url": "https://github.com/Ellipsis-Labs/sokoban/commit/f8ecce2c50c12e6b8731b59ecdb3a1f43769a094"
+      },
+      "url": "https://github.com/Ellipsis-Labs/sokoban/tree/f8ecce2c50c12e6b8731b59ecdb3a1f43769a094",
+      "version": "0.3.3"
+    },
+    "star_frame": {
+      "capabilities": {
+        "formal": "Miri tests present; no formal proof inventory found",
+        "pinocchio_anchor_v2": "native older SDK / custom integration",
+        "realloc": "native SDK resizes during edits; no reserve",
+        "storage": "unsized borrowed",
+        "validation": "fixed bit patterns and geometry; indexed children/UTF-8 checked on access; no map key-order scan"
+      },
+      "commit": "6936d582a942760b67728059be651473645ee099",
+      "commit_date": "2026-02-26",
+      "license": "Apache-2.0",
+      "package": "star_frame",
+      "source_sha256": "a3d445b3c17bcf5aefc8d115654c0b57587ed9fcaabd497ea6ae6b2c92e021d4",
+      "unsafe_syntax": {
+        "count": 164,
+        "files": {
+          "src/account_set/account.rs": 5,
+          "src/account_set/cpi_const_wrapper.rs": 1,
+          "src/account_set/impls/account_info.rs": 2,
+          "src/account_set/impls/array.rs": 1,
+          "src/account_set/impls/boxed.rs": 1,
+          "src/account_set/impls/option.rs": 1,
+          "src/account_set/impls/unit.rs": 1,
+          "src/account_set/impls/vec.rs": 1,
+          "src/account_set/mod.rs": 2,
+          "src/account_set/rest.rs": 1,
+          "src/account_set/sysvar.rs": 2,
+          "src/align1.rs": 6,
+          "src/cpi.rs": 11,
+          "src/data_types/key_for.rs": 2,
+          "src/data_types/optional_key_for.rs": 2,
+          "src/data_types/packed_value.rs": 3,
+          "src/data_types/unit_system.rs": 4,
+          "src/unsize/impls/checked.rs": 7,
+          "src/unsize/impls/list.rs": 11,
+          "src/unsize/impls/map.rs": 5,
+          "src/unsize/impls/remaining_bytes.rs": 8,
+          "src/unsize/impls/unsized_list.rs": 30,
+          "src/unsize/impls/unsized_map.rs": 3,
+          "src/unsize/mod.rs": 5,
+          "src/unsize/test_helpers.rs": 7,
+          "src/unsize/tests/struct_test.rs": 1,
+          "src/unsize/wrapper.rs": 36,
+          "src/util.rs": 5
+        }
+      },
+      "upstream_head": {
+        "api": "https://api.github.com/repos/staratlasmeta/star_frame/commits?per_page=1",
+        "commit": "d13c1f13a76e7fb106ab62876989899b300e4727",
+        "date": "2026-10-27T16:50:11Z",
+        "url": "https://github.com/staratlasmeta/star_frame/commit/d13c1f13a76e7fb106ab62876989899b300e4727"
+      },
+      "url": "https://github.com/staratlasmeta/star_frame/tree/6936d582a942760b67728059be651473645ee099",
+      "version": "0.30.0"
+    },
+    "wincode": {
+      "capabilities": {
+        "formal": "Audits/fuzzing documented; no formal proof inventory found",
+        "pinocchio_anchor_v2": "raw bytes / raw bytes",
+        "realloc": "exact resize and encode; numeric slice set in place",
+        "storage": "dynamic owned/borrowed",
+        "validation": "checked lengths, allocation limits, UTF-8, alignment; borrowed numeric map assumes key order"
+      },
+      "commit": "2d9cc7a2e974d726ced31ac1ad3c645113f685f0",
+      "commit_date": "2026-10-19",
+      "license": "Apache-2.0",
+      "package": "wincode",
+      "source_sha256": "7cf7b4c67c34dfe9f0c7ec2861786a39addc31f974f2825d7e166b855478234a",
+      "unsafe_syntax": {
+        "count": 457,
+        "files": {
+          "src/config/mod.rs": 1,
+          "src/config/serde.rs": 3,
+          "src/io/cursor.rs": 43,
+          "src/io/limit_reader.rs": 10,
+          "src/io/mod.rs": 36,
+          "src/io/slice.rs": 62,
+          "src/io/std_read.rs": 9,
+          "src/io/std_write.rs": 13,
+          "src/io/test_util.rs": 1,
+          "src/io/vec.rs": 13,
+          "src/len.rs": 4,
+          "src/schema/adapter.rs": 9,
+          "src/schema/containers.rs": 43,
+          "src/schema/external/bumpalo.rs": 12,
+          "src/schema/external/bv.rs": 3,
+          "src/schema/external/bytes.rs": 4,
+          "src/schema/external/ecow.rs": 4,
+          "src/schema/external/smallvec.rs": 5,
+          "src/schema/external/uuid.rs": 3,
+          "src/schema/external/zerocopy.rs": 3,
+          "src/schema/impls.rs": 119,
+          "src/schema/int_encoding.rs": 10,
+          "src/schema/mod.rs": 47
+        }
+      },
+      "upstream_head": {
+        "api": "https://api.github.com/repos/anza-xyz/wincode/commits?per_page=1",
+        "commit": "70a904c555c7d07f8e72eb02b886f695577b475e",
+        "date": "2026-10-28T17:45:07Z",
+        "url": "https://github.com/anza-xyz/wincode/commit/70a904c555c7d07f8e72eb02b886f695577b475e"
+      },
+      "url": "https://github.com/anza-xyz/wincode/tree/2d9cc7a2e974d726ced31ac1ad3c645113f685f0",
+      "version": "0.6.3"
+    },
+    "zeropod": {
+      "capabilities": {
+        "formal": "Kani field-move harness and Miri present; not rerun",
+        "pinocchio_anchor_v2": "raw bytes / raw bytes",
+        "realloc": "owned replacement; exact resize before root edit",
+        "storage": "unsized borrowed",
+        "validation": "whole value lengths and UTF-8; map ordering not checked"
+      },
+      "commit": "8a607caf7861c932786e3f7d8759a7c066671b25",
+      "commit_date": "2026-10-14",
+      "license": "Apache-2.0",
+      "package": "zeropod",
+      "source_sha256": "9c1c6e3b6f90da77534f6abd0a31f6c46b81eb27c6f0aaaf69896816d8bf5975",
+      "unsafe_syntax": {
+        "count": 173,
+        "files": {
+          "src/__private.rs": 15,
+          "src/array.rs": 29,
+          "src/bytes.rs": 5,
+          "src/count.rs": 6,
+          "src/edit.rs": 8,
+          "src/heap.rs": 32,
+          "src/lib.rs": 14,
+          "src/scalar.rs": 34,
+          "src/tagged.rs": 14,
+          "src/tuple.rs": 7,
+          "src/wincode.rs": 6,
+          "src/zc.rs": 3
+        }
+      },
+      "upstream_head": {
+        "api": "https://api.github.com/repos/blueshift-gg/zeropod/commits?per_page=1",
+        "commit": "8a607caf7861c932786e3f7d8759a7c066671b25",
+        "date": "2026-10-14T06:30:44Z",
+        "url": "https://github.com/blueshift-gg/zeropod/commit/8a607caf7861c932786e3f7d8759a7c066671b25"
+      },
+      "url": "https://github.com/blueshift-gg/zeropod/tree/8a607caf7861c932786e3f7d8759a7c066671b25",
+      "version": "0.4.0"
+    }
+  },
+  "compute_unit_limit": 40000000,
+  "handwritten_unsafe_syntax": 0,
+  "harness_sha256": "c535f85ea62a7678c3b920284a2e3e846282d36705f57110f39470974fcccbad",
+  "heap_limit": 262144,
+  "lock_sha256": "5a737067cb436fb3f10fed7ce36b90385fc17a2aa12991a5ee4a74a0f539333e",
+  "platform_tools": "v1.53",
+  "profile": {
+    "codegen-units": 1,
+    "lto": "fat",
+    "overflow-checks": true
+  },
+  "recorded_utc": "2026-11-14T14:04:33.780805+00:00",
+  "reports": {
+    "README.md": "28f3dc43dc433e62a01545badedf2ea7dce94cbf58f867380b07527b39f869e7",
+    "benchmarks/COMPARE.md": "0306ced80d1424b4bd5fb8a81e2c8c1ff9d9af8cf3a09246152b3b48bf77066b",
+    "benchmarks/compare/ERGONOMICS.md": "4cc3322aca9b55a89d16cb5ace5bcec0cc28938f06a100b1ff594b3ea6697df1",
+    "benchmarks/compare/GAPS.md": "caab59569662872797dd1a7951f272ce951624ad91bd7f6d7e86b8796af68f1f",
+    "crates/blubber-anchor/README.md": "6e6d6516f6c92a5a4ba71f50808d5bf17cca5ab1010fa3b54e67b2aa5f3921ee"
+  },
+  "result_files": {
+    "benchmarks/compare/results/all.csv": "17e32edcb6d29ede6d7638e191dc5401bc72c4faa209321c2f63776e4e568457",
+    "benchmarks/compare/results/all.json": "7e690160131fd16afb54b83f72ccade76ccf32d9ebb3b30537f56c9dfdb0349b",
+    "benchmarks/compare/results/calibration-v0.json": "1c273ca127035e882734f9c428ec88d371154de0c47e3662fb54d1cd15e9d8a8",
+    "benchmarks/compare/results/calibration-v3.json": "3c9985677101904b31be6d100a9f058ed144e5fc801bc9586ac879a854dc1c17",
+    "benchmarks/compare/results/heap-v0.json": "51fd89f2e29d9788a1e498bbc6b74db45826540b9bd93a987adaf6d739ad4f64",
+    "benchmarks/compare/results/heap-v3.json": "bb9ee47e52e76263e6ba387bb975fd69bf464e036d63f0d70c678a0e72673505",
+    "benchmarks/compare/results/v0.json": "b4d3e2e305228940f3ea3d81b6894297f393660bd43b06f6d2bdaa97a35bf53a",
+    "benchmarks/compare/results/v3.json": "194f21feb25c17dca85e8a21476a71707d3443b243f3ecbab6d37ad0300aeba6"
+  },
+  "rows": 1740,
+  "sbf_features": {
+    "calibration": "mixed-operations",
+    "compare-program": "baselines,zeropod,wincode,pinapod,light,anchor-slab,manifest",
+    "compare-star": "native entrypoint; shared helpers no-entrypoint",
+    "diagnostic": "heap"
+  },
+  "source_sha256": "25cdb6b94093b5397b636118332042d33b0adbc113548a1a6efe43dabe5b3de4",
+  "tools": {
+    "cargo-build-sbf": {
+      "path": "sbf-builder/cargo-build-sbf",
+      "sha256": "e558dedd0c6da98a3b8befd9a666fd3c779324743b021c1a69d1e7de2ef78aaf",
+      "version": "cargo-build-sbf 4.0.0\nplatform-tools v1.53\nrustc 1.89.0"
+    },
+    "host-cargo": {
+      "path": "host-rust/bin/cargo",
+      "sha256": "828980723df339d62434390e9fb8ef8831036583343ae2316b7ab5646b5c1953",
+      "version": "cargo 1.97.1 (c980f4866 2026-06-30)"
+    },
+    "host-rustc": {
+      "path": "host-rust/bin/rustc",
+      "sha256": "d3a664c970a9fd8361b64194861bebc1ae37b9054e5ee3400dc1c9e691797eea",
+      "version": "rustc 1.97.1 (8bab26f4f 2026-07-14)"
+    },
+    "sbf-rustc": {
+      "path": "platform-tools/rust/bin/rustc",
+      "sha256": "d95c95b68e321ad76634e1fd26b0a7c20ccdbae9ad9ca733f3ae2f2b4a0b6002",
+      "version": "rustc 1.89.0-dev"
+    }
+  }
+}

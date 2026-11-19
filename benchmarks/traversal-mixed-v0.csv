@@ -1,0 +1,391 @@
+case,layout,n,opcode,common_prefix,common_idle,whole,read_result,common_delta,whole_per_item,common_delta_per_item,slope_10_100,slope_100_1000,enforcement,heap_bytes
+list_fixed_n0_ref_common_idle_plain,list_fixed,0,0,0,607,607,0,0,,,0.000000,0.000000,oracle/idle checks enforced,0
+list_fixed_n0_ref_iter_plain,list_fixed,0,6,0,607,796,0,189,,,10.000000,10.000000,enforced,0
+list_fixed_n0_ref_try_iter_plain,list_fixed,0,7,0,607,817,0,210,,,26.000000,26.000000,enforced,0
+list_fixed_n0_mut_common_idle_plain,list_fixed,0,20,0,932,932,0,0,,,0.000000,0.000000,oracle/idle checks enforced,0
+list_fixed_n0_mut_iter_plain,list_fixed,0,26,0,932,1079,0,147,,,19.000000,19.000000,enforced,0
+list_fixed_n0_mut_try_iter_plain,list_fixed,0,27,0,932,1060,0,128,,,27.000000,27.000000,enforced,0
+list_fixed_n0_cursor_get_plain,list_fixed,0,30,0,932,975,0,43,,,13.000000,13.000000,enforced,0
+list_fixed_n0_cursor_set_plain,list_fixed,0,31,0,932,975,0,43,,,7.000000,7.000000,enforced,0
+list_fixed_n0_empty_callback_plain,list_fixed,0,32,0,932,1120,0,188,,,24.000000,24.000000,enforced,0
+list_fixed_n0_callback_get_plain,list_fixed,0,33,0,932,1128,0,196,,,15.000000,15.000000,enforced,0
+list_fixed_n0_callback_equal_set_plain,list_fixed,0,34,0,932,1119,0,187,,,7.000000,7.000000,enforced,0
+list_fixed_n0_manual_get_mut_set_plain,list_fixed,0,70,0,932,926,0,-6,,,863.000000,863.000000,oracle/idle checks enforced,0
+list_fixed_n1_ref_common_idle_plain,list_fixed,1,0,0,607,607,0,0,607.000000,0.000000,0.000000,0.000000,oracle/idle checks enforced,0
+list_fixed_n1_ref_iter_plain,list_fixed,1,6,0,607,809,17,202,809.000000,202.000000,10.000000,10.000000,enforced,0
+list_fixed_n1_ref_try_iter_plain,list_fixed,1,7,0,607,860,17,253,860.000000,253.000000,26.000000,26.000000,enforced,0
+list_fixed_n1_mut_common_idle_plain,list_fixed,1,20,0,932,932,0,0,932.000000,0.000000,0.000000,0.000000,oracle/idle checks enforced,0
+list_fixed_n1_mut_iter_plain,list_fixed,1,26,0,932,1098,17,166,1098.000000,166.000000,19.000000,19.000000,enforced,0
+list_fixed_n1_mut_try_iter_plain,list_fixed,1,27,0,932,1103,17,171,1103.000000,171.000000,27.000000,27.000000,enforced,0
+list_fixed_n1_cursor_get_plain,list_fixed,1,30,0,932,991,17,59,991.000000,59.000000,13.000000,13.000000,enforced,0
+list_fixed_n1_cursor_set_plain,list_fixed,1,31,0,932,983,0,51,983.000000,51.000000,7.000000,7.000000,enforced,0
+list_fixed_n1_empty_callback_plain,list_fixed,1,32,0,932,1148,0,216,1148.000000,216.000000,24.000000,24.000000,enforced,0
+list_fixed_n1_callback_get_plain,list_fixed,1,33,0,932,1144,17,212,1144.000000,212.000000,15.000000,15.000000,enforced,0
+list_fixed_n1_callback_equal_set_plain,list_fixed,1,34,0,932,1128,0,196,1128.000000,196.000000,7.000000,7.000000,enforced,0
+list_fixed_n1_manual_get_mut_set_plain,list_fixed,1,70,0,932,1784,0,852,1784.000000,852.000000,863.000000,863.000000,oracle/idle checks enforced,0
+list_fixed_n10_ref_common_idle_plain,list_fixed,10,0,0,607,607,0,0,60.700000,0.000000,0.000000,0.000000,oracle/idle checks enforced,0
+list_fixed_n10_ref_iter_plain,list_fixed,10,6,0,607,899,170,292,89.900000,29.200000,10.000000,10.000000,enforced,0
+list_fixed_n10_ref_try_iter_plain,list_fixed,10,7,0,607,1094,170,487,109.400000,48.700000,26.000000,26.000000,enforced,0
+list_fixed_n10_mut_common_idle_plain,list_fixed,10,20,0,932,932,0,0,93.200000,0.000000,0.000000,0.000000,oracle/idle checks enforced,0
+list_fixed_n10_mut_iter_plain,list_fixed,10,26,0,932,1269,170,337,126.900000,33.700000,19.000000,19.000000,enforced,0
+list_fixed_n10_mut_try_iter_plain,list_fixed,10,27,0,932,1346,170,414,134.600000,41.400000,27.000000,27.000000,enforced,0
+list_fixed_n10_cursor_get_plain,list_fixed,10,30,0,932,1108,170,176,110.800000,17.600000,13.000000,13.000000,enforced,0
+list_fixed_n10_cursor_set_plain,list_fixed,10,31,0,932,1046,0,114,104.600000,11.400000,7.000000,7.000000,enforced,0
+list_fixed_n10_empty_callback_plain,list_fixed,10,32,0,932,1364,0,432,136.400000,43.200000,24.000000,24.000000,enforced,0
+list_fixed_n10_callback_get_plain,list_fixed,10,33,0,932,1279,170,347,127.900000,34.700000,15.000000,15.000000,enforced,0
+list_fixed_n10_callback_equal_set_plain,list_fixed,10,34,0,932,1192,0,260,119.200000,26.000000,7.000000,7.000000,enforced,0
+list_fixed_n10_manual_get_mut_set_plain,list_fixed,10,70,0,932,9559,0,8627,955.900000,862.700000,863.000000,863.000000,oracle/idle checks enforced,0
+list_fixed_n100_ref_common_idle_plain,list_fixed,100,0,0,607,607,0,0,6.070000,0.000000,0.000000,0.000000,oracle/idle checks enforced,0
+list_fixed_n100_ref_iter_plain,list_fixed,100,6,0,607,1799,1700,1192,17.990000,11.920000,10.000000,10.000000,enforced,0
+list_fixed_n100_ref_try_iter_plain,list_fixed,100,7,0,607,3434,1700,2827,34.340000,28.270000,26.000000,26.000000,enforced,0
+list_fixed_n100_mut_common_idle_plain,list_fixed,100,20,0,932,932,0,0,9.320000,0.000000,0.000000,0.000000,oracle/idle checks enforced,0
+list_fixed_n100_mut_iter_plain,list_fixed,100,26,0,932,2979,1700,2047,29.790000,20.470000,19.000000,19.000000,enforced,0
+list_fixed_n100_mut_try_iter_plain,list_fixed,100,27,0,932,3776,1700,2844,37.760000,28.440000,27.000000,27.000000,enforced,0
+list_fixed_n100_cursor_get_plain,list_fixed,100,30,0,932,2278,1700,1346,22.780000,13.460000,13.000000,13.000000,enforced,0
+list_fixed_n100_cursor_set_plain,list_fixed,100,31,0,932,1676,0,744,16.760000,7.440000,7.000000,7.000000,enforced,0
+list_fixed_n100_empty_callback_plain,list_fixed,100,32,0,932,3524,0,2592,35.240000,25.920000,24.000000,24.000000,enforced,0
+list_fixed_n100_callback_get_plain,list_fixed,100,33,0,932,2629,1700,1697,26.290000,16.970000,15.000000,15.000000,enforced,0
+list_fixed_n100_callback_equal_set_plain,list_fixed,100,34,0,932,1822,0,890,18.220000,8.900000,7.000000,7.000000,enforced,0
+list_fixed_n100_manual_get_mut_set_plain,list_fixed,100,70,0,932,87229,0,86297,872.290000,862.970000,863.000000,863.000000,oracle/idle checks enforced,0
+list_fixed_n1000_ref_common_idle_plain,list_fixed,1000,0,0,607,607,0,0,0.607000,0.000000,0.000000,0.000000,oracle/idle checks enforced,0
+list_fixed_n1000_ref_iter_plain,list_fixed,1000,6,0,607,10799,17000,10192,10.799000,10.192000,10.000000,10.000000,enforced,0
+list_fixed_n1000_ref_try_iter_plain,list_fixed,1000,7,0,607,26834,17000,26227,26.834000,26.227000,26.000000,26.000000,enforced,0
+list_fixed_n1000_mut_common_idle_plain,list_fixed,1000,20,0,932,932,0,0,0.932000,0.000000,0.000000,0.000000,oracle/idle checks enforced,0
+list_fixed_n1000_mut_iter_plain,list_fixed,1000,26,0,932,20079,17000,19147,20.079000,19.147000,19.000000,19.000000,enforced,0
+list_fixed_n1000_mut_try_iter_plain,list_fixed,1000,27,0,932,28076,17000,27144,28.076000,27.144000,27.000000,27.000000,enforced,0
+list_fixed_n1000_cursor_get_plain,list_fixed,1000,30,0,932,13978,17000,13046,13.978000,13.046000,13.000000,13.000000,enforced,0
+list_fixed_n1000_cursor_set_plain,list_fixed,1000,31,0,932,7976,0,7044,7.976000,7.044000,7.000000,7.000000,enforced,0
+list_fixed_n1000_empty_callback_plain,list_fixed,1000,32,0,932,25124,0,24192,25.124000,24.192000,24.000000,24.000000,enforced,0
+list_fixed_n1000_callback_get_plain,list_fixed,1000,33,0,932,16129,17000,15197,16.129000,15.197000,15.000000,15.000000,enforced,0
+list_fixed_n1000_callback_equal_set_plain,list_fixed,1000,34,0,932,8122,0,7190,8.122000,7.190000,7.000000,7.000000,enforced,0
+list_fixed_n1000_manual_get_mut_set_plain,list_fixed,1000,70,0,932,863929,0,862997,863.929000,862.997000,863.000000,863.000000,oracle/idle checks enforced,0
+list_indexed_n0_ref_common_idle_plain,list_indexed,0,0,0,838,838,0,0,,,12.677778,14.750000,E4 locked whole target,0
+list_indexed_n0_ref_iter_plain,list_indexed,0,6,0,838,1105,0,267,,,244.677778,246.750000,E4 locked whole target,0
+list_indexed_n0_ref_try_iter_plain,list_indexed,0,7,0,838,1094,0,256,,,256.677778,258.750000,E4 locked whole target,0
+list_indexed_n0_mut_common_idle_plain,list_indexed,0,20,0,1197,1197,0,0,,,12.677778,14.750000,oracle/idle checks enforced,0
+list_indexed_n0_mut_iter_plain,list_indexed,0,26,0,1197,1332,0,135,,,245.677778,247.750000,E4 locked whole target,0
+list_indexed_n0_mut_try_iter_plain,list_indexed,0,27,0,1197,1321,0,124,,,252.677778,254.750000,E4 locked whole target,0
+list_indexed_n0_cursor_get_plain,list_indexed,0,30,0,1197,1504,0,307,,,193.677778,195.750000,enforced,0
+list_indexed_n0_cursor_set_plain,list_indexed,0,31,0,1197,1574,0,377,,,111.677778,113.750000,enforced,0
+list_indexed_n0_callback_get_plain,list_indexed,0,33,0,1197,1487,0,290,,,189.677778,191.750000,enforced,0
+list_indexed_n0_callback_equal_set_plain,list_indexed,0,34,0,1197,1487,0,290,,,97.677778,99.750000,enforced,0
+list_indexed_n0_fill_plain,list_indexed,0,63,0,1197,1748,0,551,,,44.677778,46.778889,enforced,0
+list_indexed_n0_rewrite_plain,list_indexed,0,64,0,1197,1743,0,546,,,104.244444,106.667778,enforced,0
+list_indexed_n1_ref_common_idle_plain,list_indexed,1,0,0,980,980,0,0,980.000000,0.000000,12.677778,14.750000,E4 locked whole target,0
+list_indexed_n1_ref_iter_plain,list_indexed,1,6,0,980,1523,9465881151554944896,543,1523.000000,543.000000,244.677778,246.750000,E4 locked whole target,0
+list_indexed_n1_ref_try_iter_plain,list_indexed,1,7,0,980,1543,9465881151554944896,563,1543.000000,563.000000,256.677778,258.750000,E4 locked whole target,0
+list_indexed_n1_mut_common_idle_plain,list_indexed,1,20,0,1339,1339,0,0,1339.000000,0.000000,12.677778,14.750000,oracle/idle checks enforced,0
+list_indexed_n1_mut_iter_plain,list_indexed,1,26,0,1339,1715,9465881151554944896,376,1715.000000,376.000000,245.677778,247.750000,E4 locked whole target,0
+list_indexed_n1_mut_try_iter_plain,list_indexed,1,27,0,1339,1718,9465881151554944896,379,1718.000000,379.000000,252.677778,254.750000,E4 locked whole target,0
+list_indexed_n1_cursor_get_plain,list_indexed,1,30,0,1339,1876,853,537,1876.000000,537.000000,193.677778,195.750000,enforced,0
+list_indexed_n1_cursor_set_plain,list_indexed,1,31,0,1339,1927,0,588,1927.000000,588.000000,111.677778,113.750000,enforced,0
+list_indexed_n1_callback_get_plain,list_indexed,1,33,0,1339,1869,853,530,1869.000000,530.000000,189.677778,191.750000,enforced,0
+list_indexed_n1_callback_equal_set_plain,list_indexed,1,34,0,1339,1867,0,528,1867.000000,528.000000,97.677778,99.750000,enforced,0
+list_indexed_n1_fill_plain,list_indexed,1,63,0,1339,2308,0,969,2308.000000,969.000000,44.677778,46.778889,enforced,0
+list_indexed_n1_rewrite_plain,list_indexed,1,64,0,1339,2388,0,1049,2388.000000,1049.000000,104.244444,106.667778,enforced,0
+list_indexed_n10_ref_common_idle_plain,list_indexed,10,0,0,1207,1207,0,0,120.700000,0.000000,12.677778,14.750000,E4 locked whole target,0
+list_indexed_n10_ref_iter_plain,list_indexed,10,6,0,1207,3862,4532868687759558259,2655,386.200000,265.500000,244.677778,246.750000,E4 locked whole target,0
+list_indexed_n10_ref_try_iter_plain,list_indexed,10,7,0,1207,3990,4532868687759558259,2783,399.000000,278.300000,256.677778,258.750000,E4 locked whole target,0
+list_indexed_n10_mut_common_idle_plain,list_indexed,10,20,0,1566,1566,0,0,156.600000,0.000000,12.677778,14.750000,oracle/idle checks enforced,0
+list_indexed_n10_mut_iter_plain,list_indexed,10,26,0,1566,4063,4532868687759558259,2497,406.300000,249.700000,245.677778,247.750000,E4 locked whole target,0
+list_indexed_n10_mut_try_iter_plain,list_indexed,10,27,0,1566,4129,4532868687759558259,2563,412.900000,256.300000,252.677778,254.750000,E4 locked whole target,0
+list_indexed_n10_cursor_get_plain,list_indexed,10,30,0,1566,3756,8530,2190,375.600000,219.000000,193.677778,195.750000,enforced,0
+list_indexed_n10_cursor_set_plain,list_indexed,10,31,0,1566,3045,0,1479,304.500000,147.900000,111.677778,113.750000,enforced,0
+list_indexed_n10_callback_get_plain,list_indexed,10,33,0,1566,3713,8530,2147,371.300000,214.700000,189.677778,191.750000,enforced,0
+list_indexed_n10_callback_equal_set_plain,list_indexed,10,34,0,1566,2859,0,1293,285.900000,129.300000,97.677778,99.750000,enforced,0
+list_indexed_n10_fill_plain,list_indexed,10,63,0,1566,2896,0,1330,289.600000,133.000000,44.677778,46.778889,enforced,0
+list_indexed_n10_rewrite_plain,list_indexed,10,64,0,1566,3480,0,1914,348.000000,191.400000,104.244444,106.667778,enforced,0
+list_indexed_n100_ref_common_idle_plain,list_indexed,100,0,0,2348,2348,0,0,23.480000,0.000000,12.677778,14.750000,E4 locked whole target,0
+list_indexed_n100_ref_iter_plain,list_indexed,100,6,0,2348,25883,10940025302301940512,23535,258.830000,235.350000,244.677778,246.750000,E4 locked whole target,0
+list_indexed_n100_ref_try_iter_plain,list_indexed,100,7,0,2348,27091,10940025302301940512,24743,270.910000,247.430000,256.677778,258.750000,E4 locked whole target,0
+list_indexed_n100_mut_common_idle_plain,list_indexed,100,20,0,2707,2707,0,0,27.070000,0.000000,12.677778,14.750000,oracle/idle checks enforced,0
+list_indexed_n100_mut_iter_plain,list_indexed,100,26,0,2707,26174,10940025302301940512,23467,261.740000,234.670000,245.677778,247.750000,E4 locked whole target,0
+list_indexed_n100_mut_try_iter_plain,list_indexed,100,27,0,2707,26870,10940025302301940512,24163,268.700000,241.630000,252.677778,254.750000,E4 locked whole target,0
+list_indexed_n100_cursor_get_plain,list_indexed,100,30,0,2707,21187,85300,18480,211.870000,184.800000,193.677778,195.750000,enforced,0
+list_indexed_n100_cursor_set_plain,list_indexed,100,31,0,2707,13096,0,10389,130.960000,103.890000,111.677778,113.750000,enforced,0
+list_indexed_n100_callback_get_plain,list_indexed,100,33,0,2707,20784,85300,18077,207.840000,180.770000,189.677778,191.750000,enforced,0
+list_indexed_n100_callback_equal_set_plain,list_indexed,100,34,0,2707,11650,0,8943,116.500000,89.430000,97.677778,99.750000,enforced,0
+list_indexed_n100_fill_plain,list_indexed,100,63,0,2707,6917,0,4210,69.170000,42.100000,44.677778,46.778889,enforced,0
+list_indexed_n100_rewrite_plain,list_indexed,100,64,0,2707,12862,0,10155,128.620000,101.550000,104.244444,106.667778,enforced,0
+list_indexed_n1000_ref_common_idle_plain,list_indexed,1000,0,0,15623,15623,0,0,15.623000,0.000000,12.677778,14.750000,E4 locked whole target,0
+list_indexed_n1000_ref_iter_plain,list_indexed,1000,6,0,15623,247958,9054122472809010804,232335,247.958000,232.335000,244.677778,246.750000,E4 locked whole target,0
+list_indexed_n1000_ref_try_iter_plain,list_indexed,1000,7,0,15623,259966,9054122472809010804,244343,259.966000,244.343000,256.677778,258.750000,E4 locked whole target,0
+list_indexed_n1000_mut_common_idle_plain,list_indexed,1000,20,0,15982,15982,0,0,15.982000,0.000000,12.677778,14.750000,oracle/idle checks enforced,0
+list_indexed_n1000_mut_iter_plain,list_indexed,1000,26,0,15982,249149,9054122472809010804,233167,249.149000,233.167000,245.677778,247.750000,E4 locked whole target,0
+list_indexed_n1000_mut_try_iter_plain,list_indexed,1000,27,0,15982,256145,9054122472809010804,240163,256.145000,240.163000,252.677778,254.750000,E4 locked whole target,0
+list_indexed_n1000_cursor_get_plain,list_indexed,1000,30,0,15982,197362,853000,181380,197.362000,181.380000,193.677778,195.750000,enforced,0
+list_indexed_n1000_cursor_set_plain,list_indexed,1000,31,0,15982,115471,0,99489,115.471000,99.489000,111.677778,113.750000,enforced,0
+list_indexed_n1000_callback_get_plain,list_indexed,1000,33,0,15982,193359,853000,177377,193.359000,177.377000,189.677778,191.750000,enforced,0
+list_indexed_n1000_callback_equal_set_plain,list_indexed,1000,34,0,15982,101425,0,85443,101.425000,85.443000,97.677778,99.750000,enforced,0
+list_indexed_n1000_fill_plain,list_indexed,1000,63,0,15982,49018,0,33036,49.018000,33.036000,44.677778,46.778889,enforced,0
+list_indexed_n1000_rewrite_plain,list_indexed,1000,64,0,15982,108863,0,92881,108.863000,92.881000,104.244444,106.667778,enforced,0
+map_fixed_n0_ref_common_idle_plain,map_fixed,0,0,0,716,716,0,0,,,21.000000,21.000000,oracle/idle checks enforced,0
+map_fixed_n0_ref_iter_plain,map_fixed,0,6,0,716,1045,0,329,,,90.000000,90.000000,enforced,0
+map_fixed_n0_ref_try_iter_plain,map_fixed,0,7,0,716,1015,0,299,,,91.000000,91.000000,enforced,0
+map_fixed_n0_mut_common_idle_plain,map_fixed,0,20,0,1040,1040,0,0,,,21.000000,21.000000,oracle/idle checks enforced,0
+map_fixed_n0_mut_iter_plain,map_fixed,0,26,0,1040,1481,0,441,,,130.000000,130.000000,"tracked, not enforced (user decision 2026-10-29)",0
+map_fixed_n0_mut_try_iter_plain,map_fixed,0,27,0,1040,1580,0,540,,,135.000000,135.000000,"tracked, not enforced (user decision 2026-10-29)",0
+map_fixed_n0_cursor_get_plain,map_fixed,0,30,0,1040,1524,0,484,,,88.000000,88.000000,enforced,0
+map_fixed_n0_cursor_set_plain,map_fixed,0,31,0,1040,1522,0,482,,,109.000000,109.000000,"tracked, not enforced (user decision 2026-10-30)",0
+map_fixed_n0_empty_callback_plain,map_fixed,0,32,0,1040,1579,0,539,,,81.000000,81.000000,enforced,0
+map_fixed_n0_callback_get_plain,map_fixed,0,33,0,1040,1585,0,545,,,72.000000,72.000000,enforced,0
+map_fixed_n0_callback_equal_set_plain,map_fixed,0,34,0,1040,1583,0,543,,,64.000000,64.000000,enforced,0
+map_fixed_n1_ref_common_idle_plain,map_fixed,1,0,0,757,757,0,0,757.000000,0.000000,21.000000,21.000000,oracle/idle checks enforced,0
+map_fixed_n1_ref_iter_plain,map_fixed,1,6,0,757,1210,1195,453,1210.000000,453.000000,90.000000,90.000000,enforced,0
+map_fixed_n1_ref_try_iter_plain,map_fixed,1,7,0,757,1184,1195,427,1184.000000,427.000000,91.000000,91.000000,enforced,0
+map_fixed_n1_mut_common_idle_plain,map_fixed,1,20,0,1081,1081,0,0,1081.000000,0.000000,21.000000,21.000000,oracle/idle checks enforced,0
+map_fixed_n1_mut_iter_plain,map_fixed,1,26,0,1081,1681,1195,600,1681.000000,600.000000,130.000000,130.000000,"tracked, not enforced (user decision 2026-10-29)",0
+map_fixed_n1_mut_try_iter_plain,map_fixed,1,27,0,1081,1765,1195,684,1765.000000,684.000000,135.000000,135.000000,"tracked, not enforced (user decision 2026-10-29)",0
+map_fixed_n1_cursor_get_plain,map_fixed,1,30,0,1081,1714,1195,633,1714.000000,633.000000,88.000000,88.000000,enforced,0
+map_fixed_n1_cursor_set_plain,map_fixed,1,31,0,1081,1738,0,657,1738.000000,657.000000,109.000000,109.000000,"tracked, not enforced (user decision 2026-10-30)",0
+map_fixed_n1_empty_callback_plain,map_fixed,1,32,0,1081,1764,0,683,1764.000000,683.000000,81.000000,81.000000,enforced,0
+map_fixed_n1_callback_get_plain,map_fixed,1,33,0,1081,1755,1195,674,1755.000000,674.000000,72.000000,72.000000,enforced,0
+map_fixed_n1_callback_equal_set_plain,map_fixed,1,34,0,1081,1747,0,666,1747.000000,666.000000,64.000000,64.000000,enforced,0
+map_fixed_n10_ref_common_idle_plain,map_fixed,10,0,0,962,962,0,0,96.200000,0.000000,21.000000,21.000000,oracle/idle checks enforced,0
+map_fixed_n10_ref_iter_plain,map_fixed,10,6,0,962,2036,12040,1074,203.600000,107.400000,90.000000,90.000000,enforced,0
+map_fixed_n10_ref_try_iter_plain,map_fixed,10,7,0,962,2019,12040,1057,201.900000,105.700000,91.000000,91.000000,enforced,0
+map_fixed_n10_mut_common_idle_plain,map_fixed,10,20,0,1286,1286,0,0,128.600000,0.000000,21.000000,21.000000,oracle/idle checks enforced,0
+map_fixed_n10_mut_iter_plain,map_fixed,10,26,0,1286,2867,12040,1581,286.700000,158.100000,130.000000,130.000000,"tracked, not enforced (user decision 2026-10-29)",0
+map_fixed_n10_mut_try_iter_plain,map_fixed,10,27,0,1286,2996,12040,1710,299.600000,171.000000,135.000000,135.000000,"tracked, not enforced (user decision 2026-10-29)",0
+map_fixed_n10_cursor_get_plain,map_fixed,10,30,0,1286,2772,12040,1486,277.200000,148.600000,88.000000,88.000000,enforced,0
+map_fixed_n10_cursor_set_plain,map_fixed,10,31,0,1286,2985,0,1699,298.500000,169.900000,109.000000,109.000000,"tracked, not enforced (user decision 2026-10-30)",0
+map_fixed_n10_empty_callback_plain,map_fixed,10,32,0,1286,2757,0,1471,275.700000,147.100000,81.000000,81.000000,enforced,0
+map_fixed_n10_callback_get_plain,map_fixed,10,33,0,1286,2668,12040,1382,266.800000,138.200000,72.000000,72.000000,enforced,0
+map_fixed_n10_callback_equal_set_plain,map_fixed,10,34,0,1286,2589,0,1303,258.900000,130.300000,64.000000,64.000000,enforced,0
+map_fixed_n100_ref_common_idle_plain,map_fixed,100,0,0,2852,2852,0,0,28.520000,0.000000,21.000000,21.000000,oracle/idle checks enforced,0
+map_fixed_n100_ref_iter_plain,map_fixed,100,6,0,2852,10136,129400,7284,101.360000,72.840000,90.000000,90.000000,enforced,0
+map_fixed_n100_ref_try_iter_plain,map_fixed,100,7,0,2852,10209,129400,7357,102.090000,73.570000,91.000000,91.000000,enforced,0
+map_fixed_n100_mut_common_idle_plain,map_fixed,100,20,0,3176,3176,0,0,31.760000,0.000000,21.000000,21.000000,oracle/idle checks enforced,0
+map_fixed_n100_mut_iter_plain,map_fixed,100,26,0,3176,14567,129400,11391,145.670000,113.910000,130.000000,130.000000,"tracked, not enforced (user decision 2026-10-29)",0
+map_fixed_n100_mut_try_iter_plain,map_fixed,100,27,0,3176,15146,129400,11970,151.460000,119.700000,135.000000,135.000000,"tracked, not enforced (user decision 2026-10-29)",0
+map_fixed_n100_cursor_get_plain,map_fixed,100,30,0,3176,10692,129400,7516,106.920000,75.160000,88.000000,88.000000,enforced,0
+map_fixed_n100_cursor_set_plain,map_fixed,100,31,0,3176,12795,0,9619,127.950000,96.190000,109.000000,109.000000,"tracked, not enforced (user decision 2026-10-30)",0
+map_fixed_n100_empty_callback_plain,map_fixed,100,32,0,3176,10047,0,6871,100.470000,68.710000,81.000000,81.000000,enforced,0
+map_fixed_n100_callback_get_plain,map_fixed,100,33,0,3176,9148,129400,5972,91.480000,59.720000,72.000000,72.000000,enforced,0
+map_fixed_n100_callback_equal_set_plain,map_fixed,100,34,0,3176,8349,0,5173,83.490000,51.730000,64.000000,64.000000,enforced,0
+map_fixed_n1000_ref_common_idle_plain,map_fixed,1000,0,0,21752,21752,0,0,21.752000,0.000000,21.000000,21.000000,oracle/idle checks enforced,0
+map_fixed_n1000_ref_iter_plain,map_fixed,1000,6,0,21752,91136,1321135,69384,91.136000,69.384000,90.000000,90.000000,enforced,0
+map_fixed_n1000_ref_try_iter_plain,map_fixed,1000,7,0,21752,92109,1321135,70357,92.109000,70.357000,91.000000,91.000000,enforced,0
+map_fixed_n1000_mut_common_idle_plain,map_fixed,1000,20,0,22076,22076,0,0,22.076000,0.000000,21.000000,21.000000,oracle/idle checks enforced,0
+map_fixed_n1000_mut_iter_plain,map_fixed,1000,26,0,22076,131567,1321135,109491,131.567000,109.491000,130.000000,130.000000,"tracked, not enforced (user decision 2026-10-29)",0
+map_fixed_n1000_mut_try_iter_plain,map_fixed,1000,27,0,22076,136646,1321135,114570,136.646000,114.570000,135.000000,135.000000,"tracked, not enforced (user decision 2026-10-29)",0
+map_fixed_n1000_cursor_get_plain,map_fixed,1000,30,0,22076,89892,1321135,67816,89.892000,67.816000,88.000000,88.000000,enforced,0
+map_fixed_n1000_cursor_set_plain,map_fixed,1000,31,0,22076,110895,0,88819,110.895000,88.819000,109.000000,109.000000,"tracked, not enforced (user decision 2026-10-30)",0
+map_fixed_n1000_empty_callback_plain,map_fixed,1000,32,0,22076,82947,0,60871,82.947000,60.871000,81.000000,81.000000,enforced,0
+map_fixed_n1000_callback_get_plain,map_fixed,1000,33,0,22076,73948,1321135,51872,73.948000,51.872000,72.000000,72.000000,enforced,0
+map_fixed_n1000_callback_equal_set_plain,map_fixed,1000,34,0,22076,65949,0,43873,65.949000,43.873000,64.000000,64.000000,enforced,0
+map_fixed_n0_ref_common_idle_common31_adjacent,map_fixed,0,0,1,716,716,0,0,,,30.000000,30.000000,oracle/idle checks enforced,0
+map_fixed_n0_ref_iter_common31_adjacent,map_fixed,0,6,1,716,1045,0,329,,,99.000000,99.000000,enforced,0
+map_fixed_n0_ref_try_iter_common31_adjacent,map_fixed,0,7,1,716,1015,0,299,,,100.000000,100.000000,enforced,0
+map_fixed_n0_mut_common_idle_common31_adjacent,map_fixed,0,20,1,1040,1040,0,0,,,30.000000,30.000000,oracle/idle checks enforced,0
+map_fixed_n0_mut_iter_common31_adjacent,map_fixed,0,26,1,1040,1481,0,441,,,139.000000,139.000000,"tracked, not enforced (user decision 2026-10-29)",0
+map_fixed_n0_mut_try_iter_common31_adjacent,map_fixed,0,27,1,1040,1580,0,540,,,144.000000,144.000000,"tracked, not enforced (user decision 2026-10-29)",0
+map_fixed_n0_cursor_get_common31_adjacent,map_fixed,0,30,1,1040,1524,0,484,,,97.000000,97.000000,enforced,0
+map_fixed_n0_cursor_set_common31_adjacent,map_fixed,0,31,1,1040,1522,0,482,,,118.000000,118.000000,"tracked, not enforced (user decision 2026-10-29)",0
+map_fixed_n0_empty_callback_common31_adjacent,map_fixed,0,32,1,1040,1579,0,539,,,90.000000,90.000000,enforced,0
+map_fixed_n0_callback_get_common31_adjacent,map_fixed,0,33,1,1040,1585,0,545,,,81.000000,81.000000,enforced,0
+map_fixed_n0_callback_equal_set_common31_adjacent,map_fixed,0,34,1,1040,1583,0,543,,,73.000000,73.000000,enforced,0
+map_fixed_n1_ref_common_idle_common31_adjacent,map_fixed,1,0,1,757,757,0,0,757.000000,0.000000,30.000000,30.000000,oracle/idle checks enforced,0
+map_fixed_n1_ref_iter_common31_adjacent,map_fixed,1,6,1,757,1210,1195,453,1210.000000,453.000000,99.000000,99.000000,enforced,0
+map_fixed_n1_ref_try_iter_common31_adjacent,map_fixed,1,7,1,757,1184,1195,427,1184.000000,427.000000,100.000000,100.000000,enforced,0
+map_fixed_n1_mut_common_idle_common31_adjacent,map_fixed,1,20,1,1081,1081,0,0,1081.000000,0.000000,30.000000,30.000000,oracle/idle checks enforced,0
+map_fixed_n1_mut_iter_common31_adjacent,map_fixed,1,26,1,1081,1681,1195,600,1681.000000,600.000000,139.000000,139.000000,"tracked, not enforced (user decision 2026-10-29)",0
+map_fixed_n1_mut_try_iter_common31_adjacent,map_fixed,1,27,1,1081,1765,1195,684,1765.000000,684.000000,144.000000,144.000000,"tracked, not enforced (user decision 2026-10-29)",0
+map_fixed_n1_cursor_get_common31_adjacent,map_fixed,1,30,1,1081,1714,1195,633,1714.000000,633.000000,97.000000,97.000000,enforced,0
+map_fixed_n1_cursor_set_common31_adjacent,map_fixed,1,31,1,1081,1738,0,657,1738.000000,657.000000,118.000000,118.000000,"tracked, not enforced (user decision 2026-10-29)",0
+map_fixed_n1_empty_callback_common31_adjacent,map_fixed,1,32,1,1081,1764,0,683,1764.000000,683.000000,90.000000,90.000000,enforced,0
+map_fixed_n1_callback_get_common31_adjacent,map_fixed,1,33,1,1081,1755,1195,674,1755.000000,674.000000,81.000000,81.000000,enforced,0
+map_fixed_n1_callback_equal_set_common31_adjacent,map_fixed,1,34,1,1081,1747,0,666,1747.000000,666.000000,73.000000,73.000000,enforced,0
+map_fixed_n10_ref_common_idle_common31_adjacent,map_fixed,10,0,1,1043,1043,0,0,104.300000,0.000000,30.000000,30.000000,oracle/idle checks enforced,0
+map_fixed_n10_ref_iter_common31_adjacent,map_fixed,10,6,1,1043,2117,12040,1074,211.700000,107.400000,99.000000,99.000000,enforced,0
+map_fixed_n10_ref_try_iter_common31_adjacent,map_fixed,10,7,1,1043,2100,12040,1057,210.000000,105.700000,100.000000,100.000000,enforced,0
+map_fixed_n10_mut_common_idle_common31_adjacent,map_fixed,10,20,1,1367,1367,0,0,136.700000,0.000000,30.000000,30.000000,oracle/idle checks enforced,0
+map_fixed_n10_mut_iter_common31_adjacent,map_fixed,10,26,1,1367,2948,12040,1581,294.800000,158.100000,139.000000,139.000000,"tracked, not enforced (user decision 2026-10-29)",0
+map_fixed_n10_mut_try_iter_common31_adjacent,map_fixed,10,27,1,1367,3077,12040,1710,307.700000,171.000000,144.000000,144.000000,"tracked, not enforced (user decision 2026-10-29)",0
+map_fixed_n10_cursor_get_common31_adjacent,map_fixed,10,30,1,1367,2853,12040,1486,285.300000,148.600000,97.000000,97.000000,enforced,0
+map_fixed_n10_cursor_set_common31_adjacent,map_fixed,10,31,1,1367,3066,0,1699,306.600000,169.900000,118.000000,118.000000,"tracked, not enforced (user decision 2026-10-29)",0
+map_fixed_n10_empty_callback_common31_adjacent,map_fixed,10,32,1,1367,2838,0,1471,283.800000,147.100000,90.000000,90.000000,enforced,0
+map_fixed_n10_callback_get_common31_adjacent,map_fixed,10,33,1,1367,2749,12040,1382,274.900000,138.200000,81.000000,81.000000,enforced,0
+map_fixed_n10_callback_equal_set_common31_adjacent,map_fixed,10,34,1,1367,2670,0,1303,267.000000,130.300000,73.000000,73.000000,enforced,0
+map_fixed_n100_ref_common_idle_common31_adjacent,map_fixed,100,0,1,3743,3743,0,0,37.430000,0.000000,30.000000,30.000000,oracle/idle checks enforced,0
+map_fixed_n100_ref_iter_common31_adjacent,map_fixed,100,6,1,3743,11027,129400,7284,110.270000,72.840000,99.000000,99.000000,enforced,0
+map_fixed_n100_ref_try_iter_common31_adjacent,map_fixed,100,7,1,3743,11100,129400,7357,111.000000,73.570000,100.000000,100.000000,enforced,0
+map_fixed_n100_mut_common_idle_common31_adjacent,map_fixed,100,20,1,4067,4067,0,0,40.670000,0.000000,30.000000,30.000000,oracle/idle checks enforced,0
+map_fixed_n100_mut_iter_common31_adjacent,map_fixed,100,26,1,4067,15458,129400,11391,154.580000,113.910000,139.000000,139.000000,"tracked, not enforced (user decision 2026-10-29)",0
+map_fixed_n100_mut_try_iter_common31_adjacent,map_fixed,100,27,1,4067,16037,129400,11970,160.370000,119.700000,144.000000,144.000000,"tracked, not enforced (user decision 2026-10-29)",0
+map_fixed_n100_cursor_get_common31_adjacent,map_fixed,100,30,1,4067,11583,129400,7516,115.830000,75.160000,97.000000,97.000000,enforced,0
+map_fixed_n100_cursor_set_common31_adjacent,map_fixed,100,31,1,4067,13686,0,9619,136.860000,96.190000,118.000000,118.000000,"tracked, not enforced (user decision 2026-10-29)",0
+map_fixed_n100_empty_callback_common31_adjacent,map_fixed,100,32,1,4067,10938,0,6871,109.380000,68.710000,90.000000,90.000000,enforced,0
+map_fixed_n100_callback_get_common31_adjacent,map_fixed,100,33,1,4067,10039,129400,5972,100.390000,59.720000,81.000000,81.000000,enforced,0
+map_fixed_n100_callback_equal_set_common31_adjacent,map_fixed,100,34,1,4067,9240,0,5173,92.400000,51.730000,73.000000,73.000000,enforced,0
+map_fixed_n1000_ref_common_idle_common31_adjacent,map_fixed,1000,0,1,30743,30743,0,0,30.743000,0.000000,30.000000,30.000000,oracle/idle checks enforced,0
+map_fixed_n1000_ref_iter_common31_adjacent,map_fixed,1000,6,1,30743,100127,1321135,69384,100.127000,69.384000,99.000000,99.000000,enforced,0
+map_fixed_n1000_ref_try_iter_common31_adjacent,map_fixed,1000,7,1,30743,101100,1321135,70357,101.100000,70.357000,100.000000,100.000000,enforced,0
+map_fixed_n1000_mut_common_idle_common31_adjacent,map_fixed,1000,20,1,31067,31067,0,0,31.067000,0.000000,30.000000,30.000000,oracle/idle checks enforced,0
+map_fixed_n1000_mut_iter_common31_adjacent,map_fixed,1000,26,1,31067,140558,1321135,109491,140.558000,109.491000,139.000000,139.000000,"tracked, not enforced (user decision 2026-10-29)",0
+map_fixed_n1000_mut_try_iter_common31_adjacent,map_fixed,1000,27,1,31067,145637,1321135,114570,145.637000,114.570000,144.000000,144.000000,"tracked, not enforced (user decision 2026-10-29)",0
+map_fixed_n1000_cursor_get_common31_adjacent,map_fixed,1000,30,1,31067,98883,1321135,67816,98.883000,67.816000,97.000000,97.000000,enforced,0
+map_fixed_n1000_cursor_set_common31_adjacent,map_fixed,1000,31,1,31067,119886,0,88819,119.886000,88.819000,118.000000,118.000000,"tracked, not enforced (user decision 2026-10-29)",0
+map_fixed_n1000_empty_callback_common31_adjacent,map_fixed,1000,32,1,31067,91938,0,60871,91.938000,60.871000,90.000000,90.000000,enforced,0
+map_fixed_n1000_callback_get_common31_adjacent,map_fixed,1000,33,1,31067,82939,1321135,51872,82.939000,51.872000,81.000000,81.000000,enforced,0
+map_fixed_n1000_callback_equal_set_common31_adjacent,map_fixed,1000,34,1,31067,74940,0,43873,74.940000,43.873000,73.000000,73.000000,enforced,0
+map_indexed_n0_ref_common_idle_plain,map_indexed,0,0,0,822,822,0,0,,,35.677778,37.750000,E4 locked whole target,0
+map_indexed_n0_ref_iter_plain,map_indexed,0,6,0,822,1108,0,286,,,531.677778,533.750000,E4 locked whole target,0
+map_indexed_n0_ref_try_iter_plain,map_indexed,0,7,0,822,1115,0,293,,,541.677778,543.750000,E4 locked whole target,0
+map_indexed_n0_mut_common_idle_plain,map_indexed,0,20,0,1183,1183,0,0,,,35.677778,37.750000,oracle/idle checks enforced,0
+map_indexed_n0_mut_iter_plain,map_indexed,0,26,0,1183,1605,0,422,,,523.677778,525.750000,E4 locked whole target,0
+map_indexed_n0_mut_try_iter_plain,map_indexed,0,27,0,1183,1581,0,398,,,545.677778,547.750000,E4 locked whole target,0
+map_indexed_n0_cursor_get_plain,map_indexed,0,30,0,1183,1716,0,533,,,275.677778,277.750000,enforced,0
+map_indexed_n0_cursor_set_plain,map_indexed,0,31,0,1183,1720,0,537,,,232.677778,234.750000,"tracked, not enforced (user decision 2026-10-29)",0
+map_indexed_n0_callback_get_plain,map_indexed,0,33,0,1183,1615,0,432,,,267.677778,269.750000,enforced,0
+map_indexed_n0_callback_equal_set_plain,map_indexed,0,34,0,1183,1617,0,434,,,177.677778,179.750000,enforced,0
+map_indexed_n0_fill_plain,map_indexed,0,63,0,1183,1753,0,570,,,69.677778,71.778889,enforced,0
+map_indexed_n0_rewrite_plain,map_indexed,0,64,0,1183,1867,0,684,,,138.244444,140.667778,enforced,0
+map_indexed_n0_rewrite_values_plain,map_indexed,0,66,0,1183,1752,0,569,,,123.244444,125.667778,enforced,0
+map_indexed_n0_map_grow_from_old_values_plain,map_indexed,0,71,0,1183,2643,0,1460,,,479.677778,481.778889,report-only recipe,0
+map_indexed_n0_map_grow_from_old_values_keyed_plain,map_indexed,0,72,0,1183,2761,0,1578,,,536.677778,538.778889,report-only recipe,0
+map_indexed_n0_map_grow_from_old_values_fixed_width_plain,map_indexed,0,73,0,1183,2644,0,1461,,,524.677778,526.778889,report-only recipe,0
+map_indexed_n1_ref_common_idle_plain,map_indexed,1,0,0,1057,1057,0,0,1057.000000,0.000000,35.677778,37.750000,E4 locked whole target,0
+map_indexed_n1_ref_iter_plain,map_indexed,1,6,0,1057,1895,13213390725466179438,838,1895.000000,838.000000,531.677778,533.750000,E4 locked whole target,0
+map_indexed_n1_ref_try_iter_plain,map_indexed,1,7,0,1057,1906,13213390725466179438,849,1906.000000,849.000000,541.677778,543.750000,E4 locked whole target,0
+map_indexed_n1_mut_common_idle_plain,map_indexed,1,20,0,1418,1418,0,0,1418.000000,0.000000,35.677778,37.750000,oracle/idle checks enforced,0
+map_indexed_n1_mut_iter_plain,map_indexed,1,26,0,1418,2404,13213390725466179438,986,2404.000000,986.000000,523.677778,525.750000,E4 locked whole target,0
+map_indexed_n1_mut_try_iter_plain,map_indexed,1,27,0,1418,2391,13213390725466179438,973,2391.000000,973.000000,545.677778,547.750000,E4 locked whole target,0
+map_indexed_n1_cursor_get_plain,map_indexed,1,30,0,1418,2595,2031,1177,2595.000000,1177.000000,275.677778,277.750000,enforced,0
+map_indexed_n1_cursor_set_plain,map_indexed,1,31,0,1418,2484,0,1066,2484.000000,1066.000000,232.677778,234.750000,"tracked, not enforced (user decision 2026-10-29)",0
+map_indexed_n1_callback_get_plain,map_indexed,1,33,0,1418,2539,2031,1121,2539.000000,1121.000000,267.677778,269.750000,enforced,0
+map_indexed_n1_callback_equal_set_plain,map_indexed,1,34,0,1418,2374,0,956,2374.000000,956.000000,177.677778,179.750000,enforced,0
+map_indexed_n1_fill_plain,map_indexed,1,63,0,1418,2465,0,1047,2465.000000,1047.000000,69.677778,71.778889,enforced,0
+map_indexed_n1_rewrite_plain,map_indexed,1,64,0,1418,2745,0,1327,2745.000000,1327.000000,138.244444,140.667778,enforced,0
+map_indexed_n1_rewrite_values_plain,map_indexed,1,66,0,1418,2543,0,1125,2543.000000,1125.000000,123.244444,125.667778,enforced,0
+map_indexed_n1_map_grow_from_old_values_plain,map_indexed,1,71,0,1418,4312,0,2894,4312.000000,2894.000000,479.677778,481.778889,report-only recipe,56
+map_indexed_n1_map_grow_from_old_values_keyed_plain,map_indexed,1,72,0,1418,4585,0,3167,4585.000000,3167.000000,536.677778,538.778889,report-only recipe,120
+map_indexed_n1_map_grow_from_old_values_fixed_width_plain,map_indexed,1,73,0,1418,4333,0,2915,4333.000000,2915.000000,524.677778,526.778889,report-only recipe,48
+map_indexed_n10_ref_common_idle_plain,map_indexed,10,0,0,1506,1506,0,0,150.600000,0.000000,35.677778,37.750000,E4 locked whole target,0
+map_indexed_n10_ref_iter_plain,map_indexed,10,6,0,1506,6784,8465620471644161605,5278,678.400000,527.800000,531.677778,533.750000,E4 locked whole target,0
+map_indexed_n10_ref_try_iter_plain,map_indexed,10,7,0,1506,6885,8465620471644161605,5379,688.500000,537.900000,541.677778,543.750000,E4 locked whole target,0
+map_indexed_n10_mut_common_idle_plain,map_indexed,10,20,0,1867,1867,0,0,186.700000,0.000000,35.677778,37.750000,oracle/idle checks enforced,0
+map_indexed_n10_mut_iter_plain,map_indexed,10,26,0,1867,7221,8465620471644161605,5354,722.100000,535.400000,523.677778,525.750000,E4 locked whole target,0
+map_indexed_n10_mut_try_iter_plain,map_indexed,10,27,0,1867,7406,8465620471644161605,5539,740.600000,553.900000,545.677778,547.750000,E4 locked whole target,0
+map_indexed_n10_cursor_get_plain,map_indexed,10,30,0,1867,5384,20400,3517,538.400000,351.700000,275.677778,277.750000,enforced,0
+map_indexed_n10_cursor_set_plain,map_indexed,10,31,0,1867,4910,0,3043,491.000000,304.300000,232.677778,234.750000,"tracked, not enforced (user decision 2026-10-29)",0
+map_indexed_n10_callback_get_plain,map_indexed,10,33,0,1867,5256,20400,3389,525.600000,338.900000,267.677778,269.750000,enforced,0
+map_indexed_n10_callback_equal_set_plain,map_indexed,10,34,0,1867,4305,0,2438,430.500000,243.800000,177.677778,179.750000,enforced,0
+map_indexed_n10_fill_plain,map_indexed,10,63,0,1867,3275,0,1408,327.500000,140.800000,69.677778,71.778889,enforced,0
+map_indexed_n10_rewrite_plain,map_indexed,10,64,0,1867,4158,0,2291,415.800000,229.100000,138.244444,140.667778,enforced,0
+map_indexed_n10_rewrite_values_plain,map_indexed,10,66,0,1867,3820,0,1953,382.000000,195.300000,123.244444,125.667778,enforced,0
+map_indexed_n10_map_grow_from_old_values_plain,map_indexed,10,71,0,1867,8973,0,7106,897.300000,710.600000,479.677778,481.778889,report-only recipe,424
+map_indexed_n10_map_grow_from_old_values_keyed_plain,map_indexed,10,72,0,1867,9759,0,7892,975.900000,789.200000,536.677778,538.778889,report-only recipe,1064
+map_indexed_n10_map_grow_from_old_values_fixed_width_plain,map_indexed,10,73,0,1867,9399,0,7532,939.900000,753.200000,524.677778,526.778889,report-only recipe,344
+map_indexed_n100_ref_common_idle_plain,map_indexed,100,0,0,4717,4717,0,0,47.170000,0.000000,35.677778,37.750000,E4 locked whole target,0
+map_indexed_n100_ref_iter_plain,map_indexed,100,6,0,4717,54635,12888220173376529672,49918,546.350000,499.180000,531.677778,533.750000,E4 locked whole target,0
+map_indexed_n100_ref_try_iter_plain,map_indexed,100,7,0,4717,55636,12888220173376529672,50919,556.360000,509.190000,541.677778,543.750000,E4 locked whole target,0
+map_indexed_n100_mut_common_idle_plain,map_indexed,100,20,0,5078,5078,0,0,50.780000,0.000000,35.677778,37.750000,oracle/idle checks enforced,0
+map_indexed_n100_mut_iter_plain,map_indexed,100,26,0,5078,54352,12888220173376529672,49274,543.520000,492.740000,523.677778,525.750000,E4 locked whole target,0
+map_indexed_n100_mut_try_iter_plain,map_indexed,100,27,0,5078,56517,12888220173376529672,51439,565.170000,514.390000,545.677778,547.750000,E4 locked whole target,0
+map_indexed_n100_cursor_get_plain,map_indexed,100,30,0,5078,30195,213000,25117,301.950000,251.170000,275.677778,277.750000,enforced,0
+map_indexed_n100_cursor_set_plain,map_indexed,100,31,0,5078,25851,0,20773,258.510000,207.730000,232.677778,234.750000,"tracked, not enforced (user decision 2026-10-29)",0
+map_indexed_n100_callback_get_plain,map_indexed,100,33,0,5078,29347,213000,24269,293.470000,242.690000,267.677778,269.750000,enforced,0
+map_indexed_n100_callback_equal_set_plain,map_indexed,100,34,0,5078,20296,0,15218,202.960000,152.180000,177.677778,179.750000,enforced,0
+map_indexed_n100_fill_plain,map_indexed,100,63,0,5078,9546,0,4468,95.460000,44.680000,69.677778,71.778889,enforced,0
+map_indexed_n100_rewrite_plain,map_indexed,100,64,0,5078,16600,0,11522,166.000000,115.220000,138.244444,140.667778,enforced,0
+map_indexed_n100_rewrite_values_plain,map_indexed,100,66,0,5078,14912,0,9834,149.120000,98.340000,123.244444,125.667778,enforced,0
+map_indexed_n100_map_grow_from_old_values_plain,map_indexed,100,71,0,5078,52144,0,47066,521.440000,470.660000,479.677778,481.778889,report-only recipe,4112
+map_indexed_n100_map_grow_from_old_values_keyed_plain,map_indexed,100,72,0,5078,58060,0,52982,580.600000,529.820000,536.677778,538.778889,report-only recipe,10512
+map_indexed_n100_map_grow_from_old_values_fixed_width_plain,map_indexed,100,73,0,5078,56620,0,51542,566.200000,515.420000,524.677778,526.778889,report-only recipe,3312
+map_indexed_n1000_ref_common_idle_plain,map_indexed,1000,0,0,38692,38692,0,0,38.692000,0.000000,35.677778,37.750000,E4 locked whole target,0
+map_indexed_n1000_ref_iter_plain,map_indexed,1000,6,0,38692,535010,7265722670656669043,496318,535.010000,496.318000,531.677778,533.750000,E4 locked whole target,0
+map_indexed_n1000_ref_try_iter_plain,map_indexed,1000,7,0,38692,545011,7265722670656669043,506319,545.011000,506.319000,541.677778,543.750000,E4 locked whole target,0
+map_indexed_n1000_mut_common_idle_plain,map_indexed,1000,20,0,39053,39053,0,0,39.053000,0.000000,35.677778,37.750000,oracle/idle checks enforced,0
+map_indexed_n1000_mut_iter_plain,map_indexed,1000,26,0,39053,527527,7265722670656669043,488474,527.527000,488.474000,523.677778,525.750000,E4 locked whole target,0
+map_indexed_n1000_mut_try_iter_plain,map_indexed,1000,27,0,39053,549492,7265722670656669043,510439,549.492000,510.439000,545.677778,547.750000,E4 locked whole target,0
+map_indexed_n1000_cursor_get_plain,map_indexed,1000,30,0,39053,280170,2157135,241117,280.170000,241.117000,275.677778,277.750000,enforced,0
+map_indexed_n1000_cursor_set_plain,map_indexed,1000,31,0,39053,237126,0,198073,237.126000,198.073000,232.677778,234.750000,"tracked, not enforced (user decision 2026-10-29)",0
+map_indexed_n1000_callback_get_plain,map_indexed,1000,33,0,39053,272122,2157135,233069,272.122000,233.069000,267.677778,269.750000,enforced,0
+map_indexed_n1000_callback_equal_set_plain,map_indexed,1000,34,0,39053,182071,0,143018,182.071000,143.018000,177.677778,179.750000,enforced,0
+map_indexed_n1000_fill_plain,map_indexed,1000,63,0,39053,74147,0,35094,74.147000,35.094000,69.677778,71.778889,enforced,0
+map_indexed_n1000_rewrite_plain,map_indexed,1000,64,0,39053,143201,0,104148,143.201000,104.148000,138.244444,140.667778,enforced,0
+map_indexed_n1000_rewrite_values_plain,map_indexed,1000,66,0,39053,128013,0,88960,128.013000,88.960000,123.244444,125.667778,enforced,0
+map_indexed_n1000_map_grow_from_old_values_plain,map_indexed,1000,71,0,39053,485745,0,446692,485.745000,446.692000,479.677778,481.778889,report-only recipe,41008
+map_indexed_n1000_map_grow_from_old_values_keyed_plain,map_indexed,1000,72,0,39053,542961,0,503908,542.961000,503.908000,536.677778,538.778889,report-only recipe,105008
+map_indexed_n1000_map_grow_from_old_values_fixed_width_plain,map_indexed,1000,73,0,39053,530721,0,491668,530.721000,491.668000,524.677778,526.778889,report-only recipe,33008
+map_indexed_n0_ref_common_idle_common31_adjacent,map_indexed,0,0,1,822,822,0,0,,,44.677778,46.750000,E4 locked whole target,0
+map_indexed_n0_ref_iter_common31_adjacent,map_indexed,0,6,1,822,1108,0,286,,,540.677778,542.750000,E4 locked whole target,0
+map_indexed_n0_ref_try_iter_common31_adjacent,map_indexed,0,7,1,822,1115,0,293,,,550.677778,552.750000,E4 locked whole target,0
+map_indexed_n0_mut_common_idle_common31_adjacent,map_indexed,0,20,1,1183,1183,0,0,,,44.677778,46.750000,oracle/idle checks enforced,0
+map_indexed_n0_mut_iter_common31_adjacent,map_indexed,0,26,1,1183,1605,0,422,,,532.677778,534.750000,E4 locked whole target,0
+map_indexed_n0_mut_try_iter_common31_adjacent,map_indexed,0,27,1,1183,1581,0,398,,,554.677778,556.750000,E4 locked whole target,0
+map_indexed_n0_cursor_get_common31_adjacent,map_indexed,0,30,1,1183,1716,0,533,,,284.677778,286.750000,enforced,0
+map_indexed_n0_cursor_set_common31_adjacent,map_indexed,0,31,1,1183,1720,0,537,,,241.677778,243.750000,"tracked, not enforced (user decision 2026-10-29)",0
+map_indexed_n0_callback_get_common31_adjacent,map_indexed,0,33,1,1183,1615,0,432,,,276.677778,278.750000,enforced,0
+map_indexed_n0_callback_equal_set_common31_adjacent,map_indexed,0,34,1,1183,1617,0,434,,,186.677778,188.750000,enforced,0
+map_indexed_n0_fill_common31_adjacent,map_indexed,0,63,1,1183,1753,0,570,,,78.677778,80.778889,enforced,0
+map_indexed_n0_rewrite_common31_adjacent,map_indexed,0,64,1,1183,1866,0,683,,,147.244444,149.667778,enforced,0
+map_indexed_n0_rewrite_values_common31_adjacent,map_indexed,0,66,1,1183,1752,0,569,,,132.244444,134.667778,enforced,0
+map_indexed_n0_map_grow_from_old_values_common31_adjacent,map_indexed,0,71,1,1183,2643,0,1460,,,497.677778,499.778889,report-only recipe,0
+map_indexed_n0_map_grow_from_old_values_keyed_common31_adjacent,map_indexed,0,72,1,1183,2761,0,1578,,,554.677778,556.778889,report-only recipe,0
+map_indexed_n0_map_grow_from_old_values_fixed_width_common31_adjacent,map_indexed,0,73,1,1183,2644,0,1461,,,542.677778,544.778889,report-only recipe,0
+map_indexed_n1_ref_common_idle_common31_adjacent,map_indexed,1,0,1,1057,1057,0,0,1057.000000,0.000000,44.677778,46.750000,E4 locked whole target,0
+map_indexed_n1_ref_iter_common31_adjacent,map_indexed,1,6,1,1057,1895,6730719044046951790,838,1895.000000,838.000000,540.677778,542.750000,E4 locked whole target,0
+map_indexed_n1_ref_try_iter_common31_adjacent,map_indexed,1,7,1,1057,1906,6730719044046951790,849,1906.000000,849.000000,550.677778,552.750000,E4 locked whole target,0
+map_indexed_n1_mut_common_idle_common31_adjacent,map_indexed,1,20,1,1418,1418,0,0,1418.000000,0.000000,44.677778,46.750000,oracle/idle checks enforced,0
+map_indexed_n1_mut_iter_common31_adjacent,map_indexed,1,26,1,1418,2404,6730719044046951790,986,2404.000000,986.000000,532.677778,534.750000,E4 locked whole target,0
+map_indexed_n1_mut_try_iter_common31_adjacent,map_indexed,1,27,1,1418,2391,6730719044046951790,973,2391.000000,973.000000,554.677778,556.750000,E4 locked whole target,0
+map_indexed_n1_cursor_get_common31_adjacent,map_indexed,1,30,1,1418,2595,2031,1177,2595.000000,1177.000000,284.677778,286.750000,enforced,0
+map_indexed_n1_cursor_set_common31_adjacent,map_indexed,1,31,1,1418,2484,0,1066,2484.000000,1066.000000,241.677778,243.750000,"tracked, not enforced (user decision 2026-10-29)",0
+map_indexed_n1_callback_get_common31_adjacent,map_indexed,1,33,1,1418,2539,2031,1121,2539.000000,1121.000000,276.677778,278.750000,enforced,0
+map_indexed_n1_callback_equal_set_common31_adjacent,map_indexed,1,34,1,1418,2374,0,956,2374.000000,956.000000,186.677778,188.750000,enforced,0
+map_indexed_n1_fill_common31_adjacent,map_indexed,1,63,1,1418,2465,0,1047,2465.000000,1047.000000,78.677778,80.778889,enforced,0
+map_indexed_n1_rewrite_common31_adjacent,map_indexed,1,64,1,1418,2744,0,1326,2744.000000,1326.000000,147.244444,149.667778,enforced,0
+map_indexed_n1_rewrite_values_common31_adjacent,map_indexed,1,66,1,1418,2543,0,1125,2543.000000,1125.000000,132.244444,134.667778,enforced,0
+map_indexed_n1_map_grow_from_old_values_common31_adjacent,map_indexed,1,71,1,1418,4312,0,2894,4312.000000,2894.000000,497.677778,499.778889,report-only recipe,56
+map_indexed_n1_map_grow_from_old_values_keyed_common31_adjacent,map_indexed,1,72,1,1418,4585,0,3167,4585.000000,3167.000000,554.677778,556.778889,report-only recipe,120
+map_indexed_n1_map_grow_from_old_values_fixed_width_common31_adjacent,map_indexed,1,73,1,1418,4333,0,2915,4333.000000,2915.000000,542.677778,544.778889,report-only recipe,48
+map_indexed_n10_ref_common_idle_common31_adjacent,map_indexed,10,0,1,1587,1587,0,0,158.700000,0.000000,44.677778,46.750000,E4 locked whole target,0
+map_indexed_n10_ref_iter_common31_adjacent,map_indexed,10,6,1,1587,6865,1656914037364094629,5278,686.500000,527.800000,540.677778,542.750000,E4 locked whole target,0
+map_indexed_n10_ref_try_iter_common31_adjacent,map_indexed,10,7,1,1587,6966,1656914037364094629,5379,696.600000,537.900000,550.677778,552.750000,E4 locked whole target,0
+map_indexed_n10_mut_common_idle_common31_adjacent,map_indexed,10,20,1,1948,1948,0,0,194.800000,0.000000,44.677778,46.750000,oracle/idle checks enforced,0
+map_indexed_n10_mut_iter_common31_adjacent,map_indexed,10,26,1,1948,7302,1656914037364094629,5354,730.200000,535.400000,532.677778,534.750000,E4 locked whole target,0
+map_indexed_n10_mut_try_iter_common31_adjacent,map_indexed,10,27,1,1948,7487,1656914037364094629,5539,748.700000,553.900000,554.677778,556.750000,E4 locked whole target,0
+map_indexed_n10_cursor_get_common31_adjacent,map_indexed,10,30,1,1948,5465,20400,3517,546.500000,351.700000,284.677778,286.750000,enforced,0
+map_indexed_n10_cursor_set_common31_adjacent,map_indexed,10,31,1,1948,4991,0,3043,499.100000,304.300000,241.677778,243.750000,"tracked, not enforced (user decision 2026-10-29)",0
+map_indexed_n10_callback_get_common31_adjacent,map_indexed,10,33,1,1948,5337,20400,3389,533.700000,338.900000,276.677778,278.750000,enforced,0
+map_indexed_n10_callback_equal_set_common31_adjacent,map_indexed,10,34,1,1948,4386,0,2438,438.600000,243.800000,186.677778,188.750000,enforced,0
+map_indexed_n10_fill_common31_adjacent,map_indexed,10,63,1,1948,3356,0,1408,335.600000,140.800000,78.677778,80.778889,enforced,0
+map_indexed_n10_rewrite_common31_adjacent,map_indexed,10,64,1,1948,4238,0,2290,423.800000,229.000000,147.244444,149.667778,enforced,0
+map_indexed_n10_rewrite_values_common31_adjacent,map_indexed,10,66,1,1948,3901,0,1953,390.100000,195.300000,132.244444,134.667778,enforced,0
+map_indexed_n10_map_grow_from_old_values_common31_adjacent,map_indexed,10,71,1,1948,9135,0,7187,913.500000,718.700000,497.677778,499.778889,report-only recipe,424
+map_indexed_n10_map_grow_from_old_values_keyed_common31_adjacent,map_indexed,10,72,1,1948,9921,0,7973,992.100000,797.300000,554.677778,556.778889,report-only recipe,1064
+map_indexed_n10_map_grow_from_old_values_fixed_width_common31_adjacent,map_indexed,10,73,1,1948,9561,0,7613,956.100000,761.300000,542.677778,544.778889,report-only recipe,344
+map_indexed_n100_ref_common_idle_common31_adjacent,map_indexed,100,0,1,5608,5608,0,0,56.080000,0.000000,44.677778,46.750000,E4 locked whole target,0
+map_indexed_n100_ref_iter_common31_adjacent,map_indexed,100,6,1,5608,55526,11442188041562297256,49918,555.260000,499.180000,540.677778,542.750000,E4 locked whole target,0
+map_indexed_n100_ref_try_iter_common31_adjacent,map_indexed,100,7,1,5608,56527,11442188041562297256,50919,565.270000,509.190000,550.677778,552.750000,E4 locked whole target,0
+map_indexed_n100_mut_common_idle_common31_adjacent,map_indexed,100,20,1,5969,5969,0,0,59.690000,0.000000,44.677778,46.750000,oracle/idle checks enforced,0
+map_indexed_n100_mut_iter_common31_adjacent,map_indexed,100,26,1,5969,55243,11442188041562297256,49274,552.430000,492.740000,532.677778,534.750000,E4 locked whole target,0
+map_indexed_n100_mut_try_iter_common31_adjacent,map_indexed,100,27,1,5969,57408,11442188041562297256,51439,574.080000,514.390000,554.677778,556.750000,E4 locked whole target,0
+map_indexed_n100_cursor_get_common31_adjacent,map_indexed,100,30,1,5969,31086,213000,25117,310.860000,251.170000,284.677778,286.750000,enforced,0
+map_indexed_n100_cursor_set_common31_adjacent,map_indexed,100,31,1,5969,26742,0,20773,267.420000,207.730000,241.677778,243.750000,"tracked, not enforced (user decision 2026-10-29)",0
+map_indexed_n100_callback_get_common31_adjacent,map_indexed,100,33,1,5969,30238,213000,24269,302.380000,242.690000,276.677778,278.750000,enforced,0
+map_indexed_n100_callback_equal_set_common31_adjacent,map_indexed,100,34,1,5969,21187,0,15218,211.870000,152.180000,186.677778,188.750000,enforced,0
+map_indexed_n100_fill_common31_adjacent,map_indexed,100,63,1,5969,10437,0,4468,104.370000,44.680000,78.677778,80.778889,enforced,0
+map_indexed_n100_rewrite_common31_adjacent,map_indexed,100,64,1,5969,17490,0,11521,174.900000,115.210000,147.244444,149.667778,enforced,0
+map_indexed_n100_rewrite_values_common31_adjacent,map_indexed,100,66,1,5969,15803,0,9834,158.030000,98.340000,132.244444,134.667778,enforced,0
+map_indexed_n100_map_grow_from_old_values_common31_adjacent,map_indexed,100,71,1,5969,53926,0,47957,539.260000,479.570000,497.677778,499.778889,report-only recipe,4112
+map_indexed_n100_map_grow_from_old_values_keyed_common31_adjacent,map_indexed,100,72,1,5969,59842,0,53873,598.420000,538.730000,554.677778,556.778889,report-only recipe,10512
+map_indexed_n100_map_grow_from_old_values_fixed_width_common31_adjacent,map_indexed,100,73,1,5969,58402,0,52433,584.020000,524.330000,542.677778,544.778889,report-only recipe,3312
+map_indexed_n1000_ref_common_idle_common31_adjacent,map_indexed,1000,0,1,47683,47683,0,0,47.683000,0.000000,44.677778,46.750000,E4 locked whole target,0
+map_indexed_n1000_ref_iter_common31_adjacent,map_indexed,1000,6,1,47683,544001,5100347940702137931,496318,544.001000,496.318000,540.677778,542.750000,E4 locked whole target,0
+map_indexed_n1000_ref_try_iter_common31_adjacent,map_indexed,1000,7,1,47683,554002,5100347940702137931,506319,554.002000,506.319000,550.677778,552.750000,E4 locked whole target,0
+map_indexed_n1000_mut_common_idle_common31_adjacent,map_indexed,1000,20,1,48044,48044,0,0,48.044000,0.000000,44.677778,46.750000,oracle/idle checks enforced,0
+map_indexed_n1000_mut_iter_common31_adjacent,map_indexed,1000,26,1,48044,536518,5100347940702137931,488474,536.518000,488.474000,532.677778,534.750000,E4 locked whole target,0
+map_indexed_n1000_mut_try_iter_common31_adjacent,map_indexed,1000,27,1,48044,558483,5100347940702137931,510439,558.483000,510.439000,554.677778,556.750000,E4 locked whole target,0
+map_indexed_n1000_cursor_get_common31_adjacent,map_indexed,1000,30,1,48044,289161,2157135,241117,289.161000,241.117000,284.677778,286.750000,enforced,0
+map_indexed_n1000_cursor_set_common31_adjacent,map_indexed,1000,31,1,48044,246117,0,198073,246.117000,198.073000,241.677778,243.750000,"tracked, not enforced (user decision 2026-10-29)",0
+map_indexed_n1000_callback_get_common31_adjacent,map_indexed,1000,33,1,48044,281113,2157135,233069,281.113000,233.069000,276.677778,278.750000,enforced,0
+map_indexed_n1000_callback_equal_set_common31_adjacent,map_indexed,1000,34,1,48044,191062,0,143018,191.062000,143.018000,186.677778,188.750000,enforced,0
+map_indexed_n1000_fill_common31_adjacent,map_indexed,1000,63,1,48044,83138,0,35094,83.138000,35.094000,78.677778,80.778889,enforced,0
+map_indexed_n1000_rewrite_common31_adjacent,map_indexed,1000,64,1,48044,152191,0,104147,152.191000,104.147000,147.244444,149.667778,enforced,0
+map_indexed_n1000_rewrite_values_common31_adjacent,map_indexed,1000,66,1,48044,137004,0,88960,137.004000,88.960000,132.244444,134.667778,enforced,0
+map_indexed_n1000_map_grow_from_old_values_common31_adjacent,map_indexed,1000,71,1,48044,503727,0,455683,503.727000,455.683000,497.677778,499.778889,report-only recipe,41008
+map_indexed_n1000_map_grow_from_old_values_keyed_common31_adjacent,map_indexed,1000,72,1,48044,560943,0,512899,560.943000,512.899000,554.677778,556.778889,report-only recipe,105008
+map_indexed_n1000_map_grow_from_old_values_fixed_width_common31_adjacent,map_indexed,1000,73,1,48044,548703,0,500659,548.703000,500.659000,542.677778,544.778889,report-only recipe,33008

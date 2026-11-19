@@ -1,0 +1,27 @@
+[package]
+name = "blubber-anchor"
+description = "Unpublished native account adapter"
+version = "0.1.0"
+license = "MIT"
+edition.workspace = true
+rust-version.workspace = true
+publish = false
+
+[features]
+default = ["derive"]
+derive = ["blubber/derive"]
+verify-on-load = ["blubber/verify-on-load"]
+
+[dependencies]
+blubber = { workspace = true, features = ["account-runtime"] }
+blubber-core.workspace = true
+anchor-lang.workspace = true
+pinocchio.workspace = true
+pinocchio-system.workspace = true
+solana-account-view.workspace = true
+
+[dev-dependencies]
+blubber-model.workspace = true
+
+[lints]
+workspace = true

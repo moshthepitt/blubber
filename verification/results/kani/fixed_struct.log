@@ -1,0 +1,14 @@
+Kani Rust Verifier 0.68.0 (standalone)
+CBMC 6.11.0
+rustc 1.100.0-nightly (8925ea358 2026-08-20)
+Kani: 5 passed; 0 failed; 2388 properties (89 unreachable); default checks enabled
+Symbolic inputs: full-domain native fields and corrupted bytes; exact lengths 0..17; real derive output; jobs=1; per-harness timeout=600s
+source-tree-sha256 (156 paths; sorted path-NUL-content-hash): abb04ca65257167d4ede3b7a5efc38d95887900e4c05e6bf90a3ec9cbccf8821
+kani-raw-sha256: 9e96e2edb16d7a4528ae91750ee1a728bc834795166945977664b43a9fa254dc
+Coverage: 0 expected covers satisfied; all 5 per-harness counts matched
+cover-inventory-sha256 (sorted name:count lines): 621b1a6d4cc2cd645f347dacc352aba52c2b38b7f3145bbbe6653a26df0796ee
+fixed_struct_exact_lengths: PASS; width=17; unwind=18
+fixed_struct_limits_corrupted: PASS; width=3; unwind=5
+fixed_struct_limits_roundtrip: PASS; width=3; unwind=5
+fixed_struct_padded_corrupted: PASS; width=15; unwind=17
+fixed_struct_padded_roundtrip: PASS; width=15; unwind=17

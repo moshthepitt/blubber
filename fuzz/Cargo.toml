@@ -1,0 +1,66 @@
+[package]
+license = "MIT"
+name = "blubber-fuzz"
+version = "0.0.0"
+publish = false
+edition = "2021"
+rust-version = "1.89"
+
+[package.metadata]
+cargo-fuzz = true
+
+[workspace]
+members = ["."]
+
+[features]
+sdk-fuzz = ["dep:mollusk-svm", "dep:solana-account", "dep:solana-instruction", "dep:solana-pubkey", "dep:blubber-policy"]
+verify-on-load = ["blubber/verify-on-load", "blubber-policy?/verify-on-load"]
+
+[dependencies]
+mollusk-svm = { version = "0.16.2", optional = true }
+solana-account = { version = "4.5.0", optional = true }
+solana-instruction = { version = "3.5.1", optional = true }
+solana-pubkey = { version = "4.4.0", optional = true }
+blubber-policy = { path = "../programs/policy", features = ["corrupt"], optional = true }
+bumpalo = "3.20.3"
+blubber = { path = "../crates/blubber", features = ["alloc", "derive"] }
+blubber-core = { path = "../crates/blubber-core" }
+blubber-model = { path = "../crates/blubber-model" }
+libfuzzer-sys = "0.4.13"
+
+[[bin]]
+name = "validate"
+path = "fuzz_targets/validate.rs"
+test = false
+doc = false
+bench = false
+
+[[bin]]
+name = "edit"
+path = "fuzz_targets/edit.rs"
+test = false
+doc = false
+bench = false
+
+[profile.release]
+overflow-checks = true
+
+[lints.rust]
+missing_docs = "deny"
+unsafe_code = "forbid"
+
+[[bin]]
+name = "policy_read"
+path = "fuzz_targets/policy_read.rs"
+required-features = ["sdk-fuzz"]
+test = false
+doc = false
+bench = false
+
+[[bin]]
+name = "policy_edit"
+path = "fuzz_targets/policy_edit.rs"
+required-features = ["sdk-fuzz"]
+test = false
+doc = false
+bench = false

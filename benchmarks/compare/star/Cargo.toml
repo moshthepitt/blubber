@@ -1,0 +1,21 @@
+[package]
+license = "MIT"
+name = "compare-star"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[lib]
+crate-type = ["cdylib"]
+
+[features]
+heap = []
+
+[dependencies]
+compare-program = { path = "../program", features = ["no-entrypoint"] }
+star_frame = { git = "https://github.com/staratlasmeta/star_frame", rev = "6936d582a942760b67728059be651473645ee099", version = "0.30.0" }
+pinocchio = { version = "0.9.3", features = ["std"] }
+pinocchio-new = { package = "pinocchio", version = "0.11.2", default-features = false, features = ["alloc", "cpi"] }
+
+[lints.rust]
+unexpected_cfgs = { level = "warn", check-cfg = ['cfg(target_os, values("solana"))'] }

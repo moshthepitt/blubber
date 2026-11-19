@@ -1,0 +1,31 @@
+Kani Rust Verifier 0.68.0 (standalone)
+CBMC 6.11.0
+rustc 1.100.0-nightly (8925ea358 2026-08-20)
+Kani: 259 passed; 0 failed; 1150394 properties (94363 unreachable); default checks enabled
+D14 record: real production bodies; jobs=4; per-harness timeout=600s; unwind=0 denotes loop-free
+source-tree-sha256 (156 paths; sorted path-NUL-content-hash): abb04ca65257167d4ede3b7a5efc38d95887900e4c05e6bf90a3ec9cbccf8821
+kani-raw-sha256: bedf9842bbfe5fb1b9071d6499b77735825968b12e24d434475da9249dc50920
+Coverage: 327 expected covers satisfied; all 259 per-harness counts matched
+cover-inventory-sha256 (sorted name:count lines): ea1cabbd82b7285e3955948e18fd35053ce78df9d7ca0a16dccadb9ad1ec4b11
+Root List<u32> edits; List<u32>/List<Record> admission; independent byte oracle; unwind=49; all unwind assertions enabled
+Full-width usize/u32 index and truncation guards use the production source; no stubs or contracts
+Walk/slots: split4/account24/region8; bool counts0..4, stop pairs through n4, poison/closed; generated read/write n1; unwind9/33
+Indexed: arbitrary u8 ends; 4-byte overwrite; 24-byte window; two window covers; unwind=9
+record_admit_*: PASS; 6 harnesses; 0 failures; record_ancestor_patch_*: PASS; 2 harnesses; 0 failures
+record_batched_text_*: PASS; 25 harnesses; 0 failures; record_chunk_move_*: PASS; 2 harnesses; 0 failures
+record_directory_suffix_suffix_*: PASS; 4 harnesses; 0 failures; record_fixed_destination: PASS; 1 harnesses; 0 failures
+record_fixed_fill_*: PASS; 5 harnesses; 0 failures; record_fixed_fold_fold_*: PASS; 4 harnesses; 0 failures
+record_fixed_insert_*: PASS; 24 harnesses; 0 failures; record_fixed_map_remove_*: PASS; 3 harnesses; 0 failures
+record_fixed_remove_*: PASS; 6 harnesses; 0 failures; record_fixed_values_values_*: PASS; 5 harnesses; 0 failures
+record_indices_full_width,record_truncation_full_width: PASS; 2 harnesses; 0 failures; record_indexed_*: PASS; 3 harnesses; 0 failures
+record_keyless_*: PASS; 6 harnesses; 0 failures; record_lazy_list_empty_*: PASS; 5 harnesses; 0 failures
+record_lazy_list_patch_*: PASS; 4 harnesses; 0 failures; record_lazy_map_*: PASS; 17 harnesses; 0 failures
+record_lazy_map_patch_*: PASS; 5 harnesses; 0 failures; record_list_stream_*: PASS; 26 harnesses; 0 failures
+record_map_stream_*: PASS; 14 harnesses; 0 failures; record_map_*: PASS; 15 harnesses; 0 failures
+record_point_read_*: PASS; 5 harnesses; 0 failures; record_prepared_*: PASS; 1 harnesses; 0 failures
+record_rewrite_*: PASS; 13 harnesses; 0 failures; record_scoped_point_*: PASS; 2 harnesses; 0 failures
+record_slot_*: PASS; 9 harnesses; 0 failures; record_strict_keys32_keys_*: PASS; 4 harnesses; 0 failures
+record_tail_remove_*: PASS; 11 harnesses; 0 failures; record_text_aggregate_*: PASS; 6 harnesses; 0 failures
+record_uniform_fill_*: PASS; 7 harnesses; 0 failures; record_walk_*: PASS; 8 harnesses; 0 failures
+record_word_lookup_*: PASS; 9 harnesses; 0 failures
+P2 controls: certified tables; arbitrary-byte capacity guard; no successful variable growth composition or stubs

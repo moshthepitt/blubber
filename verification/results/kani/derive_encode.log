@@ -1,0 +1,24 @@
+Kani Rust Verifier 0.68.0 (standalone)
+CBMC 6.11.0
+rustc 1.100.0-nightly (8925ea358 2026-08-20)
+Kani: 15 passed; 0 failed; 13034 properties (868 unreachable); default checks enabled
+D14 derive_encode: real production bodies; jobs=1; per-harness timeout=600s; unwind=0 denotes loop-free
+source-tree-sha256 (156 paths; sorted path-NUL-content-hash): abb04ca65257167d4ede3b7a5efc38d95887900e4c05e6bf90a3ec9cbccf8821
+kani-raw-sha256: bfca87e3c5d37073ba8b43eb29a3e8fd970cfb5616bedb168fb3ddad0f4e7e00
+Coverage: 23 expected covers satisfied; all 15 per-harness counts matched
+cover-inventory-sha256 (sorted name:count lines): c7087508ade3b98dc51f85b00023b677aba80b2a0558f6a99c1699b65d07fd28
+derive_encode_capacity: PASS; width=32; unwind=34
+derive_encode_fixed: PASS; width=32; unwind=34
+derive_encode_fixed_list: PASS; width=9; unwind=12
+derive_encode_fixed_map: PASS; width=10; unwind=14
+derive_encode_fixed_validation: PASS; width=3; unwind=3
+derive_encode_indexed_list: PASS; width=16; unwind=18
+derive_encode_indexed_map: PASS; width=18; unwind=18
+derive_encode_init_policy: PASS; width=0; unwind=2
+derive_encode_init_publication: PASS; width=0; unwind=32
+derive_encode_policy_identity: PASS; width=13; unwind=17
+derive_encode_policy_trusted: PASS; width=13; unwind=17
+derive_encode_prepared_replay: PASS; width=6; unwind=8
+derive_encode_projection_swap: PASS; width=10; unwind=12
+derive_encode_unrestricted_validation: PASS; width=6; unwind=9
+derive_encode_variable: PASS; width=32; unwind=34

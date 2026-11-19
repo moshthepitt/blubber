@@ -1,0 +1,82 @@
+[package]
+license = "MIT"
+name = "blubber-mollusk"
+description = "Host runtime tests and compute-unit benchmarks for Blubber"
+version.workspace = true
+edition.workspace = true
+rust-version = "1.97.1"
+publish = false
+
+[features]
+sbf-tests = []
+depth16 = ["blubber-cu-fixture/depth16"]
+alloc = ["blubber/alloc"]
+
+[dependencies]
+blubber-cu-fixture = { path = "../../programs/cu-fixture" }
+blubber-model.workspace = true
+solana-instruction.workspace = true
+solana-pubkey.workspace = true
+
+[dev-dependencies]
+blubber-borrow-resize = { path = "../../programs/borrow-resize" }
+blubber-demo = { path = "../../programs/blubber-demo" }
+pinocchio.workspace = true
+blubber = { workspace = true, features = ["pinocchio"] }
+mollusk-svm = { workspace = true, features = ["inner-instructions", "register-tracing"] }
+# Keep trace decoding on the runtime cohort already pinned by Cargo.lock.
+solana-transaction-status-client-types = "4.3.0"
+mollusk-svm-bencher.workspace = true
+solana-account.workspace = true
+solana-svm = { version = "4.3.0", features = ["agave-unstable-api"] }
+
+[lints]
+workspace = true
+
+[[bench]]
+name = "compute_units"
+harness = false
+
+[[bench]]
+name = "mixed_operations"
+harness = false
+
+[[test]]
+name = "borrow_resize"
+required-features = ["sbf-tests"]
+
+[[test]]
+name = "bulk_copy"
+required-features = ["sbf-tests"]
+
+[[test]]
+name = "initialize"
+required-features = ["sbf-tests"]
+
+[[test]]
+name = "invocation_boundaries"
+required-features = ["sbf-tests"]
+
+[[test]]
+name = "rent"
+required-features = ["sbf-tests"]
+
+[[test]]
+name = "runtime_edits"
+required-features = ["sbf-tests"]
+
+[[test]]
+name = "schema_digest"
+required-features = ["sbf-tests"]
+
+[[test]]
+name = "scoped"
+required-features = ["sbf-tests"]
+
+[[test]]
+name = "stack_matrix"
+required-features = ["sbf-tests"]
+
+[[test]]
+name = "tour"
+required-features = ["sbf-tests"]

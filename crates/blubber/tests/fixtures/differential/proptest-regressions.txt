@@ -1,0 +1,3 @@
+# Proptest ChaCha seeds replay before new cases; concrete JSON tapes preserve
+# resolved histories across command/input generator changes.
+cc 0000000000000000000000000000000000000000000000000000000000000000

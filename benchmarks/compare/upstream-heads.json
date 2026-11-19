@@ -1,0 +1,77 @@
+{
+  "anchor_slab": {
+    "api": "https://api.github.com/repos/otter-sec/anchor/commits?sha=anchor-next&per_page=1",
+    "branch": "anchor-next",
+    "commit": "602813667faa88d1c31b554a018a3fcc1b21e548",
+    "date": "2026-10-30T12:56:03Z",
+    "url": "https://github.com/otter-sec/anchor/commit/602813667faa88d1c31b554a018a3fcc1b21e548"
+  },
+  "borsh": {
+    "api": "https://api.github.com/repos/near/borsh-rs/commits?per_page=1",
+    "commit": "0baa89c98d90d26f185801708469e0a81f78aaf5",
+    "date": "2026-10-23T00:44:44Z",
+    "url": "https://github.com/near/borsh-rs/commit/0baa89c98d90d26f185801708469e0a81f78aaf5"
+  },
+  "bytemuck": {
+    "api": "https://api.github.com/repos/Lokathor/bytemuck/commits?per_page=1",
+    "commit": "ea3616110b0134e9991fdb66be8892dbc427c5ac",
+    "date": "2026-09-11T20:47:50Z",
+    "url": "https://github.com/Lokathor/bytemuck/commit/ea3616110b0134e9991fdb66be8892dbc427c5ac"
+  },
+  "critbit": {
+    "api": "https://api.github.com/repos/Ellipsis-Labs/sokoban/commits?per_page=1",
+    "commit": "f8ecce2c50c12e6b8731b59ecdb3a1f43769a094",
+    "date": "2024-08-23T18:37:14Z",
+    "url": "https://github.com/Ellipsis-Labs/sokoban/commit/f8ecce2c50c12e6b8731b59ecdb3a1f43769a094"
+  },
+  "light": {
+    "api": "https://api.github.com/repos/Lightprotocol/light-protocol/commits?per_page=1",
+    "commit": "bec7b830250126e1f6a2993872599f45af6e0aa0",
+    "date": "2026-10-14T19:44:12Z",
+    "url": "https://github.com/Lightprotocol/light-protocol/commit/bec7b830250126e1f6a2993872599f45af6e0aa0"
+  },
+  "manifest": {
+    "api": "https://api.github.com/repos/Bonasa-Tech/manifest/commits?per_page=1",
+    "commit": "ff62612100a82a46babb646fc312ab9ceea041db",
+    "date": "2026-10-29T00:47:16Z",
+    "url": "https://github.com/Bonasa-Tech/manifest/commit/ff62612100a82a46babb646fc312ab9ceea041db"
+  },
+  "manifest_checked": {
+    "api": "https://api.github.com/repos/Bonasa-Tech/manifest/commits?per_page=1",
+    "commit": "ff62612100a82a46babb646fc312ab9ceea041db",
+    "date": "2026-10-29T00:47:16Z",
+    "url": "https://github.com/Bonasa-Tech/manifest/commit/ff62612100a82a46babb646fc312ab9ceea041db"
+  },
+  "observed_utc": "2026-10-30T16:58:42.356297+00:00",
+  "pinapod": {
+    "api": "https://api.github.com/repos/pina-rs/pinapod/commits?per_page=1",
+    "commit": "23ec6efe815ac5ebe2678be0fcc5db65c2b5d855",
+    "date": "2026-10-29T16:28:19Z",
+    "url": "https://github.com/pina-rs/pinapod/commit/23ec6efe815ac5ebe2678be0fcc5db65c2b5d855"
+  },
+  "slab_observed_utc": "2026-10-30T20:15:01.851055+00:00",
+  "sokoban": {
+    "api": "https://api.github.com/repos/Ellipsis-Labs/sokoban/commits?per_page=1",
+    "commit": "f8ecce2c50c12e6b8731b59ecdb3a1f43769a094",
+    "date": "2024-08-23T18:37:14Z",
+    "url": "https://github.com/Ellipsis-Labs/sokoban/commit/f8ecce2c50c12e6b8731b59ecdb3a1f43769a094"
+  },
+  "star_frame": {
+    "api": "https://api.github.com/repos/staratlasmeta/star_frame/commits?per_page=1",
+    "commit": "d13c1f13a76e7fb106ab62876989899b300e4727",
+    "date": "2026-10-27T16:50:11Z",
+    "url": "https://github.com/staratlasmeta/star_frame/commit/d13c1f13a76e7fb106ab62876989899b300e4727"
+  },
+  "wincode": {
+    "api": "https://api.github.com/repos/anza-xyz/wincode/commits?per_page=1",
+    "commit": "70a904c555c7d07f8e72eb02b886f695577b475e",
+    "date": "2026-10-28T17:45:07Z",
+    "url": "https://github.com/anza-xyz/wincode/commit/70a904c555c7d07f8e72eb02b886f695577b475e"
+  },
+  "zeropod": {
+    "api": "https://api.github.com/repos/blueshift-gg/zeropod/commits?per_page=1",
+    "commit": "8a607caf7861c932786e3f7d8759a7c066671b25",
+    "date": "2026-10-14T06:30:44Z",
+    "url": "https://github.com/blueshift-gg/zeropod/commit/8a607caf7861c932786e3f7d8759a7c066671b25"
+  }
+}

@@ -1,0 +1,7 @@
+[workspace]
+resolver="2"
+members=["native","slab","borsh","tests"]
+[profile.release]
+overflow-checks=true
+lto="fat"
+codegen-units=1

@@ -1,0 +1,6 @@
+Rust SBF v1.53; v0; source-identical host/MSRV/SBF fixed public types
+PASS45 FAIL0: representation and fixed generated slots n=0,1,10,100,1000; complete-byte/read-result oracles
+Q5 generated get/set/empty callback: common delta<=30*n+300; both whole slopes<=30
+source-sha256=8d9f752a0e8e232752b9c7929f02a0f0176405383ec160f794bca34a0b1f0da3
+elf-sha256=844539c4a1d1aabac0ac7cb4110cec86fac0e68d536da81433697515386ee3cd
+raw-sha256=01f7c2e600cd404aadbd34b040b4276a831a449decde5bf92d81c61e7ee89fed

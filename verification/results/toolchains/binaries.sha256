@@ -1,0 +1,13 @@
+1208c995c8e5244577693eba311d34bc2050c4acf984e10c4c7baf2003abff14  verus-x86-linux/verus
+e2342d0af6cb8ebd538c729b2e4246354c2d791c215c1348a8fc3f8a32c727dc  verus-x86-linux/rust_verify
+e583c4186a45e72411fa2cb2048401eed03f0f8e5f24694676a8f6271a50b765  verus-x86-linux/z3
+b53b780f77f952062f8ca8a3b70aef2390b1e45ad91939be94afdc9543026853  rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/bin/rustc
+8be5b4c9b018737d3b9c269625ab2f7e566269bc6042e2876f033d084989b977  kani-cli/bin/kani
+a0f84272664e45a6b9f1ad7671c2e20aa4523676fb57f5310c18b0a359278a6d  kani-home/kani-0.68.0/bin/kani-driver
+d627c15f3e46f2ffd95a08a2e16e0c1d7dbbe1cb7ee9c05d69a8bd14a4336b71  kani-home/kani-0.68.0/bin/kani-compiler
+01ae2ae74a9dc5673631e42256f780393081650f4a22d6f4220566c0deb1643a  kani-home/kani-0.68.0/bin/cbmc
+53e430eed32027184b787e1450672e6ac40b3b806c13e1c3ea272232098fecab  kani-home/kani-0.68.0/bin/kissat
+d28cb0e099f1c7fe85910e03eaea7b04cdcb0ce88b393acd17cfa9e849fda820  kani-home/kani-0.68.0/toolchain/bin/rustc
+0d432400be6080fa069039d5e6de4bae999b7c39a68c102a0295d6dcc1ab1a80  miri-rustup/toolchains/nightly-2025-12-08-x86_64-unknown-linux-gnu/bin/rustc
+1552ff27b8260726d39323f26d23406c4ae2654583519f46258ac1aca0a72040  miri-rustup/toolchains/nightly-2025-12-08-x86_64-unknown-linux-gnu/bin/miri
+d95c95b68e321ad76634e1fd26b0a7c20ccdbae9ad9ca733f3ae2f2b4a0b6002  rust/bin/rustc

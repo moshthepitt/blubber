@@ -1,0 +1,26 @@
+[package]
+license = "MIT"
+name = "blubber-stack-matrix"
+description = "SBF depth, value width and edit-family stack acceptance fixture"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+publish = false
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[features]
+depth16 = ["blubber/max-depth-16"]
+medium = []
+wide = []
+alloc = ["blubber/alloc", "pinocchio/alloc"]
+overflow = []
+constraint-prefix = []
+
+[dependencies]
+blubber = { workspace = true, features = ["derive", "pinocchio"] }
+pinocchio.workspace = true
+
+[lints]
+workspace = true

@@ -1,0 +1,23 @@
+[package]
+license = "MIT"
+name = "blubber-kani"
+version = "0.0.0"
+edition = "2021"
+rust-version = "1.89.0"
+publish = false
+
+[workspace]
+
+[features]
+verify-on-load = ["blubber/verify-on-load"]
+
+[dependencies]
+blubber = { path = "../../crates/blubber", default-features = false, features = ["derive", "pinocchio"] }
+blubber-core = { path = "../../crates/blubber-core", default-features = false, features = ["program-error"] }
+solana-program-error = { version = "3.0.1", default-features = false }
+pinocchio = { version = "0.11.2", default-features = false, features = ["account-resize", "cpi"] }
+
+[lints.rust]
+unsafe_code = "deny"
+missing_docs = "deny"
+unexpected_cfgs = { level = "warn", check-cfg = ["cfg(kani)"] }

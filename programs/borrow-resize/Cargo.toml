@@ -1,0 +1,23 @@
+[package]
+license = "MIT"
+name = "blubber-borrow-resize"
+description = "SBF fixture for safe account leases and SDK resize semantics"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+publish = false
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[features]
+runtime = []
+verify-on-load = ["blubber/verify-on-load"]
+alloc = ["blubber/alloc", "pinocchio/alloc"]
+
+[dependencies]
+blubber = { workspace = true, features = ["derive", "pinocchio"] }
+pinocchio.workspace = true
+
+[lints]
+workspace = true

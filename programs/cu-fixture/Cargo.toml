@@ -1,0 +1,38 @@
+[package]
+license = "MIT"
+name = "blubber-cu-fixture"
+description = "Uninstrumented typed edit compute-unit fixtures"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+publish = false
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[features]
+identity = []
+policy-pinocchio = []
+policy = ["dep:blubber-anchor", "alloc"]
+verify-on-load = ["blubber/verify-on-load", "blubber-anchor?/verify-on-load"]
+metrics = ["dep:solana-program-log"]
+depth16 = ["blubber/max-depth-16"]
+matrix = []
+entry-combinators = []
+walk-contract = ["traversal"]
+rewrite-kernel = ["traversal"]
+rewrite-api = ["traversal"]
+mixed-operations = ["alloc", "matrix"]
+mixed-alternate = ["mixed-operations"]
+traversal = ["matrix", "alloc"]
+alloc = ["blubber/alloc", "pinocchio/alloc"]
+
+[dependencies]
+blubber-anchor = { path = "../../crates/blubber-anchor", version = "0.1.0", optional = true }
+solana-program-log = { version = "1.1.0", default-features = false, optional = true }
+blubber-core.workspace = true
+blubber = { workspace = true, features = ["derive", "pinocchio"] }
+pinocchio.workspace = true
+
+[lints]
+workspace = true

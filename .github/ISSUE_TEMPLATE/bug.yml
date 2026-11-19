@@ -1,0 +1,25 @@
+name: Bug
+description: Report incorrect library behaviour
+body:
+  - type: input
+    id: version
+    attributes:
+      label: Crate version and features
+    validations:
+      required: true
+  - type: dropdown
+    id: arch
+    attributes:
+      label: Runtime architecture
+      options:
+        - Host only
+        - SBF v0
+        - SBF v3
+        - Both SBF versions
+  - type: textarea
+    id: example
+    attributes:
+      label: Minimal schema and steps
+      description: Include expected and observed results, and relevant account bytes.
+    validations:
+      required: true

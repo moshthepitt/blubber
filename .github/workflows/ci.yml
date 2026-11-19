@@ -1,0 +1,56 @@
+name: CI
+
+on: [push, pull_request]
+
+permissions:
+  contents: read
+
+jobs:
+  rust:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: 1.97.1
+          components: rustfmt, clippy
+      - uses: Swatinem/rust-cache@v2
+      - run: cargo fmt --all -- --check
+      - run: cargo clippy --workspace --all-targets --all-features --locked -- -D warnings
+      - run: bash scripts/reproduce.sh test
+      - name: Check minimum Rust
+        run: |
+          rustup toolchain install 1.89.0 --profile minimal
+          cargo +1.89.0 check --locked -p blubber-core -p blubber-derive -p blubber --all-features
+      - name: Package library crates
+        run: |
+          cargo package --locked -p blubber-core
+          cargo package --locked -p blubber-derive
+      - run: python3 .github/check-links.py
+
+  verus:
+    runs-on: ubuntu-latest
+    env:
+      VERUS_VERSION: 0.2026.10.18.7d82994
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: 1.99.1
+      - uses: Swatinem/rust-cache@v2
+      - uses: actions/cache@v4
+        with:
+          path: ~/.local/share/verus
+          key: verus-linux-x86-${{ env.VERUS_VERSION }}
+      - name: Install pinned Verus
+        run: |
+          verus_dir="$HOME/.local/share/verus"
+          if [[ ! -x "$verus_dir/verus-x86-linux/verus" ]]; then
+            mkdir -p "$verus_dir"
+            release="https://github.com/verus-lang/verus/releases/download/release/$VERUS_VERSION"
+            curl --fail --location --silent --show-error \
+              "$release/verus-$VERUS_VERSION-x86-linux.zip" -o "$RUNNER_TEMP/verus.zip"
+            unzip -q "$RUNNER_TEMP/verus.zip" -d "$verus_dir"
+          fi
+          echo "$verus_dir/verus-x86-linux" >> "$GITHUB_PATH"
+      - run: bash scripts/reproduce.sh verus

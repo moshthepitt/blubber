@@ -1,0 +1,40 @@
+Kani Rust Verifier 0.68.0 (standalone)
+CBMC 6.11.0
+rustc 1.100.0-nightly (8925ea358 2026-08-20)
+Verus
+  Version: 0.2026.10.18.7d82994
+  Profile: release
+  Platform: linux_x86_64
+  Toolchain: 1.99.1-x86_64-unknown-linux-gnu (overridden by environment variable RUSTUP_TOOLCHAIN)
+
+Kani: 23 passed; 0 failed; 5677 properties (1 unreachable); default checks enabled
+Symbolic inputs: two full-domain values per type; bool additionally checks all tag bytes; jobs=1; per-harness timeout=600s
+source-tree-sha256 (156 paths; sorted path-NUL-content-hash): abb04ca65257167d4ede3b7a5efc38d95887900e4c05e6bf90a3ec9cbccf8821
+kani-raw-sha256: c45fe9bc789e4efc9889334b54ca722369878f31efbaa49af86373a98632183a
+Verus: 1 verified; 0 errors; theorem raw_key_identity; arbitrary positive u32 width
+verus-raw-sha256: be561ba80ec4e3bfc163104e23e35d9ab4aa745010fd1977e2c2ac9477c7d464
+Coverage: 6 expected covers satisfied; all 23 per-harness counts matched
+cover-inventory-sha256 (sorted name:count lines): 47b40e5ed4bba271a133981fafb4dfad9d14d4e02cd58249275b86cb5ec152a3
+map_key_address_projection: PASS; width=32; unwind=34
+map_key_array_1: PASS; width=1; unwind=3
+map_key_array_16: PASS; width=16; unwind=18
+map_key_array_2: PASS; width=2; unwind=4
+map_key_array_3: PASS; width=3; unwind=5
+map_key_array_31: PASS; width=31; unwind=33
+map_key_array_32: PASS; width=32; unwind=34
+map_key_array_33: PASS; width=33; unwind=35
+map_key_array_4: PASS; width=4; unwind=6
+map_key_array_64: PASS; width=64; unwind=66
+map_key_bool: PASS; width=1; unwind=3
+map_key_i128: PASS; width=16; unwind=18
+map_key_i16: PASS; width=2; unwind=18
+map_key_i32: PASS; width=4; unwind=18
+map_key_i64: PASS; width=8; unwind=18
+map_key_i8: PASS; width=1; unwind=18
+map_key_pubkey: PASS; width=32; unwind=34
+map_key_pubkey_projection: PASS; width=32; unwind=34
+map_key_u128: PASS; width=16; unwind=18
+map_key_u16: PASS; width=2; unwind=18
+map_key_u32: PASS; width=4; unwind=18
+map_key_u64: PASS; width=8; unwind=18
+map_key_u8: PASS; width=1; unwind=18

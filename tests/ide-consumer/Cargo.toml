@@ -1,0 +1,14 @@
+[package]
+license = "MIT"
+name = "blubber-ide-consumer"
+description = "Host and rust-analyzer acceptance consumer for generated APIs"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+publish = false
+
+[dependencies]
+wire = { package = "blubber", path = "../../crates/blubber", default-features = false, features = ["derive"] }
+
+[lints]
+workspace = true

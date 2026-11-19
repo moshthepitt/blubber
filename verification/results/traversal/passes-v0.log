@@ -1,0 +1,17 @@
+Q7 v0: PASS 12 budgets / 60 samples; FAIL 0; sizes=(0, 1, 10, 100, 1000)
+Tools: SBF v1.53 / Rust 1.89.0-dev; Mollusk 0.16.2 / Agave 4.3.0;
+source-sha256=8d9f752a0e8e232752b9c7929f02a0f0176405383ec160f794bca34a0b1f0da3
+raw-sha256=cd89e388765a048f22886ed603613b985cfffd06cc183d9019254e71b841eaa2
+elf-sha256=564af55fcbf4a6ffdcab770b218707b2c6a5e917c1b1060a268804db191403bf
+{"enforced": true, "limit": [200, 2500], "max_intercept": 1894.5, "row": "list_indexed_cursor_get_plain", "slope_100_1000": 192.75, "slope_10_100": 190.67777777777778, "totals": [1596, 1969, 3822, 20983, 194458]}
+{"enforced": true, "limit": [200, 2500], "max_intercept": 1974.5, "row": "list_indexed_cursor_set_plain", "slope_100_1000": 119.75, "slope_10_100": 117.67777777777778, "totals": [1663, 2000, 3172, 13763, 121538]}
+{"enforced": true, "limit": [200, 2500], "max_intercept": 1923.5, "row": "list_indexed_callback_get_plain", "slope_100_1000": 194.75, "slope_10_100": 192.67777777777778, "totals": [1607, 2000, 3871, 21212, 196487]}
+{"enforced": true, "limit": [200, 2500], "max_intercept": 1971.5, "row": "list_indexed_callback_equal_set_plain", "slope_100_1000": 97.75, "slope_10_100": 95.67777777777778, "totals": [1600, 1975, 2949, 11560, 99535]}
+{"enforced": true, "limit": [300, 2800], "max_intercept": 2592.5, "row": "map_indexed_cursor_get_plain", "slope_100_1000": 285.75, "slope_10_100": 283.6777777777778, "totals": [1701, 2589, 5450, 30981, 288156]}
+{"enforced": true, "limit": [205, 2800], "max_intercept": 2544.5, "row": "map_indexed_cursor_set_plain", "slope_100_1000": 192.75, "slope_10_100": 190.67777777777778, "totals": [1702, 2424, 4472, 21633, 195108]}
+{"enforced": true, "limit": [275, 2600], "max_intercept": 2548.5, "row": "map_indexed_callback_get_plain", "slope_100_1000": 265.75, "slope_10_100": 263.6777777777778, "totals": [1601, 2524, 5206, 28937, 268112]}
+{"enforced": true, "limit": [195, 2700], "max_intercept": 2493.5, "row": "map_indexed_callback_equal_set_plain", "slope_100_1000": 179.75, "slope_10_100": 177.67777777777778, "totals": [1600, 2360, 4291, 20282, 182057]}
+{"enforced": true, "limit": [305, 2700], "max_intercept": 2585.5, "row": "map_indexed_cursor_get_common31_adjacent", "slope_100_1000": 294.75, "slope_10_100": 292.6777777777778, "totals": [1703, 2591, 5533, 31874, 297149]}
+{"enforced": true, "limit": [210, 2800], "max_intercept": 2537.5, "row": "map_indexed_cursor_set_common31_adjacent", "slope_100_1000": 201.75, "slope_10_100": 199.67777777777778, "totals": [1704, 2426, 4555, 22526, 204101]}
+{"enforced": true, "limit": [280, 2600], "max_intercept": 2541.5, "row": "map_indexed_callback_get_common31_adjacent", "slope_100_1000": 274.75, "slope_10_100": 272.6777777777778, "totals": [1603, 2526, 5289, 29830, 277105]}
+{"enforced": true, "limit": [195, 2800], "max_intercept": 2486.5, "row": "map_indexed_callback_equal_set_common31_adjacent", "slope_100_1000": 188.75, "slope_10_100": 186.67777777777778, "totals": [1602, 2362, 4374, 21175, 191050]}

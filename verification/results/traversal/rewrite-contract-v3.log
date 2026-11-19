@@ -1,0 +1,7 @@
+Q9 v3; SBF v1.53/Rust 1.89.0-dev; Mollusk 0.16.2
+PASS15 FAIL0; all five APIs in one caller; fatal 4096-byte frame diagnostics; complete byte/read oracles
+Both layouts at n=0,1,10,100,1000; plain and common31 map keys; fill then varied rewrite
+source-sha256=8d9f752a0e8e232752b9c7929f02a0f0176405383ec160f794bca34a0b1f0da3
+raw-sha256=4d08ecbe2a863780e212c456b9e4014ad13aacd360c7024258033ee770d7169c
+elf-sha256=64685e884baa8a79df15642bc8ae44d2c0149840bac2d122c52327c73dbb6df7
+bencher-sha256=747e94a1c62dee107d51105e6186fc9de68bbc30ef09d6b36c59645b5eb5d8a0

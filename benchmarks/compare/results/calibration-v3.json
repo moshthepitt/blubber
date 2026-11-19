@@ -1,0 +1,51 @@
+[
+  {
+    "arch": "v3",
+    "case": "list_fixed_n1000_ref_iter_plain",
+    "observed_cu": 10779,
+    "published_cu": 10779,
+    "relative_error": 0.0
+  },
+  {
+    "arch": "v3",
+    "case": "list_fixed_n1000_callback_equal_set_plain",
+    "observed_cu": 8198,
+    "published_cu": 8198,
+    "relative_error": 0.0
+  },
+  {
+    "arch": "v3",
+    "case": "map_fixed_n1000_ref_iter_plain",
+    "observed_cu": 91116,
+    "published_cu": 91116,
+    "relative_error": 0.0
+  },
+  {
+    "arch": "v3",
+    "case": "map_fixed_n1000_callback_equal_set_plain",
+    "observed_cu": 66025,
+    "published_cu": 66025,
+    "relative_error": 0.0
+  },
+  {
+    "arch": "v3",
+    "case": "list_indexed_n1000_fill_plain",
+    "observed_cu": 52971,
+    "published_cu": 52971,
+    "relative_error": 0.0
+  },
+  {
+    "arch": "v3",
+    "case": "map_indexed_n1000_fill_plain",
+    "observed_cu": 74110,
+    "published_cu": 74110,
+    "relative_error": 0.0
+  },
+  {
+    "arch": "v3",
+    "case": "map_indexed_n1000_map_grow_from_old_values_plain",
+    "observed_cu": 485703,
+    "published_cu": 485703,
+    "relative_error": 0.0
+  }
+]

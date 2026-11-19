@@ -1,0 +1,16 @@
+[package]
+license = "MIT"
+name = "blubber-ergo-tests"
+version = "0.0.0"
+edition = "2021"
+rust-version = "1.97.1"
+publish = false
+
+[dev-dependencies]
+blubber-model = { path = "../../../crates/blubber-model" }
+mollusk-svm = { version = "0.16.2", features = ["inner-instructions", "register-tracing"] }
+solana-svm = { version = "4.3.0", features = ["agave-unstable-api"] }
+solana-account = "4.5.0"
+solana-instruction = "3.5.1"
+solana-pubkey = "4.4.0"
+solana-transaction-status-client-types = "4.3.0"

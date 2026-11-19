@@ -1,0 +1,13 @@
+Kani 0.68.0; CBMC 6.11.0; nightly-2026-08-21; worker counts in per-cohort reports; timeout=600s/harness
+All default safety, overflow, pointer, bounds and unwinding checks enabled
+arithmetic::*: PASS; 6 harnesses; report-sha256: b5af7174f67229e2dfaf6521b7eb63b7fba88a5fd9e4767e696052f3cf6be4a9
+leaf::*: PASS; 29 harnesses; report-sha256: d9402fe1612d059d86e2a5fd89e0cde35977a378fcac49bb343844495f682d3c
+derive_encode::*: PASS; 15 harnesses; report-sha256: f7642625871c62ae05d05be4ea77dd0452eb02e109015ee86d77d66088315399
+error_codes::*: PASS; 3 harnesses; report-sha256: acac3dee2908786b60af75d3787661ff02a28db379e4f4c6f042579eb489f788
+map_key::*: PASS; 23 harnesses; report-sha256: 903784380986febcb6db1d882e46b435a85ac301424157ab79de7354f5ad036f
+fixed_struct::*: PASS; 5 harnesses; report-sha256: d5410638dacfb9560e998fb3e27bf1b4949c2a3187a448399aaffc5996320c2b
+record::*: PASS; 259 harnesses; report-sha256: 2a56c293e4b7024a66f39c322985bf54502b9c58fdf3d3948babd5ebeddf2916
+typed_plan::*: PASS; 21 harnesses; report-sha256: cfde85707626eca9732d331b46fe1c6789ae6e8f9699a999cbb41e3b0d8f03cf
+Total: 361 passed; 0 failed; 0 timeout/OOM/unknown; all explicit inventories matched
+List/map/batched iterator states: bounded Kani cases; other variable typed paths use Verus + bounded-exhaustive tests + Miri; see ASSURANCE.md
+Model-checking exclusions: successful tail compositions; see ASSURANCE.md; not model-checked

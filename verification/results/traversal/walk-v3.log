@@ -1,0 +1,33 @@
+{
+  "stage": "Q7",
+  "architecture": "v3",
+  "source_sha256": "8d9f752a0e8e232752b9c7929f02a0f0176405383ec160f794bca34a0b1f0da3",
+  "indexed_limits": "enforced",
+  "recovery_targets_sha256": "5dd3fa7665a8551044dc1da49dec4ab2f276a057eee6048dd348dd673a099ab5",
+  "tools": {
+    "host": "rustc 1.97.1",
+    "sbf": "v1.53/rustc 1.89.0-dev",
+    "runtime": "Mollusk 0.16.2/Agave 4.3.0",
+    "bencher": "0.16.2"
+  },
+  "bencher_sha256": "2eb034a16245ea0ea4eea39d9d96619017c29b2ba66e44704b64f00179bf31ed",
+  "raw_sha256": "9c2c1d116bcf517422f75669011faae7a534d88b7a60735e1502613d3289beb3",
+  "diagnostic_sha256": "b176eccd37df1701de38b613fc054e6c45cf58f5a683a332818f39d0fbf3fa79",
+  "baseline_sha256": "eeaae58e738be566114f746befd807335a010e45c8317d4ad4e8ef6b2baefd7d",
+  "oracles": {
+    "tests/mollusk/src/matrix.rs": "87882b0399e2f11b0e43109906a9ee706b9e13361e1db7f0c5ef7070073e3b78",
+    "tests/mollusk/src/traversal.rs": "d408ecf7397db341ba2c20a41c2cebc7e28a08bf164daf14735eba2c24baf85d",
+    "tests/mollusk/benches/support/traversal.rs": "91cc403bd7b01e87c3e1d8ac4be2ca71c1a69173dc0c11afae1c58c826cf8367"
+  },
+  "elfs": {
+    "blubber_cu_traversal": "fadb91eaea27af24d41d9719690449371e0bf428ebc1f13a4840b34ea8f268ca",
+    "blubber_cu_traversal_metrics": "04f76e7ef149242db070699578ca1542e06cb76691186344742a39fac1bb5c58"
+  },
+  "tool_sha256": {
+    "host_rustc": "d3a664c970a9fd8361b64194861bebc1ae37b9054e5ee3400dc1c9e691797eea",
+    "sbf_rustc": "d95c95b68e321ad76634e1fd26b0a7c20ccdbae9ad9ca733f3ae2f2b4a0b6002",
+    "lockfile": "9528ae88ac74e95b66a907779acfb3b4f57ee29fcadf1ef98023742de7460efd"
+  },
+  "pass": 1215,
+  "fail": 0
+}

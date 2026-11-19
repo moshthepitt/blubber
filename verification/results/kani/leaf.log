@@ -1,0 +1,38 @@
+Kani Rust Verifier 0.68.0 (standalone)
+CBMC 6.11.0
+rustc 1.100.0-nightly (8925ea358 2026-08-20)
+Kani: 29 passed; 0 failed; 17606 properties (599 unreachable); default checks enabled
+D14 leaf: real production bodies; jobs=1; per-harness timeout=600s; unwind=0 denotes loop-free
+source-tree-sha256 (156 paths; sorted path-NUL-content-hash): abb04ca65257167d4ede3b7a5efc38d95887900e4c05e6bf90a3ec9cbccf8821
+kani-raw-sha256: 2e056f0a9e633e5d110c7e3eb50df3249d09420c7d244e675df18f5d5dd4a172
+Coverage: 10 expected covers satisfied; all 29 per-harness counts matched
+cover-inventory-sha256 (sorted name:count lines): 2bbe71c075a6eb18231f31f2539c499b3366baa837c961ed4d2a67f38b5764d7
+leaf_bool_and_option: PASS; width=3; unwind=4
+leaf_chunk_admission: PASS; width=8; unwind=10
+leaf_chunk_bool: PASS; width=8; unwind=10
+leaf_chunk_custom_domain_n0: PASS; width=8; unwind=10
+leaf_chunk_custom_domain_n1: PASS; width=8; unwind=10
+leaf_chunk_custom_domain_n2: PASS; width=8; unwind=10
+leaf_chunk_custom_domain_n3: PASS; width=8; unwind=10
+leaf_chunk_custom_domain_n4: PASS; width=8; unwind=10
+leaf_chunk_decoder_selection: PASS; width=3; unwind=5
+leaf_fixed_region_decoders: PASS; width=16; unwind=19
+leaf_i128: PASS; width=17; unwind=19
+leaf_i16: PASS; width=17; unwind=19
+leaf_i32: PASS; width=17; unwind=19
+leaf_i64: PASS; width=17; unwind=19
+leaf_i8: PASS; width=17; unwind=19
+leaf_u128: PASS; width=17; unwind=19
+leaf_u16: PASS; width=17; unwind=19
+leaf_u32: PASS; width=17; unwind=19
+leaf_u64: PASS; width=17; unwind=19
+leaf_u8: PASS; width=17; unwind=19
+leaf_utf8_0: PASS; width=0; unwind=10
+leaf_utf8_1: PASS; width=1; unwind=10
+leaf_utf8_2: PASS; width=2; unwind=10
+leaf_utf8_3: PASS; width=3; unwind=10
+leaf_utf8_4: PASS; width=4; unwind=10
+leaf_utf8_5: PASS; width=5; unwind=10
+leaf_utf8_6: PASS; width=6; unwind=10
+leaf_utf8_7: PASS; width=7; unwind=10
+leaf_utf8_8: PASS; width=8; unwind=10
