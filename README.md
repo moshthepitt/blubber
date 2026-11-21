@@ -1,219 +1,115 @@
 # Blubber
 
-A Solana account gives you one byte slice. If you want to push to a list in
-that slice, Blubber gives you a typed editor that works in place. A derive
-generates the readers and editors for your schema. Pinocchio support handles
-account borrows, growth and rent settlement.
+Blubber is a Rust library for Solana programs that stores lists, strings and maps inside an account and edits them in place.
 
-One maintainer works on this 0.1.0 release. Verus checks the byte kernel. The
-typed APIs and runtime account behaviour have separate checks and tests.
-[Assurance](ASSURANCE.md) explains the bounds of each claim.
+I have been writing Solana programs since the first version of Anchor. Back then, if you wanted a map, the advice was to use a PDA per entry. That works, but every instruction and client call has to pass around all those extra accounts. The other options have their own costs: `bytemuck` and Anchor zero-copy make you pick a maximum length up front and pay rent for empty slots, while Borsh copies the whole account onto the heap and writes it back. When I was one of the developers on the Star Atlas programs, we needed variable-size types badly enough that we left Anchor and wrote our own framework, Star Frame.
 
-I built it because I wanted to see what is possible. I think the idea of simple
-and friendly Solana unsized types is a worthy goal, and I wanted to contribute
-to this area.
+So I built Blubber to solve that problem as a library, not a framework. You declare an account struct with `List`, `Str` and `Map` fields, and Blubber generates typed readers and editors that work on the account bytes directly. That lets you keep a player inventory, an allowlist or a registry in one account. When data grows, the account grows and the handler pays the rent difference. It plugs into Pinocchio today, and Anchor support is coming.
+
+Here is a queue account with an authority and a list of `u64`:
+
+<!-- code:schema -->
+```rust
+use blubber::List;
+
+/// An append-only queue of numbers.
+#[blubber::schema(account)]
+pub struct Queue {
+    /// Signer allowed to append.
+    pub authority: Address,
+    /// Values in insertion order.
+    pub values: List<u64>,
+}
+```
+
+<!-- code:push -->
+```rust
+fn push(
+    program_id: &Address,
+    state: &mut AccountView,
+    authority: &AccountView,
+    payer: &AccountView,
+    system_program: &AccountView,
+    value: u64,
+) -> ProgramResult {
+    if !authority.is_signer() {
+        return Err(ProgramError::MissingRequiredSignature);
+    }
+    let signer = *authority.address();
+    // This program initializes the queue and is its only writer.
+    Queue::with_edit_options(
+        state,
+        program_id,
+        EditOptions {
+            funding: Funding::TopUp {
+                payer,
+                system_program,
+            },
+            headroom: Headroom::UpTo(8), // One u64, with no spare bytes at opening.
+            refund: None,
+        },
+        |queue| {
+            if queue.try_authority()? != signer {
+                return Err(ErrorKind::Unauthorized.into());
+            }
+            queue.values_mut().push(value)
+        },
+    )?;
+    Ok(())
+}
+```
+
+The account has no spare bytes when the edit opens, so `Headroom::UpTo(8)` asks for up to eight more, enough for one `u64`. `Funding::TopUp` moves the extra rent from `payer` when the account grows. The closure runs on the account bytes, so nothing is decoded into a `Vec`.
+
+Other in-place libraries exist too, including Star Frame, which I helped build, and Zeropod. Below is the measured cost of four operations on SBF v0 with 1,000 items:
+
+| Operation (1,000 items, SBF v0) | Blubber (lazy load) | Blubber (checked load) | Borsh | Fastest other library |
+| --- | --- | --- | --- | --- |
+| Sum a `List<u64>` | 10,566<!-- num:cmp.v0.n1000.list_sum.lazy --> CU | 10,854<!-- num:cmp.v0.n1000.list_sum.checked --> CU | 27,481<!-- num:cmp.v0.n1000.list_sum.borsh --> CU | 10,295<!-- num:cmp.v0.n1000.list_sum.bytemuck --> CU (`bytemuck`) |
+| Look up one key in a `Map` | 974<!-- num:cmp.v0.n1000.map_lookup.lazy --> CU | 22,401<!-- num:cmp.v0.n1000.map_lookup.checked --> CU | 188,944<!-- num:cmp.v0.n1000.map_lookup.borsh --> CU | 426<!-- num:cmp.v0.n1000.map_lookup.zeropod --> CU (Zeropod) |
+| Push one `u64` to a `List<u64>` | 1,446<!-- num:cmp.v0.n1000.list_push.lazy --> CU | 1,781<!-- num:cmp.v0.n1000.list_push.checked --> CU | 50,642<!-- num:cmp.v0.n1000.list_push.borsh --> CU | 389<!-- num:cmp.v0.n1000.list_push.anchor_slab --> CU (Anchor slab) |
+| Set every string in a `List<Str>` to a longer string | 45,153<!-- num:cmp.v0.n1000.list_grow_constant.lazy --> CU | 49,169<!-- num:cmp.v0.n1000.list_grow_constant.checked --> CU | 397,094<!-- num:cmp.v0.n1000.list_grow_constant.borsh --> CU | 202,917<!-- num:cmp.v0.n1000.list_grow_constant.star_frame --> CU (Star Frame) |
+
+A lazy load checks the account header up front and checks fields as you read them. A checked load scans the whole account before your code runs, so its cost grows with the account. That is why the checked lookup costs so much more than the lazy one.
+
+At 1,000 items, lazy Blubber used fewer CU than Borsh on every operation Borsh could finish, and Borsh ran out of heap on 1<!-- num:cmp.v0.n1000.summary.borsh_heap_exhausted --> more. Rewriting many strings is where Blubber is the fastest library measured: setting every string to a longer one costs about 4.5<!-- num:cmp.v0.n1000.derived.constant_fill_star_frame_ratio_rounded --> times less CU than Star Frame and about 9<!-- num:cmp.v0.n1000.derived.constant_fill_borsh_ratio_rounded --> times less than Borsh, and uses no heap. A single push or lookup costs about 550<!-- num:cmp.v0.n1000.derived.map_lookup_zeropod_extra_rounded --> to 1,050<!-- num:cmp.v0.n1000.derived.list_push_anchor_slab_extra_rounded --> CU more than the fastest library measured; see [`benchmarks/COMPARE.md`](benchmarks/COMPARE.md) and [`benchmarks/compare/GAPS.md`](benchmarks/compare/GAPS.md).
+
+Blubber's source has no `unsafe` code. Verus checks the byte-moving core, with all 1,707<!-- num:proof.verus.verified --> proof obligations passing, and there is no external audit yet. See [`ASSURANCE.md`](ASSURANCE.md).
 
 ## Install
 
-For the 0.1.0 release:
+Run `cargo add blubber@0.1.0 --features pinocchio`<!-- num-code:"cargo add blubber@{{num:release.blubber.version}} --features pinocchio" --> on Rust 1.89.0<!-- num:release.rust.minimum -->+. See the [guide](docs/guide.md#create-an-account) for crate features.
 
-```sh
-cargo add blubber@0.1.0 --features pinocchio
-```
+## Release status
 
-The equivalent dependency entry is:
+`blubber`, `blubber-core` and `blubber-derive` 0.1.0<!-- num:release.blubber.version --> are on crates.io and docs.rs. See [`CHANGELOG.md`](CHANGELOG.md#010).
 
-```toml
-[dependencies]
-blubber = { version = "0.1.0", features = ["pinocchio"] }
-```
+## What is missing
 
-The default `derive` feature generates schemas and accessors. An unpublished
-[Anchor adapter](crates/blubber-anchor/README.md) is available from the repository. Rust 1.89 or newer is required. The library is `no_std` and forbids unsafe
-code. The gate suite checks both the minimum Rust version and the pinned host
-compiler.
-
-## Initialize, edit and read
-
-This example runs on host storage without an SDK or allocator:
-
-```rust
-use blubber::{List, SliceStore, Str};
-
-#[blubber::schema(account, namespace = "example:queue", semantic_epoch = 1)]
-struct Queue {
-    count: u64,
-    label: Str,
-    values: List<u64>,
-}
-
-let mut bytes = [0; 256];
-let mut store = SliceStore::new(&mut bytes);
-let mut queue = Queue::initialize(&mut store, QueueInit {
-    count: 0,
-    label: "pending",
-    values: &[10, 20],
-})?;
-queue.count_mut().set(1)?;
-queue.label_mut().set("ready")?;
-queue.values_mut().push(30)?;
-let receipt = queue.commit()?;
-
-let queue = Queue::load(&bytes[..receipt.used_len as usize])?;
-assert_eq!(queue.count(), 1);
-assert_eq!(queue.label(), "ready");
-let sum = queue.values().try_iter().try_fold(0, |sum, value| {
-    value.map(|value| sum + value)
-})?;
-assert_eq!(sum, 60);
-# Ok::<(), blubber::Error>(())
-```
-
-For runtime accounts, use the [Pinocchio quickstart](docs/guide.md#pinocchio-accounts).
-It covers owner and application authority checks, lazy and checked loads,
-explicit growth budgets and commit propagation. The [complete edit tour](programs/blubber-demo/src/exercise.rs)
-also runs on host stores and SBF. Treat every SBF stack warning as an error:
-frames must fit 4,096 bytes. Direct mapping removes stack frame gaps on v0.
-The repository's [stack checker](scripts/sbf-stack.sh) enforces this during builds.
-
-## For coding agents
-
-<!-- agent-rules:start -->
-
-1. Load. Use `State::with_read` and `State::with_edit` for a valid current
-   schema written only by approved writers. After a raw write, an unaudited
-   CPI writer or a program upgrade, use `with_read_checked`,
-   `with_edit_checked` or `with_edit_checked_options`.
-2. Authority. Take the expected owner from a program constant or the
-   runtime-supplied program ID. Check application authority, including signer
-   and PDA seeds as applicable, before changing bytes.
-3. Headroom. The default is `Headroom::UpTo(0)`. For growth, set
-   `Headroom::UpTo(n)` to the peak additional encoded bytes beyond opening
-   spare. Include new directory words and changed ancestor sizes. Pushing to
-   a nonempty indexed string list adds one four-byte end word plus UTF-8 bytes.
-4. Funding. Use `Funding::Prepaid` if the account already has final rent.
-   Use `Funding::TopUp { payer, system_program }` to fund a deficit.
-5. Commit. Commit a direct mutable session with `root.commit()?` before CPI.
-   Scoped edit helpers commit on callback success. Propagate the commit error
-   and use the returned receipt if you need the published length.
-6. Errors. Return edit errors from the instruction so the transaction rolls
-   back. A callback error alone does not undo completed writes. Repair or roll
-   back poisoned bytes and use an explicit checked mutable load to recover.
-7. Reads. Use `try_get` and `try_iter` on lazy runtime collections to
-   propagate invalid input. Use fallible field accessors where provided.
-8. Borrows. Finish reads before editing or resizing the same storage. Keep
-   one child editor live at a time. Use `with_mut`, `cursor_mut` or
-   `try_for_each_mut` for scoped edits and passes.
-9. SBF. Start with `no_std` and enable `alloc` when using
-   `Headroom::OnDemand`. Reject stack diagnostics. Frames must fit 4,096
-   bytes. Split large handlers with `#[inline(never)]` and rebuild.
-10. Schema. Use a concrete account root. Set `namespace` and `semantic_epoch`
-    before deployment. Bump the epoch and migrate when the meaning changes.
-    Use supported codecs for enum or float representations.
-
-<!-- agent-rules:end -->
-
-Find examples and tests in the [agent guide](docs/agents.md).
-
-## Choose features and schemas
-
-| Feature | Adds |
-| --- | --- |
-| Default `derive` | `#[blubber::schema]`, `#[derive(blubber::Fixed)]` and generated accessors |
-| No default features | Typed APIs with handwritten schema contracts; no SDK dependency |
-| `alloc` | Owned mirrors, extraction helpers and `VecStore` |
-| `pinocchio` | Safe account guards, headroom leases, rent settlement and signer/PDA creation |
-| `account-runtime` | Support for runtime adapters; applications normally use `pinocchio` |
-| `max-depth-16` | A sixteen-node depth budget instead of eight; identical wire format |
-| `verify-on-load` | Full scans on lazy loads and initialization; opt-in |
-
-Format 1 supports signed and unsigned integers through 128 bits, booleans,
-fixed byte arrays, public keys, packed fixed structs, UTF-8 strings, options,
-lists and sorted maps. Nested schemas support type and const generics; account
-roots must be concrete. Enums and floating-point codecs are not provided.
-See the [schema guide](docs/guide.md#schemas) and [identity and migration](docs/trust-model.md#account-identity).
-
-Account editing defaults to `Headroom::UpTo(0)`. Equal-width edits and growth
-within existing spare need no new reservation. Request positive encoded growth
-beyond that spare with `EditOptions`, including directory and parent bytes.
-`Max` and allocator-dependent `OnDemand` require explicit selection.
-
-Raw byte loads and host mutable loads scan the complete active encoding.
-Authenticated Pinocchio loads check owner, identity and envelope, then check
-touched contents. Lazy entry requires valid initialization or migration for the
-current schema followed only by approved writers. It does not certify untouched
-bytes or global map order. Use checked entry after raw writes or an unaudited
-handoff. The [trust model](docs/trust-model.md) explains recovery and proof limits.
-
-Read the [guide](docs/guide.md), [recipes](docs/recipes.md),
-[trust model](docs/trust-model.md) and [performance guide](docs/performance.md).
-[SPEC.md](SPEC.md) defines the format and operation contracts.
-
-## Performance
-
-Whole instruction CU at n=1000 on SBF v0, generated from the retained comparison
-data. List strings grow from eight to seventeen bytes; map growth derives new
-values from old values and includes staging. Each library keeps its measured
-load and capacity contract. Fixed baselines reserve 1000 slots; PinaPod reserves
-seventeen-byte string slots, and Critbit uses the fixture's 128-bit key projection.
-
-<!-- compare-headline:start -->
-
-| Library | List sum | Map lookup | List grow all | Map grow all |
-|---|---|---|---|---|
-| Blubber lazy | 10,566 | 974 | 45,185 | 521,411 |
-| Blubber checked | 10,854 | 22,401 | 49,177 | 525,376 |
-| Borsh | 27,481 | 188,944 | 397,094 | OOM |
-| Star Frame | 17,341 | 537 | 202,917 | 1,287,238 |
-| Bytemuck | 10,295 | n/a | n/a | n/a |
-| Sokoban | n/a | 583 | n/a | n/a |
-| Zeropod | 11,306 | 426 | 516,682 | 878,116 |
-| Wincode | 10,332 | 632 | 424,705 | 1,328,841 |
-| PinaPod | 10,303 | n/a | 786,919 | n/a |
-| Light | 10,297 | n/a | n/a | n/a |
-| Anchor slab | 10,298 | n/a | n/a | n/a |
-| Critbit | n/a | 1,268 | n/a | n/a |
-| Manifest | n/a | 573 | n/a | n/a |
-| Manifest checked | n/a | 835,565 | n/a | n/a |
-
-<!-- compare-headline:end -->
-
-<!-- compare-summary:start -->
-
-Blubber lazy list sum costs 10,566 CU versus 10,295 for Bytemuck; map lookup costs 974 versus 426 for Zeropod. Blubber lazy string-list growth costs 45,185 CU versus 202,917 for Star Frame. Old-dependent string-map growth costs 521,411 versus 878,116 for Zeropod. These are v0 whole-instruction totals for the measured methods and load policies.
-
-<!-- compare-summary:end -->
-
-<!-- compare-arch-note:start -->
-
-Most v3 headline values are within a few CU of v0. Blubber string-list growth differs by 3,978 to 3,984 CU. The other headline differences are at most 12 CU. See the [full data](benchmarks/COMPARE.md).
-
-<!-- compare-arch-note:end -->
-
-[Per-size tables](docs/performance.md#comparison-by-size) show both architectures.
-The lazy list sum and Bytemuck both add 10 CU per item over the sampled
-nonempty sizes. The headline map lookup hits the middle key on Blubber's
-first probe. That lazy lookup and Zeropod's both have a flat cost across those
-sizes. In both comparisons the whole-instruction gap is fixed overhead.
-[Comparison measurements](benchmarks/compare/results/all.csv).
-
-The [full comparison](benchmarks/COMPARE.md) includes load policies, matching idles,
-heap, account sizes and failed operations. Measurements use platform-tools v1.53,
-Mollusk 0.16.2, a 40,000,000-CU meter and 256 KiB heap; expensive rows can exceed a
-production transaction's budget. The [receipt](benchmarks/compare/results/receipt.json)
-binds measured sources, tools, ELFs and independent byte/read checks.
+- Enums and floats.
+- String map keys, because map keys are fixed-size today, such as integers and public keys.
+- Rewriting every string in a list from its old value in one call, which maps already support.
+- A TypeScript decoder and stock Anchor account decoding.
 
 ## Roadmap
 
-After 0.1.0 I want to bring down the cost of a single map lookup and let the
-benchmarks guide the rest of the speed work. I plan to work on client and IDL
-tooling, including account decoders where the library can describe the wire
-format. A TypeScript decoder and variable-size string keys for maps are on the
-list. I am aiming to add enums in 0.2.
+I plan to build:
 
-I want an external review before 1.0, which I am aiming to ship in the first
-quarter of 2027.
+- Enums in 0.2<!-- num:roadmap.enums.version -->
+- String map keys
+- Cheaper single lookups
+- Client and IDL tooling, and a TypeScript decoder
+- External review before the 1.0<!-- num:roadmap.stable.version --> release planned for Q1 2027<!-- num:roadmap.stable.quarter -->
 
-## License
+## Where to go next
 
-[MIT](LICENSE).
+- [Write an account and handler](docs/guide.md#create-an-account)
+- [Size headroom and replace collections](docs/recipes.md#replace-a-collection)
+- [Choose lazy or checked loads](docs/trust-model.md#choose-a-load)
+- [Inspect benchmark numbers](docs/performance.md#find-the-numbers)
+- [Fix a version mismatch](docs/guide.md#fix-a-version-mismatch)
+- Coding agents: [`docs/agents.md`](docs/agents.md#find-the-task).
+
+## Licence
+
+MIT. See [`LICENSE`](LICENSE).

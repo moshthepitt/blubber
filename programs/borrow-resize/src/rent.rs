@@ -23,7 +23,7 @@ pub(super) fn run(id: &Address, accounts: &mut [AccountView], ix: &[u8]) -> Prog
         Funding::Prepaid
     };
     let action = *ix.get(4).ok_or(ProgramError::InvalidInstructionData)?;
-    let expected = ProgramError::Custom(0xB100 + u32::from(*ix.get(13).unwrap_or(&0)));
+    let expected = 0xB100 + u32::from(*ix.get(13).unwrap_or(&0));
     let original = state.data_len();
     let mut alias = *state;
     let mut payer_alias = *payer;
@@ -46,7 +46,7 @@ pub(super) fn run(id: &Address, accounts: &mut [AccountView], ix: &[u8]) -> Prog
     }
     let opened = Store::new_with_headroom(state, id, funding, mode);
     if matches!(action, 6 | 8) {
-        assert!(matches!(opened, Err(error) if ProgramError::from(error) == expected));
+        assert!(matches!(opened, Err(error) if error.custom_code() == Some(expected)));
         assert_eq!(alias.data_len(), original, "invalid funding grew state");
         assert!(!alias.is_borrowed());
         return Ok(());
@@ -74,7 +74,7 @@ pub(super) fn run(id: &Address, accounts: &mut [AccountView], ix: &[u8]) -> Prog
         Ok(store)
     };
     if matches!(action, 7 | 9) {
-        assert!(matches!(attached, Err(error) if ProgramError::from(error) == expected));
+        assert!(matches!(attached, Err(error) if error.custom_code() == Some(expected)));
         assert!(!alias.is_borrowed());
         return Ok(());
     }

@@ -7,7 +7,7 @@ use std::fmt::Write;
 const NUMBERS: [&str; 10] = [
     "u8", "u16", "u32", "u64", "u128", "i8", "i16", "i32", "i64", "i128",
 ];
-const KEYS: [&str; 8] = ["u16", "i16", "u32", "i32", "u8", "i8", "[u8; 3]", "Pubkey"];
+const KEYS: [&str; 8] = ["u16", "i16", "u32", "i32", "u8", "i8", "[u8; 3]", "Address"];
 
 fn structure(out: &mut String, name: &str, fields: &[(&str, String)], account: bool) {
     writeln!(
@@ -186,6 +186,11 @@ pub(crate) fn source() -> String {
             "pub(super) fn shape() -> ModelSchema {{ <Root as Bridge>::schema() }}"
         )
         .unwrap();
+        writeln!(
+            out,
+            "pub(super) fn encoding() -> String {{ fixture_encoding::<Root>({id}, Root::DISCRIMINATOR) }}"
+        )
+        .unwrap();
         if id == 0 {
             writeln!(out, "#[test]\nfn detection_controls() {{ detection_controls_for::<Root>(Root::DISCRIMINATOR); }}").unwrap();
         }
@@ -200,5 +205,14 @@ pub(crate) fn source() -> String {
         writeln!(out, "fixture_{id:02}::shape(),").unwrap();
     }
     writeln!(out, "]; let unique: std::collections::BTreeSet<_> = schemas.iter().map(|s| format!(\"{{s:?}}\")).collect(); assert_eq!(unique.len(), 32); assert_eq!(schemas.iter().map(oracle::depth).max(), Some(8)); for s in schemas {{ s.check(8).unwrap(); }} }}").unwrap();
+    writeln!(
+        out,
+        "#[test]\nfn fixture_encodings_match_goldens() {{ let actual = ["
+    )
+    .unwrap();
+    for id in 0..32 {
+        writeln!(out, "fixture_{id:02}::encoding(),").unwrap();
+    }
+    writeln!(out, "]; assert_eq!(actual.join(\"\\n\"), include_str!(concat!(env!(\"CARGO_MANIFEST_DIR\"), \"/tests/support/differential/wire-vectors.txt\")).trim_end()); }}").unwrap();
     out
 }

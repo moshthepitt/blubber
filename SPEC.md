@@ -1,15 +1,28 @@
-# Format and API specification
+# Specification
 
-Blubber stores a tree of exact byte regions in one allocation. Each child of a valid
-root is contained in its parent. Relative payload boundaries let a whole subtree move
-without changing its internal encoding. Scalars decode by value; strings borrow checked
-UTF-8. Account bytes never become native Rust structs or collection headers.
+This document defines Format 1, the wire contract for Blubber accounts, along with the typed API contracts and runtime adapter behaviour. Read this if you are reviewing a guarantee or writing an independent codec or decoder. If you are choosing a load policy for an application, start with [`docs/trust-model.md#choose-a-load`](docs/trust-model.md#choose-a-load).
 
-This document specifies the current wire format, typed API contracts and adapter
-boundaries. [ASSURANCE.md](ASSURANCE.md) states what has been proved, model-checked or
-tested, with the bounds and trusted premises. The generated [public API
-listing](verification/public-api.txt) records exact declarations; [API
-coverage](verification/public-api.tsv) maps implementation areas to checks.
+## Use this specification
+
+A schema describes the fields and how to encode them: the account root describes the whole account payload, and a nested schema describes an item or field. The account envelope contains identity and used length, while a codec reads and writes a type's encoding. A stable schema namespace and a semantic epoch contribute to the default identity, and the discriminator stores the chosen identity in the account bytes.
+
+Source-level declarations such as `Schema`, `AccountSchema`, `MapKey` and `Resize` are listed in [`verification/public-api.txt`](verification/public-api.txt), with the item inventory in [`verification/public-api.tsv`](verification/public-api.tsv). For the methods generated for a specific account struct, read the macro documentation in [`crates/blubber-derive/src/lib.rs`](crates/blubber-derive/src/lib.rs) and its `Queue` example. Keep the tour markers in this file intact: [`crates/blubber/tests/tour.rs`](crates/blubber/tests/tour.rs) checks that the marked tour matches its compiled source, and the test fails if they drift.
+
+## Find a contract
+
+| Topic | Contract sections |
+| --- | --- |
+| Built-in scalar and collection encodings, `MapKey` ordering, and schema depth budgets | [`#wire-formats`](#wire-formats), [`#schemas-and-generated-types`](#schemas-and-generated-types) |
+| Canonical layout descriptors, semantic epochs, and account discriminators | [`#layout-bound-identity`](#layout-bound-identity) |
+| Checked scan rules, lazy load preconditions, and writer history | [`#loads-and-writer-history`](#loads-and-writer-history) |
+| In-place borrowed edits, byte movement, and outside-byte preservation | [`#typed-edits-and-atomicity`](#typed-edits-and-atomicity), [`#physical-splice-and-publication`](#physical-splice-and-publication) |
+| Raw byte gateways and custom codec obligations | [`#strict-raw-gateways`](#strict-raw-gateways) |
+| Error kinds, byte offsets, poisoning, and rollback expectations | [`#errors-and-offsets`](#errors-and-offsets) |
+| Runtime headroom, `Resize` limits, commit, and rent settlement | [`#runtime-headroom-and-settlement`](#runtime-headroom-and-settlement) |
+
+## Find supporting evidence
+
+This file defines the contract. [`ASSURANCE.md#find-a-claim`](ASSURANCE.md#find-a-claim) records the scope of the Verus proofs and test suites. The final section of this specification records their premises.
 
 ## Crates and ownership
 
@@ -19,12 +32,9 @@ provides typed views, edits, storage and generated-code support; `blubber-derive
 local schema types and fixed codecs. The independent `blubber-model` is unpublished and
 test-only.
 
-The `derive` feature is enabled by default. `alloc` adds owned mirrors, Vec storage and
-explicit on-demand growth. `account-runtime` supplies account runtime support;
-`pinocchio` exposes its adapter. The unpublished `blubber-anchor` crate depends on
-`blubber` through `account-runtime` and `__private` support. It does not add a framework
-dependency to the published crates. Adapter-specific setup is documented in [its
-README](crates/blubber-anchor/README.md).
+The `derive` feature is enabled by default. `alloc` adds owned mirrors and Vec
+storage. `pinocchio` provides the account runtime adapter and re-exports its
+SDK as `pinocchio_sdk`. Together, `alloc` and `pinocchio` support on-demand growth.
 
 Every local crate and generated implementation forbids unsafe code. Views use safe
 immutable borrows; editors own an exclusive root capability. Holding a child prevents
@@ -48,7 +58,7 @@ runtime costs never replace that whole-instruction measurement.
 `programs/blubber-demo/src/state.rs`:
 
 ```rust
-use blubber::{List, Map, Pubkey, Str};
+use blubber::{Address, List, Map, Str};
 
 /// Native limits encoded without Rust padding.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, blubber::Fixed)]
@@ -72,13 +82,13 @@ pub struct Record {
 #[blubber::schema(account)]
 pub struct MyAccount {
     /// Authority allowed to run the exercise.
-    pub authority: Pubkey,
+    pub authority: Address,
     /// Example counter.
     pub counter: u64,
     /// Variable-size records.
     pub records: List<Record>,
     /// Balances ordered by public key.
-    pub balances: Map<Pubkey, u64>,
+    pub balances: Map<Address, u64>,
     /// Labels ordered by numeric key.
     pub labels: Map<u16, Str>,
     /// Uncounted UTF-8 note.
@@ -92,7 +102,7 @@ pub struct MyAccount {
 }
 
 /// Borrows static inputs and copies the account's stored `authority`.
-pub fn seed(authority: Pubkey) -> MyAccountInit<'static> {
+pub fn seed(authority: Address) -> MyAccountInit<'static> {
     const RECORDS: &[RecordInit<'static>] = &[
         RecordInit {
             name: "one",
@@ -124,12 +134,12 @@ pub fn seed(authority: Pubkey) -> MyAccountInit<'static> {
 
 ```rust
 use crate::state::{Limits, MyAccountMut, RecordInit};
-use blubber::{ErrorKind, Pubkey, Result};
+use blubber::{Address, ErrorKind, Result};
 
 /// Runs the complete read/edit tour after checking the stored authority.
 ///
 /// Expects an account initialized from [`crate::state::seed`].
-pub fn exercise(acct: &mut MyAccountMut<'_>, actor: Pubkey) -> Result<()> {
+pub fn exercise(acct: &mut MyAccountMut<'_>, actor: Address) -> Result<()> {
     if acct.authority() != actor {
         return Err(ErrorKind::Unauthorized.into());
     }
@@ -145,7 +155,7 @@ pub fn exercise(acct: &mut MyAccountMut<'_>, actor: Pubkey) -> Result<()> {
         }
     }
     for (key, amount) in acct.balances() {
-        let _: (Pubkey, u64) = (key, amount);
+        let _: (Address, u64) = (key, amount);
     }
     // Last uses of the borrowed reads precede the first edit.
 
@@ -154,7 +164,9 @@ pub fn exercise(acct: &mut MyAccountMut<'_>, actor: Pubkey) -> Result<()> {
         enabled: true,
         limit: 200,
     })?;
+    // docs:start nested-string-edit
     acct.records_mut().at_mut(1)?.name_mut().set("longer")?;
+    // docs:end nested-string-edit
     acct.records_mut()
         .at_mut(1)?
         .tags_mut()
@@ -266,15 +278,15 @@ pub mod exercise;
 pub mod state;
 
 use blubber::pinocchio::{EditOptions, Funding, Headroom};
-use pinocchio::{error::ProgramError, AccountView, Address, ProgramResult};
+use blubber::pinocchio_sdk::{error::ProgramError, AccountView, Address, ProgramResult};
 use state::{seed, MyAccount};
 
 #[cfg(target_os = "solana")]
-pinocchio::program_entrypoint!(process_instruction, 3);
+blubber::pinocchio_sdk::program_entrypoint!(process_instruction, 3);
 #[cfg(target_os = "solana")]
-pinocchio::no_allocator!();
+blubber::pinocchio_sdk::no_allocator!();
 #[cfg(target_os = "solana")]
-pinocchio::nostd_panic_handler!();
+blubber::pinocchio_sdk::nostd_panic_handler!();
 
 /// Dispatches creation (0), read-only validation (1), or the edit tour (2).
 ///
@@ -303,7 +315,7 @@ pub fn process_instruction(
     if !payer.is_signer() {
         return Err(ProgramError::MissingRequiredSignature);
     }
-    let actor = (*payer.address()).into();
+    let actor = *payer.address();
     match *opcode {
         0 => {
             let _receipt =
@@ -351,7 +363,7 @@ last child. Empty strings are zero bytes. Equal adjacent boundaries are valid.
 | `u8/u16/u32/u64/u128` | 1/2/4/8/16 bytes, unsigned LE |
 | `i8/i16/i32/i64/i128` | 1/2/4/8/16 bytes, two's-complement LE |
 | `bool` | One byte, exactly `00` or `01` |
-| `Pubkey` | Exactly 32 raw bytes; SDK-independent newtype |
+| `Address` | Exactly 32 raw bytes |
 | `[u8; N]` | Exactly N raw bytes; N > 0 for fixed/container use |
 | Derived `Fixed` struct | Concatenated fixed field encodings in declaration order; bool checks recurse |
 | `Str` | Raw UTF-8 bytes, no length word or terminator; entire exact region is the string |
@@ -425,7 +437,7 @@ relation must reflect the Rust key's total order.
 | Unsigned integer | Big-endian, fixed width |
 | Signed integer | Reinterpret two's-complement bits as unsigned, XOR its most significant sign bit, then big-endian |
 | `bool` | `00` or `01` |
-| `Pubkey`, `[u8; N]` | Raw bytes, lexicographic order |
+| `Address`, `[u8; N]` | Raw bytes, lexicographic order |
 
 For example, i16 values -32768, -1, 0, 32767 encode as `00 00`, `7f ff`, `80 00`, `ff
 ff`. Ordinary scalar u16 256 encodes `00 01`; map key u16 256 encodes `01 00`. Fixed
@@ -538,6 +550,12 @@ destination after successful measurement, must write every byte, and must match 
 schema. Built-in/generated encoders are deterministic and nonallocating on measured
 inputs. The fallible slot adapter checks the returned byte count. Short/long counts,
 errors or unwinding after destructive work leave poison set.
+
+Account initialization completes measurement and any required replay before modifying
+storage. After preflight and resize, it marks the store poisoned, zeroes the exposed
+bytes, and writes the exact payload through the replay writer. It publishes the
+discriminator and used length after encoding, then clears poison after any required
+validation.
 
 Handwritten Schema, Fixed and MapKey implementations remain outside functional
 assurance. Their audit/replay/order markers default to false. Derives and containers
@@ -736,7 +754,7 @@ fixed. Option, List, Map and UTF-8 are variable. All byte lengths and packed
 widths must fit u32.
 
 No Rust type names, table indices, addresses, witness flags or optimisation
-fields occur in this encoding. Pubkey, Address and `[u8; 32]` share the raw
+fields occur in this encoding. `Address` and `[u8; 32]` share the raw
 contract. `List<u8>` uses the counted-list contract. Fixed derive and a
 schema marker with the same packed fields share the struct contract.
 
@@ -842,6 +860,19 @@ Lazy fixed-map fill can omit a source-key scan when independent stride geometry 
 every loan; checked routes retain validation. Empty input, count mismatch,
 measurement/capacity errors and codec failures retain their distinct frames and poison
 rules. Every required measurement/encode call and exact slot-length check remains.
+
+With `alloc`, `MapMut<K, Str>::rewrite_values_with` admits the map directory and
+keys, then visits old strings in entry order through the batched reader. The caller
+sets a total byte capacity for staging. The transform receives the old string and
+the remaining writable slice, writes its replacement at the start and returns the
+length. A length beyond that slice returns `Capacity`. Equal-width replacements
+need no staging offsets. One UTF-8 scan checks the packed output, and every
+replacement end must lie on a character boundary. Callback errors, staging
+allocation failures and invalid output preserve bytes and used length and leave
+poison clear. A detected source fault sets sticky poison on a lazy path. Checked
+admission preserves its pre-write frame. An admitted empty map invokes no callback
+and makes no allocation or write. The existing rewrite stream preserves the count
+and keys and publishes once for a nonempty map.
 
 Variable fill advances payload and directory cursors together. A later encoder failure
 therefore preserves the same partial-progress ordering as individual slot work.
@@ -1411,10 +1442,11 @@ impl From<ErrorKind> for Error { /* Fault { kind, offset: NO_OFFSET } */ }
 For Fault, `custom_code = 0xB100 + kind as u32`. Codes are stable and reserved by
 applications using this adapter. Program errors preserve the SDK's full u64 conversion,
 including native and custom codes; `custom_code` returns None for that variant.
-`From<Error> for pinocchio::error::ProgramError` maps Fault to Custom(code), and Program
-through the SDK's u64 conversion. `From<ProgramError> for Error` records the reverse u64
-representation. Known preflight conditions use the specific Fault kind before invoking
-the SDK.
+`From<Error> for pinocchio::error::ProgramError` uses the SDK's u64 conversion for
+Program and preserves located schema faults as Custom(code). Without an offset, WrongOwner,
+BorrowConflict, GrowthLimit, RentShortfall and AlreadyInitialized map to InvalidAccountOwner,
+AccountBorrowFailed, InvalidRealloc, AccountNotRentExempt and AccountAlreadyInitialized.
+`From<ProgramError> for Error` records the full SDK code.
 
 Offsets identify the first offending account byte: count/header word, directory word,
 key start, tag, bool, or UTF-8 failing byte. For API indices and policy failures without
@@ -1457,7 +1489,7 @@ trim reduces exposure within the same loan.
 ### Runtime headroom and settlement
 
 `Headroom::default() == Headroom::UpTo(0)` in every feature set. Store::new, Funding
-conversion, generated scoped helpers and native bound-payer edits all use this default.
+conversion and generated scoped helpers use this default.
 Existing opening spare can satisfy growth. Additional physical capacity requires
 explicit Max, UpTo(n), or alloc-only OnDemand.
 
@@ -1485,9 +1517,9 @@ For a resize within the 10 MiB account cap that exceeds the invocation's growth
 limit, `OnDemand` returns `RentShortfall` if underfunded and `GrowthLimit` if funded,
 while a reserved lease bounded by the invocation's growth limit returns `GrowthLimit`
 before checking funding.
-Funding checks precede growth/movement. Rent uses the complete sysvar, checked
-arithmetic and supported legacy thresholds 1.0/2.0; unsupported thresholds fail before
-transfers/refunds. Payer/recipient/System Program identity, writability, signature and
+Funding checks precede growth/movement. Rent uses the SDK's checked SIMD-0194 quote.
+On a cluster still using threshold 2.0, the runtime rejects accounts underfunded by the lower quote.
+Payer/recipient/System Program identity, writability, signature and
 alias constraints are checked. Refund authorization is explicit; settlement uses actual
 final length, including retained capacity after failed trim. Finish edits before CPI and
 reload afterward.
@@ -1497,57 +1529,9 @@ Generated helpers include lazy and checked read/edit closures, explicit EditOpti
 helper validates the complete root before invoking edit and returns `(R, CommitInfo)`
 after successful completion. Creation and prefunded allocation helpers measure input
 before System CPI, include the full envelope, check signer/PDA seeds and aliases,
-initialize and commit. Creation is bounded by the original-length growth window; larger
-accounts require a separate runtime allocation instruction.
-
-### Native account wrapper
-
-`blubber_anchor::Blubber<State, Policy>` has sealed Lazy/Checked policies;
-`Blubber<State>` defaults to Lazy and `Blubber<State, Checked>` always scans. The
-wrapper authenticates owner/identity/envelope, retains a genuine SDK guard, and checks
-copied fixed-prefix domains before publishing constraint fields. Variable data remains
-scoped to callbacks.
-
-New wrappers permit initialization but no typed/prefix access. Measurement, capacity and
-funding failures retain New state. Successful initialization commits and enters Ready.
-`initialize_if_new` ignores input on existing Ready state; reuse still checks the
-selected load policy, rent and application authority. Missing initialization fails
-successful exit. Automatic SDK reuse checks physical space; explicit growth/trim changes
-later space requirements.
-
-The initialization route uses both complete encoder and replay markers. Lazy feature-off
-initialization of a covered graph omits the post-write full scan and redundant covered
-replay. Checked policy, verify-on-load and uncovered/default-false graphs retain checked
-publication; variable-child sizing remains. Prefix publication follows that selected
-check, not an unconditional scan. See [initialization assurance](ASSURANCE.md#encoders-and-initialization).
-
-Edits transfer a held guard directly for zero-opening-growth policies and release it
-before discovery for positive headroom. No application callback runs during an unguarded
-handoff. Commit occurs once; success and returned errors attempt reacquisition. Failed
-reacquisition is terminal. Host unwind attempts reacquisition but never publishes a
-prefix. Preserve the original operation error if cleanup also fails.
-
-Explicit SDK realloc and managed growth use one sizing authority per handler. Exact
-realloc validates used length, cap and invocation window, resizes and settles once;
-later edits preserve that allocation through UpTo(0). Explicit shrink clears the opening
-reservation floor. Close checks Ready/mutable state, owner, distinct writable authorized
-recipient, borrow readiness and lamport addition; it invalidates identity, releases
-exclusion, transfers once through the safe SDK close operation and becomes terminal.
-
-`with_cpi`/`with_cpi_read` finish edits and release exclusion, perform checked CPI,
-reacquire and fully validate owner, identity, used length and root before refreshing the
-prefix. Returned callback/preflight errors require that reload too. Runtime callee
-errors can abort the invocation and rely on rollback rather than returned cleanup.
-Failed reload/reacquisition is terminal. Read-only CPI arguments do not constrain
-captured outside handles. Original invocation length is never reset.
-
-The owning wrapper retains private leaked copied-handle slots, not account bytes.
-References remain bounded by wrapper borrows/callbacks. The SDK handle keeps the
-wrapper non-Send and non-Sync; leaking a copied handle never extends invocation
-memory validity. Account layout is omitted from
-the adapter's IDL while account flags, arguments, seeds and relations remain. A stock
-account decoder cannot decode format 1. The exact SDK git dependency keeps this adapter
-unpublished; it is excluded from the three published archives.
+initialize and commit. Prefunded allocation uses the System instruction enabled by
+SIMD-0312. Creation is bounded by the original-length growth window. Larger accounts
+require a separate runtime allocation instruction.
 
 ## Resource and assurance premises
 

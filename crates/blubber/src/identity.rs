@@ -324,15 +324,15 @@ impl<const N: usize> Writer<N> {
 /// Panics for a length above u32 or an all-zero identity (reserved for new data).
 #[doc(hidden)]
 pub const fn account_identity(namespace: &str, epoch: u32, descriptor: &[u8]) -> [u8; 8] {
-    let mut hash = crate::identity_sha256::Sha256::new();
-    hash.update(b"blubber\0schema\0");
-    hash.update(&1u32.to_le_bytes());
-    hash.update(&(add(0, namespace.len()) as u32).to_le_bytes());
-    hash.update(namespace.as_bytes());
-    hash.update(&epoch.to_le_bytes());
-    hash.update(&(add(0, descriptor.len()) as u32).to_le_bytes());
-    hash.update(descriptor);
-    let digest = hash.finish();
+    let mut hash = sha2_const_stable::Sha256::new();
+    hash = hash.update(b"blubber\0schema\0");
+    hash = hash.update(&1u32.to_le_bytes());
+    hash = hash.update(&(add(0, namespace.len()) as u32).to_le_bytes());
+    hash = hash.update(namespace.as_bytes());
+    hash = hash.update(&epoch.to_le_bytes());
+    hash = hash.update(&(add(0, descriptor.len()) as u32).to_le_bytes());
+    hash = hash.update(descriptor);
+    let digest = hash.finalize();
     let bytes = [
         digest[0], digest[1], digest[2], digest[3], digest[4], digest[5], digest[6], digest[7],
     ];

@@ -20,7 +20,7 @@ mod keyless_differential;
 mod oracle;
 mod validation;
 
-use blubber::{List, Map, Pubkey, Str};
+use blubber::{Address, List, Map, Str};
 use blubber_model::{Edit as ModelEdit, PathSegment as Segment, Schema as ModelSchema, Value};
 use bridge::{Bridge, Observed};
 
@@ -364,7 +364,7 @@ concrete_bridge!(__Root7, i16);
 concrete_bridge!(__Root8, i32);
 concrete_bridge!(__Root9, i64);
 concrete_bridge!(__Root10, i128);
-concrete_bridge!(__Root11, Pubkey);
+concrete_bridge!(__Root11, Address);
 concrete_bridge!(__Root12, [u8; 33]);
 concrete_bridge!(__Root13, Str);
 concrete_bridge!(__Root14, Option<Str>);
@@ -376,7 +376,7 @@ concrete_bridge!(__Root19, Record);
 concrete_bridge!(__Root20, List<Record>);
 concrete_bridge!(__Root21, Map<[u8; 3], Record>);
 concrete_bridge!(__Root22, Deep);
-concrete_bridge!(__Root23, Map<Pubkey, List<u128>>);
+concrete_bridge!(__Root23, Map<Address, List<u128>>);
 concrete_bridge!(__Root24, Packed);
 concrete_bridge!(__Root25, List<Packed>);
 concrete_bridge!(__Root26, Map<u16, Packed>);

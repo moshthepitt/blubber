@@ -10,7 +10,7 @@
     allow(dead_code, unused_imports, unused_macros)
 )]
 use crate::{mark, matrix::matrix_key, schemas::*};
-use blubber::{pinocchio::ReadStore, List, Pubkey, Schema, Str};
+use blubber::{pinocchio::ReadStore, List, Schema, Str};
 use core::hint::black_box;
 use pinocchio::{error::ProgramError, AccountView, Address, ProgramResult};
 
@@ -71,7 +71,7 @@ fn text(x: &str) -> u64 {
     sum
 }
 #[inline(always)]
-fn copied_key(key: Pubkey) -> u64 {
+fn copied_key(key: Address) -> u64 {
     let bytes = key.to_bytes();
     let a = u64::from_le_bytes(bytes[..8].try_into().unwrap());
     let b = u64::from_le_bytes(bytes[8..16].try_into().unwrap());
@@ -124,7 +124,7 @@ macro_rules! owned_sum {
 #[inline(never)]
 fn sum_map<I, V>(iter: I, mut decode: impl FnMut(V) -> u64) -> u64
 where
-    I: Iterator<Item = (Pubkey, V)>,
+    I: Iterator<Item = (Address, V)>,
 {
     let mut out = 0u64;
     for (key, value) in iter {
@@ -135,7 +135,7 @@ where
 #[inline(never)]
 fn try_sum_map<I, V>(iter: I, mut decode: impl FnMut(V) -> u64) -> blubber::Result<u64>
 where
-    I: Iterator<Item = blubber::Result<(Pubkey, V)>>,
+    I: Iterator<Item = blubber::Result<(Address, V)>>,
 {
     let mut out = 0u64;
     for item in iter {
@@ -305,7 +305,7 @@ macro_rules! fixture {
             id: &Address,
             op: u8,
             n: usize,
-            key: Pubkey,
+            key: Address,
         ) -> core::result::Result<u64, ProgramError> {
             let index = n.saturating_sub(1);
             let _ = (index, key);
@@ -545,7 +545,7 @@ pub fn run(id: &Address, accounts: &mut [AccountView], ix: &[u8]) -> ProgramResu
     if n > 1000 {
         return Err(ProgramError::InvalidInstructionData);
     }
-    let key = Pubkey::from_bytes(matrix_key(2 * n as u32, *common != 0));
+    let key = Address::new_from_array(matrix_key(2 * n as u32, *common != 0));
     mark(10);
     mark(11);
     mark(0);
@@ -637,13 +637,13 @@ pub fn run(id: &Address, accounts: &mut [AccountView], ix: &[u8]) -> ProgramResu
 #[test]
 fn copied_key_checksum_matches_every_byte_lane() {
     for byte in 0..=255u8 {
-        let all = Pubkey::from_bytes([byte; 32]);
+        let all = Address::new_from_array([byte; 32]);
         assert_eq!(copied_key(all), u64::from(byte) * 32);
         for lane in 0..32 {
             let mut bytes = [42; 32];
             bytes[lane] = byte;
             assert_eq!(
-                copied_key(Pubkey::from_bytes(bytes)),
+                copied_key(Address::new_from_array(bytes)),
                 bytes.into_iter().map(u64::from).sum::<u64>()
             );
         }

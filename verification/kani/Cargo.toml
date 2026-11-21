@@ -15,7 +15,7 @@ verify-on-load = ["blubber/verify-on-load"]
 blubber = { path = "../../crates/blubber", default-features = false, features = ["derive", "pinocchio"] }
 blubber-core = { path = "../../crates/blubber-core", default-features = false, features = ["program-error"] }
 solana-program-error = { version = "3.0.1", default-features = false }
-pinocchio = { version = "0.11.2", default-features = false, features = ["account-resize", "cpi"] }
+pinocchio = { version = "0.12.0", default-features = false, features = ["account-resize", "cpi"] }
 
 [lints.rust]
 unsafe_code = "deny"

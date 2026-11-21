@@ -5,25 +5,25 @@ M7c exact ceilings: benchmarks/m7c-cu-decisions.csv (user decision 2026-11-02)
 fill measures=1 when nonempty; rewrite measures<=2n; encodes=n; ends<=n;
 reserve/suffix move/ancestor publication<=1; source/codec counters checked in list_edits;
 Q1 recursive measures/input: Str=0; 8-byte List<u8>=8 u8; MeasuredRecord=1 u64+1 List+8 Str;
-source-sha256=8d9f752a0e8e232752b9c7929f02a0f0176405383ec160f794bca34a0b1f0da3
-raw-sha256=0a080303105c53fcdf3a6572dfdc58726fb26f1024dfe37d2d0f2db6fe743aff
-elf-sha256=64685e884baa8a79df15642bc8ae44d2c0149840bac2d122c52327c73dbb6df7
-diagnostic-elf-sha256=848f4d42fc777254778cb2586c02f3f871ee2845e9a917075c1373592179a467
-bencher-sha256=1083b614d2927f3930fa48978862fda5f698c14f91a0e409748dd843c894080c
+source-sha256=74ff527799aaf29b4b5b1890b106324f68a6103fa6bc1eae6a1a1373ab902b7b
+raw-sha256=b6c86715f27eddcfb0904e0f4f3db07021c35b891ab36fd756ed6bbcfbf8ec2f
+elf-sha256=e38f5e94ada5410e17f2db9ad1b9d56920e44616214efd5177f8bbd4658cd75e
+diagnostic-elf-sha256=15c2641847d35044ba0025fc67a3301b3205c17f605dca5a5f4aee9207c38d0a
+bencher-sha256=3efee96e9dd5c64935bbc24f835e3eb336dc5bb4ff6a5f13074f385aa6079bc5
 oracles={"tests/mollusk/benches/support/traversal.rs": "91cc403bd7b01e87c3e1d8ac4be2ca71c1a69173dc0c11afae1c58c826cf8367", "tests/mollusk/src/matrix.rs": "87882b0399e2f11b0e43109906a9ee706b9e13361e1db7f0c5ef7070073e3b78", "tests/mollusk/src/traversal.rs": "d408ecf7397db341ba2c20a41c2cebc7e28a08bf164daf14735eba2c24baf85d"}
-tools={"Cargo.lock": "9528ae88ac74e95b66a907779acfb3b4f57ee29fcadf1ef98023742de7460efd", "host-rust/bin/rustc": "d3a664c970a9fd8361b64194861bebc1ae37b9054e5ee3400dc1c9e691797eea", "platform-tools/rust/bin/rustc": "d95c95b68e321ad76634e1fd26b0a7c20ccdbae9ad9ca733f3ae2f2b4a0b6002"}
-list_indexed_n0_fill_plain: whole=1810 common=1416 admitted=1960 delta=394
-list_indexed_n1_fill_plain: whole=2307 common=1556 admitted=2112 delta=751
-list_indexed_n10_fill_plain: whole=2924 common=1783 admitted=2339 delta=1141
-list_indexed_n100_fill_plain: whole=7305 common=2924 admitted=3480 delta=4381
-list_indexed_n1000_fill_plain: whole=52980 common=16199 admitted=16755 delta=36781
-map_indexed_n0_fill_plain: whole=1810 common=1395 admitted=1974 delta=415
-map_indexed_n1_fill_plain: whole=2459 common=1628 admitted=2264 delta=831
-map_indexed_n10_fill_plain: whole=3267 common=2077 admitted=2713 delta=1190
-map_indexed_n100_fill_plain: whole=9538 common=5288 admitted=5924 delta=4250
-map_indexed_n1000_fill_plain: whole=74113 common=39263 admitted=39899 delta=34850
-map_indexed_n0_fill_common31_adjacent: whole=1808 common=1393 admitted=1972 delta=415
-map_indexed_n1_fill_common31_adjacent: whole=2457 common=1626 admitted=2262 delta=831
-map_indexed_n10_fill_common31_adjacent: whole=3346 common=2156 admitted=2792 delta=1190
-map_indexed_n100_fill_common31_adjacent: whole=10427 common=6177 admitted=6813 delta=4250
-map_indexed_n1000_fill_common31_adjacent: whole=83102 common=48252 admitted=48888 delta=34850
+tools={"Cargo.lock": "4c47a7f4f331b0cc3918d454a195bad2ffab0ddbc1b38f0297c389da875c1a8a", "host-rust/bin/rustc": "d3a664c970a9fd8361b64194861bebc1ae37b9054e5ee3400dc1c9e691797eea", "platform-tools/rust/bin/rustc": "d95c95b68e321ad76634e1fd26b0a7c20ccdbae9ad9ca733f3ae2f2b4a0b6002"}
+list_indexed_n0_fill_plain: whole=1768 common=1421 admitted=1919 delta=347
+list_indexed_n1_fill_plain: whole=2259 common=1561 admitted=2108 delta=698
+list_indexed_n10_fill_plain: whole=2873 common=1788 admitted=2335 delta=1085
+list_indexed_n100_fill_plain: whole=7254 common=2929 admitted=3476 delta=4325
+list_indexed_n1000_fill_plain: whole=52929 common=16204 admitted=16751 delta=36725
+map_indexed_n0_fill_plain: whole=1776 common=1400 admitted=1933 delta=376
+map_indexed_n1_fill_plain: whole=2423 common=1633 admitted=2264 delta=790
+map_indexed_n10_fill_plain: whole=3227 common=2082 admitted=2713 delta=1145
+map_indexed_n100_fill_plain: whole=9498 common=5293 admitted=5924 delta=4205
+map_indexed_n1000_fill_plain: whole=74073 common=39268 admitted=39899 delta=34805
+map_indexed_n0_fill_common31_adjacent: whole=1774 common=1398 admitted=1931 delta=376
+map_indexed_n1_fill_common31_adjacent: whole=2421 common=1631 admitted=2262 delta=790
+map_indexed_n10_fill_common31_adjacent: whole=3306 common=2161 admitted=2792 delta=1145
+map_indexed_n100_fill_common31_adjacent: whole=10387 common=6182 admitted=6813 delta=4205
+map_indexed_n1000_fill_common31_adjacent: whole=83062 common=48257 admitted=48888 delta=34805

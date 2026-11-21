@@ -284,15 +284,14 @@ fn expand_inner(
                 Self::NAMESPACE, Self::SEMANTIC_EPOCH, Self::WIRE_DESCRIPTOR_BYTES)),
         };
         let creation_helpers = [
-            ("create", "create_account", false),
-            ("create_pda", "create_pda", true),
-            ("allocate_account", "allocate_account", false),
-            ("allocate_pda", "allocate_pda", true),
-        ].map(|(method, backend, pda)| {
+            ("create", false, false),
+            ("create_pda", false, true),
+            ("allocate_account", true, false),
+            ("allocate_pda", true, true),
+        ].map(|(method, prefunded, pda)| {
             let method = Ident::new(method, name.span());
-            let backend = Ident::new(backend, name.span());
             let seeds_arg = pda.then(|| quote!(seeds_with_bump: &[&[::core::primitive::u8]],));
-            let seeds = pda.then(|| quote!(, seeds_with_bump));
+            let seeds = if pda { quote!(Some(seeds_with_bump)) } else { quote!(None) };
             quote! {
                 /// Creates or allocates the account, initializes it, and commits rent.
                 ///
@@ -301,15 +300,15 @@ fn expand_inner(
                 /// seeds including bump, derived against the calling program_id.
                 /// Propagate errors on-chain to roll back CPIs and initialization.
                 pub fn #method(
-                    state: &mut #library::pinocchio::AccountView,
-                    payer: &#library::pinocchio::AccountView,
-                    system_program: &#library::pinocchio::AccountView,
-                    program_id: &#library::pinocchio::Address,
+                    state: &mut #library::pinocchio_sdk::AccountView,
+                    payer: &#library::pinocchio_sdk::AccountView,
+                    system_program: &#library::pinocchio_sdk::AccountView,
+                    program_id: &#library::pinocchio_sdk::Address,
                     #seeds_arg
                     init: #init_name<'_>,
                 ) -> #library::Result<#library::CommitInfo> {
                     let space = Self::encoded_len_of(&init)?;
-                    #library::pinocchio::#backend(state, payer, system_program, program_id, space #seeds)?;
+                    #library::__private::create(state, payer, system_program, program_id, space, #prefunded, #seeds)?;
                     let mut store = #library::pinocchio::Store::new_with_headroom(
                         state, program_id, #library::pinocchio::Funding::Prepaid,
                         #library::pinocchio::Headroom::UpTo(0),
@@ -418,8 +417,8 @@ fn expand_inner(
                     /// map order or disjoint directories. Use `with_read_checked` for
                     /// untrusted contents. `verify-on-load` adds a complete scan.
                     pub fn with_read<R>(
-                        account: &#library::pinocchio::AccountView,
-                        program_id: &#library::pinocchio::Address,
+                        account: &#library::pinocchio_sdk::AccountView,
+                        program_id: &#library::pinocchio_sdk::Address,
                         read: impl ::core::ops::FnOnce(#ref_name<'_>) -> #library::Result<R>,
                     ) -> #library::Result<R> {
                         let store = #library::pinocchio::ReadStore::new(account, program_id)?;
@@ -440,8 +439,8 @@ fn expand_inner(
                     /// map order or disjoint directories. Use `with_edit_checked` for
                     /// untrusted contents. `verify-on-load` adds a complete scan.
                     pub fn with_edit<R>(
-                        account: &mut #library::pinocchio::AccountView,
-                        program_id: &#library::pinocchio::Address,
+                        account: &mut #library::pinocchio_sdk::AccountView,
+                        program_id: &#library::pinocchio_sdk::Address,
                         funding: #library::pinocchio::Funding<'_>,
                         edit: impl ::core::ops::FnOnce(&mut #mut_name<'_>) -> #library::Result<R>,
                     ) -> #library::Result<(R, #library::CommitInfo)> {
@@ -467,7 +466,8 @@ fn expand_inner(
                     ///
                     #[doc = concat!(
                         "```\nuse ", stringify!(#library), "::{schema, List};\n",
-                        "use ", stringify!(#library), "::pinocchio::{AccountView, Address, EditOptions, Funding, Headroom};\n",
+                        "use ", stringify!(#library), "::pinocchio::{EditOptions, Funding, Headroom};\n",
+                        "use ", stringify!(#library), "::pinocchio_sdk::{AccountView, Address};\n",
                         "#[schema(account)]\nstruct Queue { values: List<u64> }\n",
                         "fn push_two(account: &mut AccountView, owner: &Address) -> ",
                         stringify!(#library), "::Result<()> {\n",
@@ -480,8 +480,8 @@ fn expand_inner(
                     )]
                     #[inline(always)]
                     pub fn with_edit_options<'a, R>(
-                        account: &'a mut #library::pinocchio::AccountView,
-                        program_id: &#library::pinocchio::Address,
+                        account: &'a mut #library::pinocchio_sdk::AccountView,
+                        program_id: &#library::pinocchio_sdk::Address,
                         options: #library::pinocchio::EditOptions<'a>,
                         edit: impl ::core::ops::FnOnce(&mut #mut_name<'_>) -> #library::Result<R>,
                     ) -> #library::Result<(R, #library::CommitInfo)> {
@@ -501,8 +501,8 @@ fn expand_inner(
                     /// The result cannot borrow account data beyond the callback.
                     /// Validates the complete encoding before invoking the callback.
                     pub fn with_read_checked<R>(
-                        account: &#library::pinocchio::AccountView,
-                        program_id: &#library::pinocchio::Address,
+                        account: &#library::pinocchio_sdk::AccountView,
+                        program_id: &#library::pinocchio_sdk::Address,
                         read: impl ::core::ops::FnOnce(#ref_name<'_>) -> #library::Result<R>,
                     ) -> #library::Result<R> {
                         let store = #library::pinocchio::ReadStore::new(account, program_id)?;
@@ -517,8 +517,8 @@ fn expand_inner(
                     /// The result cannot borrow the temporary account session.
                     /// Validates the complete encoding before invoking the callback.
                     pub fn with_edit_checked<R>(
-                        account: &mut #library::pinocchio::AccountView,
-                        program_id: &#library::pinocchio::Address,
+                        account: &mut #library::pinocchio_sdk::AccountView,
+                        program_id: &#library::pinocchio_sdk::Address,
                         funding: #library::pinocchio::Funding<'_>,
                         edit: impl ::core::ops::FnOnce(&mut #mut_name<'_>) -> #library::Result<R>,
                     ) -> #library::Result<(R, #library::CommitInfo)> {
@@ -539,8 +539,8 @@ fn expand_inner(
                     /// the temporary session or its refund recipient.
                     #[inline(always)]
                     pub fn with_edit_checked_options<'a, R>(
-                        account: &'a mut #library::pinocchio::AccountView,
-                        program_id: &#library::pinocchio::Address,
+                        account: &'a mut #library::pinocchio_sdk::AccountView,
+                        program_id: &#library::pinocchio_sdk::Address,
                         options: #library::pinocchio::EditOptions<'a>,
                         edit: impl ::core::ops::FnOnce(&mut #mut_name<'_>) -> #library::Result<R>,
                     ) -> #library::Result<(R, #library::CommitInfo)> {

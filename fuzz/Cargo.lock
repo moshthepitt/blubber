@@ -469,8 +469,9 @@ dependencies = [
  "blubber-derive",
  "pinocchio",
  "pinocchio-system",
- "solana-account-view",
+ "sha2-const-stable",
  "solana-address 2.8.0",
+ "solana-program-log",
 ]
 
 [[package]]
@@ -488,7 +489,6 @@ dependencies = [
  "proc-macro-crate",
  "proc-macro2",
  "quote",
- "sha2 0.10.9",
  "syn 2.0.119",
 ]
 
@@ -1564,9 +1564,9 @@ checksum = "2ee67f1008b1ba2321834326597b8e186293b049a023cdef258527550b9935b4"
 
 [[package]]
 name = "pinocchio"
-version = "0.11.2"
+version = "0.12.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a6cababcb62a2e739c7078ae16eda02789a6e3edd21bbdded864e85c38a7914d"
+checksum = "402c0799a02d9b979837f50cade9f758898813430873542b87a62aaa3d56022a"
 dependencies = [
  "solana-account-view",
  "solana-address 2.8.0",
@@ -1577,9 +1577,9 @@ dependencies = [
 
 [[package]]
 name = "pinocchio-system"
-version = "0.6.1"
+version = "0.7.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f3ae2ee67b42e2ac797dd88312da473c895660e270d8093e0ba2749b885b5778"
+checksum = "436f1ab80f654fc35e24162bd610d86b5215d0b4265ee45479e70cea896f63fa"
 dependencies = [
  "pinocchio",
  "solana-address 2.8.0",
@@ -1981,9 +1981,9 @@ dependencies = [
 
 [[package]]
 name = "solana-account-view"
-version = "2.0.0"
+version = "3.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "fc141b940560430425ebaadb7645496c45f6a10fad9911d719bd03eab7f4d422"
+checksum = "6d648359fbdc962a6d4435b8a05b6f4920fa9ea2c12bb92d0284c7eefb81551f"
 dependencies = [
  "solana-address 2.8.0",
  "solana-program-error",
@@ -2308,9 +2308,9 @@ dependencies = [
 
 [[package]]
 name = "solana-instruction-view"
-version = "2.1.0"
+version = "3.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6ab7a27d0c4214b9f7389c3dd00b68c93093a67f1dcc5b7893aebe299bbcbb47"
+checksum = "e145b112003bc400015bac7cc36196bd37404defb112daa9ac9ca7f47450ada8"
 dependencies = [
  "solana-account-view",
  "solana-address 2.8.0",
@@ -2518,6 +2518,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "4f04fa578707b3612b095f0c8e19b66a1233f7c42ca8082fcb3b745afcc0add6"
 
 [[package]]
+name = "solana-program-log"
+version = "1.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "ffd48ddef444e6db138fb11bdb9ab8117bb830a78cef051a453454de5613039b"
+dependencies = [
+ "solana-define-syscall 5.2.0",
+]
+
+[[package]]
 name = "solana-program-memory"
 version = "3.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2603,9 +2612,9 @@ dependencies = [
 
 [[package]]
 name = "solana-rent"
-version = "4.4.0"
+version = "4.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "dc016b348926395ba01f8288cdf5da25fc30f5a0806028b32d5e5b3147b10bf9"
+checksum = "6e7c7590d4e53446a00c363783d98199d8c8f5099ca60eaf2a0f1f50d0e7a31e"
 dependencies = [
  "serde",
  "serde_derive",

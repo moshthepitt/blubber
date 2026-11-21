@@ -9,7 +9,6 @@ publish = false
 crate-type = ["cdylib", "rlib"]
 
 [features]
-anchor-slab = ["dep:anchor_slab", "dep:bytemuck"]
 manifest = ["dep:hypertree", "dep:bytemuck"]
 heap = []
 no-entrypoint = []
@@ -21,7 +20,7 @@ light = ["dep:light-zero-copy"]
 
 [dependencies]
 blubber = { path = "../../../crates/blubber", features = ["derive", "pinocchio", "alloc"] }
-pinocchio = { version = "0.11.2", default-features = false, features = ["account-resize", "cpi", "alloc"] }
+pinocchio = { version = "0.12.0", default-features = false, features = ["account-resize", "cpi", "alloc"] }
 borsh = { version = "1.8.1", default-features = false, features = ["derive"] }
 
 bytemuck = { version = "1.25.2", features = ["derive", "min_const_generics"], optional = true }
@@ -30,8 +29,6 @@ zeropod = { git = "https://github.com/blueshift-gg/zeropod", rev = "8a607caf7861
 wincode = { git = "https://github.com/anza-xyz/wincode", rev = "2d9cc7a2e974d726ced31ac1ad3c645113f685f0", version = "0.6.3", default-features = false, features = ["alloc", "derive"], optional = true }
 pinapod = { git = "https://github.com/pina-rs/pinapod", rev = "c1b89cc19693f0952eb9990e23e48acbd992f2c7", version = "0.4.7", optional = true }
 light-zero-copy = { version = "0.6.0", default-features = false, optional = true }
-
-anchor_slab = { package = "anchor-lang", git = "https://github.com/otter-sec/anchor", rev = "7d68eb325f297013a5e0903ddd698fe26218f5a3", optional = true }
 
 hypertree = { git = "https://github.com/CKS-Systems/manifest", rev = "5f4272ec067459dc6ed761331319678edcd25f51", version = "1.2.0", optional = true }
 

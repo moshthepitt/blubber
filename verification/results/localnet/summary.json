@@ -1,5 +1,5 @@
 {
-  "balance_lamports": 98673976200,
+  "balance_lamports": 99672681200,
   "commitment": "confirmed",
   "completed_tiers": [
     "base",
@@ -20,7 +20,7 @@
     "min": 150,
     "sum": 196200
   },
-  "deployment_fees_lamports": 155795000,
+  "deployment_fees_lamports": 157090000,
   "devnet_comparison": {
     "base_aggregate": {
       "comparable": true,
@@ -7766,7 +7766,7 @@
       "borrow-alloc-v3": false,
       "borrow-no-alloc-v0": false,
       "borrow-no-alloc-v3": false,
-      "input-owner": true,
+      "input-owner": false,
       "policy-off-v0": false,
       "policy-off-v3": false,
       "policy-on-v0": false,
@@ -7781,40 +7781,40 @@
   },
   "elfs": {
     "borrow-alloc-v0": {
-      "sha256": "fd5a03d8560d99b0b58c4ac821a1509489fefe222b3ad0bff31fb226b60d42d7",
-      "size": 3697608
+      "sha256": "d3f429cefa2a0c18285d2658d1236ebfdde47d3a92469e05080b1eaed57a4fa8",
+      "size": 3747200
     },
     "borrow-alloc-v3": {
-      "sha256": "006d3a7bb9ca356938b22a3f577438d52b6a8b9cf3f286f3ea11b652ce7dfdfb",
-      "size": 3559024
+      "sha256": "4a75ab583dec89ec8a00f4e179e82fae8d4e2895c1bf34f499de46f275d6a6b9",
+      "size": 3582104
     },
     "borrow-no-alloc-v0": {
-      "sha256": "e5fb6c4969bdc77d97ba7d8c46dcb927f07976ae170fa79c5fb874b102bd5818",
-      "size": 3691120
+      "sha256": "aa2dc9a1c2689e4d8bb9389b77f705b558fb2892540e0393c5fb3308b2cb100a",
+      "size": 3703944
     },
     "borrow-no-alloc-v3": {
-      "sha256": "724f79c617a2e153a75f9cc20e084b149e6f895e1b6c2312b2d40f6567cf999c",
-      "size": 3526392
+      "sha256": "e62952b2190b49f570bce01a2ad6ae280379979a773245b8070fc8cdb892ec83",
+      "size": 3540704
     },
     "input-owner": {
-      "sha256": "0865cc2342cf2117114e0e90e06af434f340a11d56847838d563bd62137d31ab",
-      "size": 2672
+      "sha256": "3eb5d0701f54da2e2bdbdb08b53b39b910ec2a99e47552f69f2e0d11f8c86666",
+      "size": 2712
     },
     "policy-off-v0": {
-      "sha256": "7edfde4b18f6d4a762aa5d2174e7851213e320618abac9d7249f4b4d971af67b",
-      "size": 217656
+      "sha256": "ba7eebbd080453a3ece485371b97c5ad5fe86a9107b4a3276c71267e8f99b073",
+      "size": 229080
     },
     "policy-off-v3": {
-      "sha256": "17e68b360b0347e1b119324ce74e38b2c8366e02d9dd29b7f22e7ad76135dc5f",
-      "size": 209688
+      "sha256": "062604f40587fba0a30ea42344b13fac7fdf5e87ab65f4137fa2a52a67fe7251",
+      "size": 220296
     },
     "policy-on-v0": {
-      "sha256": "fb85ee04687cc782ff3a3d1bec81105d3ab96f957a922b5bd40c4514790fac97",
-      "size": 220424
+      "sha256": "4e093aa24c574f680c19234f9e96da20833d99a9f3c7b31e7af0946bb0d2f23c",
+      "size": 232512
     },
     "policy-on-v3": {
-      "sha256": "1aa8f81d256b237f31582d81c893daf1cecdbe60737230c44d7a3e1f72558e7a",
-      "size": 211704
+      "sha256": "c27175b890fcd5326440e0b5a4b89f8453ec4558c2237ad2abdd921e9a3ae0d5",
+      "size": 223784
     }
   },
   "feature_set_source": "https://api.devnet.solana.com",
@@ -7827,16 +7827,16 @@
   },
   "funding": {
     "base": {
-      "airdrop_lamports": 26000000000,
-      "balance_lamports": 26000000000,
-      "needed_lamports": 25987709520,
+      "airdrop_lamports": 27000000000,
+      "balance_lamports": 27000000000,
+      "needed_lamports": 26333459840,
       "opening_balance_lamports": 0
     },
     "large": {
       "airdrop_lamports": 73000000000,
-      "balance_lamports": 98754876960,
-      "needed_lamports": 98742947680,
-      "opening_balance_lamports": 25754876960
+      "balance_lamports": 99754106960,
+      "needed_lamports": 99088413000,
+      "opening_balance_lamports": 26754106960
     }
   },
   "historical_cases": 0,
@@ -9194,20 +9194,20 @@
     }
   ],
   "mollusk_differences": {},
-  "payer": "DDmVZEDroNtU9qFo4yN8DsaYoxJDFRPE8Hu5bPHgGPnK",
+  "payer": "Cwi7ayVteRvmGiUSJywXfUruafWcya8imbzG7D3WCb9R",
   "plans": {
     "base": {
       "case_count": 1284,
-      "fee_estimate_lamports": 243195000,
-      "net_cost_estimate_lamports": 261458040,
-      "peak_lamports": 25987709520,
+      "fee_estimate_lamports": 244100000,
+      "net_cost_estimate_lamports": 262363040,
+      "peak_lamports": 26333459840,
       "signature_fee_lamports": 5000
     },
     "large": {
       "case_count": 24,
-      "fee_estimate_lamports": 91490000,
-      "net_cost_estimate_lamports": 96055760,
-      "peak_lamports": 98742947680,
+      "fee_estimate_lamports": 92110000,
+      "net_cost_estimate_lamports": 96675760,
+      "peak_lamports": 99088413000,
       "signature_fee_lamports": 5000
     }
   },
@@ -9218,12 +9218,12 @@
     },
     "cluster": "http://127.0.0.1:8899",
     "epoch": {
-      "absoluteSlot": 78,
-      "blockHeight": 77,
+      "absoluteSlot": 143377,
+      "blockHeight": 143224,
       "epoch": 0,
-      "slotIndex": 78,
+      "slotIndex": 143377,
       "slotsInEpoch": 432000,
-      "transactionCount": 75
+      "transactionCount": 143095
     },
     "features": {
       "account_data_direct_mapping": {
@@ -9237,7 +9237,7 @@
         "id": "7VgiehxNxu53KdxgLspGQY8myE6f7UokaWa4jsGcaSz"
       }
     },
-    "genesis": "EmNLtd5v8AgWFi7uGpoBCE5Srn1gXSPCoxhkhm7e5reo",
+    "genesis": "GtDhRgf25uebbpfmyZyzwhBkazNu6obUtSNtWqdYswsR",
     "mapping": "direct",
     "slot_timing": {
       "slot_ms": 50.0,
@@ -9250,122 +9250,122 @@
   },
   "programs": {
     "base-borrow-alloc-v0": {
-      "elf_sha256": "fd5a03d8560d99b0b58c4ac821a1509489fefe222b3ad0bff31fb226b60d42d7",
-      "id": "Dbk2FuEMJuzK8jC3U5RpGGLp3Xrpbr3R1HkpZnPGEWSz",
+      "elf_sha256": "d3f429cefa2a0c18285d2658d1236ebfdde47d3a92469e05080b1eaed57a4fa8",
+      "id": "Gvhnh3Aju1bazVsodoVbXzoCKh1EWgEFJWjSJJ7LC5ep",
       "retained_shell_lamports": 1141440,
       "state": "closed"
     },
     "base-borrow-alloc-v3": {
-      "elf_sha256": "006d3a7bb9ca356938b22a3f577438d52b6a8b9cf3f286f3ea11b652ce7dfdfb",
-      "id": "GG4VCPsDXP2MG6tLDRU3rC9XGZRSLmgGJGZPKF5e5udf",
+      "elf_sha256": "4a75ab583dec89ec8a00f4e179e82fae8d4e2895c1bf34f499de46f275d6a6b9",
+      "id": "CtCWUwpPqPkxnu2EQx586YEVcr1ZaBSRDD8uJjD4uVTV",
       "retained_shell_lamports": 1141440,
       "state": "closed"
     },
     "base-borrow-no-alloc-v0": {
-      "elf_sha256": "e5fb6c4969bdc77d97ba7d8c46dcb927f07976ae170fa79c5fb874b102bd5818",
-      "id": "9FgiX1H3uAvEoJC9CZ5Lmvg4GR6JzJhE8yJYYFDZoM9c",
+      "elf_sha256": "aa2dc9a1c2689e4d8bb9389b77f705b558fb2892540e0393c5fb3308b2cb100a",
+      "id": "E8gc9XLFtGG1B5PLSZoq7ohfwnVqZrdmDQyFTE8YgsWk",
       "retained_shell_lamports": 1141440,
       "state": "closed"
     },
     "base-borrow-no-alloc-v3": {
-      "elf_sha256": "724f79c617a2e153a75f9cc20e084b149e6f895e1b6c2312b2d40f6567cf999c",
-      "id": "BTfVohf2uHQvdgs385QpoRS54P6bq6zwZScNaPNCJ9gs",
+      "elf_sha256": "e62952b2190b49f570bce01a2ad6ae280379979a773245b8070fc8cdb892ec83",
+      "id": "DhiHyrCjFBc7458D1GqcH3rvc3tvNjWi31qYN4KnACxX",
       "retained_shell_lamports": 1141440,
       "state": "closed"
     },
     "base-policy-off-v0": {
-      "elf_sha256": "7edfde4b18f6d4a762aa5d2174e7851213e320618abac9d7249f4b4d971af67b",
-      "id": "9QSNjXVS264QBhh4gj8xTvRuqU9SUhqJNNhETdJeVpDA",
+      "elf_sha256": "ba7eebbd080453a3ece485371b97c5ad5fe86a9107b4a3276c71267e8f99b073",
+      "id": "7jYtQaEGNPLUibHYcv8NpRoTA4rCSfsd3K8STYNyYhNs",
       "retained_shell_lamports": 1141440,
       "state": "closed"
     },
     "base-policy-off-v3": {
-      "elf_sha256": "17e68b360b0347e1b119324ce74e38b2c8366e02d9dd29b7f22e7ad76135dc5f",
-      "id": "568P64Drqb4FTZ8JfG5YJwwCVpmn7AU6wMTgauqi8N8K",
+      "elf_sha256": "062604f40587fba0a30ea42344b13fac7fdf5e87ab65f4137fa2a52a67fe7251",
+      "id": "7gWXPpot15NMqQggCfHJGWy9QGMUgx6q5YwkmffanvBW",
       "retained_shell_lamports": 1141440,
       "state": "closed"
     },
     "base-policy-on-v0": {
-      "elf_sha256": "fb85ee04687cc782ff3a3d1bec81105d3ab96f957a922b5bd40c4514790fac97",
-      "id": "5yMNWe9ATvbq6u8uv77uqntTatdHz4CCcs53rGZMR8Ez",
+      "elf_sha256": "4e093aa24c574f680c19234f9e96da20833d99a9f3c7b31e7af0946bb0d2f23c",
+      "id": "5pp7WU3gid3yMDcchisZ1QP3skxMCgQwQKk3jFqAXmoB",
       "retained_shell_lamports": 1141440,
       "state": "closed"
     },
     "base-policy-on-v3": {
-      "elf_sha256": "1aa8f81d256b237f31582d81c893daf1cecdbe60737230c44d7a3e1f72558e7a",
-      "id": "HnEsbXWaC1xYSVEnoqh8UQNKBQn6q3hJLzXkLMFUZCwx",
+      "elf_sha256": "c27175b890fcd5326440e0b5a4b89f8453ec4558c2237ad2abdd921e9a3ae0d5",
+      "id": "7NbGm9KUm5SSiPJqLTkBXK2FDhFaF5AFR9jSufKPX21D",
       "retained_shell_lamports": 1141440,
       "state": "closed"
     },
     "large-borrow-alloc-v0": {
-      "elf_sha256": "fd5a03d8560d99b0b58c4ac821a1509489fefe222b3ad0bff31fb226b60d42d7",
-      "id": "J69Xm9UHNs4SFG8opJ3ZPsD9qoLSnCMbhf9eTVuQTsVf",
+      "elf_sha256": "d3f429cefa2a0c18285d2658d1236ebfdde47d3a92469e05080b1eaed57a4fa8",
+      "id": "6kmBc6qG1FNsQKpnFswuCeD2LSs8Rs6riYSCMDQrLScU",
       "retained_shell_lamports": 1141440,
       "state": "closed"
     },
     "large-borrow-alloc-v3": {
-      "elf_sha256": "006d3a7bb9ca356938b22a3f577438d52b6a8b9cf3f286f3ea11b652ce7dfdfb",
-      "id": "3EhmGdJfGnpN4bom559mPhawAzLkeHCg85uuc3qNjSLc",
+      "elf_sha256": "4a75ab583dec89ec8a00f4e179e82fae8d4e2895c1bf34f499de46f275d6a6b9",
+      "id": "GjMKX7FXUTjqyRSVyEGbfKT3UHSwisSmod5b1xiJ9RCD",
       "retained_shell_lamports": 1141440,
       "state": "closed"
     },
     "large-borrow-no-alloc-v0": {
-      "elf_sha256": "e5fb6c4969bdc77d97ba7d8c46dcb927f07976ae170fa79c5fb874b102bd5818",
-      "id": "8qSLUvKxEKWGYztR8VRK1rtBqhA5wBkHCsTzLMTP48Ph",
+      "elf_sha256": "aa2dc9a1c2689e4d8bb9389b77f705b558fb2892540e0393c5fb3308b2cb100a",
+      "id": "9SQrWu52aXxWBhVwQfTrhcKSmYCATsTHsVzmwWy5QhcL",
       "retained_shell_lamports": 1141440,
       "state": "closed"
     },
     "large-borrow-no-alloc-v3": {
-      "elf_sha256": "724f79c617a2e153a75f9cc20e084b149e6f895e1b6c2312b2d40f6567cf999c",
-      "id": "GhTjskAcqf6eoqhRMKf5DgwKg2FbyaS13cf6ZpTuR4Gm",
+      "elf_sha256": "e62952b2190b49f570bce01a2ad6ae280379979a773245b8070fc8cdb892ec83",
+      "id": "GMGp9m7q8WWc51njGjaoevMrmtbEYjtXx4fay5jnMz6G",
       "retained_shell_lamports": 1141440,
       "state": "closed"
     },
     "owner-borrow-alloc-v0-op13-s128-plain-w1-owner1-exec0-a0": {
-      "elf_sha256": "0865cc2342cf2117114e0e90e06af434f340a11d56847838d563bd62137d31ab",
-      "id": "E2yJaByUHUF96m6Aw7bmKNZinMohekqeE7mtTjC3r4Gd",
+      "elf_sha256": "3eb5d0701f54da2e2bdbdb08b53b39b910ec2a99e47552f69f2e0d11f8c86666",
+      "id": "87Z83U7ChUTetN2QrRBAhLp8nhEaC9wYEASgLKXdAmv5",
       "retained_shell_lamports": 1141440,
       "state": "closed"
     },
     "owner-borrow-alloc-v0-op14-s128-plain-w1-owner1-exec0-a0": {
-      "elf_sha256": "0865cc2342cf2117114e0e90e06af434f340a11d56847838d563bd62137d31ab",
-      "id": "GPExaNvXbWroBs6vxQ9Bk9m2i9ggLhp2A4bvnQx2Zey3",
+      "elf_sha256": "3eb5d0701f54da2e2bdbdb08b53b39b910ec2a99e47552f69f2e0d11f8c86666",
+      "id": "GRdVCTQ8jkistAY3kJfcwZxAwQ6hAkYkGxtWHcuKWjEY",
       "retained_shell_lamports": 1141440,
       "state": "closed"
     },
     "owner-borrow-alloc-v3-op13-s128-plain-w1-owner1-exec0-a0": {
-      "elf_sha256": "0865cc2342cf2117114e0e90e06af434f340a11d56847838d563bd62137d31ab",
-      "id": "5P4bff58oQugGX5tjGe4PZRT2CGYWWhaNL3dhw9snSBG",
+      "elf_sha256": "3eb5d0701f54da2e2bdbdb08b53b39b910ec2a99e47552f69f2e0d11f8c86666",
+      "id": "3CDQeVtxHQxTCVHNt7cVNNoaC47yZE7ocG3BSRHDRGYq",
       "retained_shell_lamports": 1141440,
       "state": "closed"
     },
     "owner-borrow-alloc-v3-op14-s128-plain-w1-owner1-exec0-a0": {
-      "elf_sha256": "0865cc2342cf2117114e0e90e06af434f340a11d56847838d563bd62137d31ab",
-      "id": "AMREmp8aPggKcwA4MwsrmcpY45VM3NFZNjpXLwjoP33o",
+      "elf_sha256": "3eb5d0701f54da2e2bdbdb08b53b39b910ec2a99e47552f69f2e0d11f8c86666",
+      "id": "75TptA7BxdL7jowjJz18MkcrNN46rQYWN3dWZrmRRm8U",
       "retained_shell_lamports": 1141440,
       "state": "closed"
     },
     "owner-borrow-no-alloc-v0-op13-s128-plain-w1-owner1-exec0-a0": {
-      "elf_sha256": "0865cc2342cf2117114e0e90e06af434f340a11d56847838d563bd62137d31ab",
-      "id": "EGYSLvjGQaQfxf6ShCfyQo91sj1DupcUg6ByPNoioVz1",
+      "elf_sha256": "3eb5d0701f54da2e2bdbdb08b53b39b910ec2a99e47552f69f2e0d11f8c86666",
+      "id": "831H7JMi5FHdHUkftZAnZypRV7n1GTpp4F5zv2FwQq77",
       "retained_shell_lamports": 1141440,
       "state": "closed"
     },
     "owner-borrow-no-alloc-v0-op14-s128-plain-w1-owner1-exec0-a0": {
-      "elf_sha256": "0865cc2342cf2117114e0e90e06af434f340a11d56847838d563bd62137d31ab",
-      "id": "Dq1sbwzf8AFDUc6EeZYpZnRsDLPvQDD8Furquj9LV6yy",
+      "elf_sha256": "3eb5d0701f54da2e2bdbdb08b53b39b910ec2a99e47552f69f2e0d11f8c86666",
+      "id": "HHcgnxChgqz61MaVbvNyvKBh35oevo9JKD7kPyxYqHUK",
       "retained_shell_lamports": 1141440,
       "state": "closed"
     },
     "owner-borrow-no-alloc-v3-op13-s128-plain-w1-owner1-exec0-a0": {
-      "elf_sha256": "0865cc2342cf2117114e0e90e06af434f340a11d56847838d563bd62137d31ab",
-      "id": "QhGBn5hF4Q4gfoDb2zkYza1tqzfnqeQLrLRFiidpKyM",
+      "elf_sha256": "3eb5d0701f54da2e2bdbdb08b53b39b910ec2a99e47552f69f2e0d11f8c86666",
+      "id": "2BUPwf7kiEAh34YJm35Zomy9h54CDyNp5VRGRzTupg8y",
       "retained_shell_lamports": 1141440,
       "state": "closed"
     },
     "owner-borrow-no-alloc-v3-op14-s128-plain-w1-owner1-exec0-a0": {
-      "elf_sha256": "0865cc2342cf2117114e0e90e06af434f340a11d56847838d563bd62137d31ab",
-      "id": "92UHH7bmX77Y8iNRqeFxc8gNam3VCfaSB4ahNTPeWnUQ",
+      "elf_sha256": "3eb5d0701f54da2e2bdbdb08b53b39b910ec2a99e47552f69f2e0d11f8c86666",
+      "id": "86DYykSSZzH37gswiSNYHLVH3Sw9AQTLk2wzo1Zhihht",
       "retained_shell_lamports": 1141440,
       "state": "closed"
     }
@@ -9376,12 +9376,12 @@
     "exemption_threshold": 1.0,
     "lamports_per_byte_year": 6960,
     "sha256": "90dfa0c787553fcd84ca093a258dd3bc781915b0636309e8eecb0187b8613c98",
-    "slot": 84
+    "slot": 143382
   },
-  "run_id": "1795015608457490187",
+  "run_id": "1795185235224717396",
   "source": {
-    "head": "4354ff2aae29ec6d1489e21474d8d309aee80146",
-    "sha256": "bd973ba6811c1ec4264be5a3d5a475c649c67d1337aeb4174dc702e863d27384"
+    "head": "3215f8e3a60f7d18193ee321e64bb7339a79cf99",
+    "sha256": "83ad1a5837b09309b68e7cb74abdb41f2983541a1b4265ee11172c5e6c75dd1b"
   },
   "status": "ok",
   "tiers": {
@@ -9396,6 +9396,6 @@
       "run": 24
     }
   },
-  "total_fees_lamports": 303195000,
+  "total_fees_lamports": 304490000,
   "transaction_fees_lamports": 147400000
 }

@@ -304,13 +304,6 @@ pub use crate::readers::kani_batched_text;
 #[doc(hidden)]
 pub use crate::readers::{kani_batched_list_state, kani_batched_map_state};
 
-/// Checked SDK operations shared by account adapters.
-#[cfg(feature = "account-runtime")]
-pub mod pinocchio {
-    pub use crate::pinocchio::creation::{funding_amount, preflight_accounts, signer_seeds};
-    pub use crate::pinocchio::rent::minimum_balance;
-    pub use crate::pinocchio::support::{
-        check_funding, check_payer, check_refund, settle_account, MAX_STORAGE,
-    };
-    pub use crate::view::identity_mismatch_message;
-}
+/// Creates a system account for a generated initializer.
+#[cfg(feature = "pinocchio")]
+pub use crate::pinocchio::creation::create;

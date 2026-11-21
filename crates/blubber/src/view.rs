@@ -156,7 +156,7 @@ impl<'a> View<'a> {
     #[inline(always)]
     fn load_envelope<S: RootSchema>(bytes: &'a [u8], discriminator: [u8; 8]) -> Result<Self> {
         let used = blubber_core::raw::account_used(bytes, discriminator, S::MIN_SIZE);
-        #[cfg(feature = "pinocchio")]
+        #[cfg(all(feature = "pinocchio", any(target_os = "solana", target_arch = "bpf")))]
         let used = used.map_err(|error| identity_admission_error(&(discriminator, bytes), error));
         let used = used?;
         // The proved envelope check establishes every View bound here.
@@ -818,7 +818,7 @@ impl MapHeader {
 }
 
 // Error classification and context stay outside successful envelope admission.
-#[cfg(feature = "pinocchio")]
+#[cfg(all(feature = "pinocchio", any(target_os = "solana", target_arch = "bpf")))]
 #[cold]
 #[inline(never)]
 fn identity_admission_error((expected, bytes): &([u8; 8], &[u8]), error: Error) -> Error {
@@ -835,18 +835,22 @@ fn identity_admission_error((expected, bytes): &([u8; 8], &[u8]), error: Error) 
 }
 
 // Error-path formatting and logging stay out of successful adapter admission.
-#[cfg(feature = "pinocchio")]
+#[cfg(all(feature = "pinocchio", any(target_os = "solana", target_arch = "bpf")))]
 #[cold]
 #[inline(never)]
 fn report_identity_mismatch(expected: [u8; 8], found: &[u8]) {
     let message = identity_mismatch_message(expected, found);
-    // Pinocchio has no safe log wrapper; preserve the diagnostic as return data.
-    pinocchio::cpi::set_return_data(&message);
+    if let Ok(text) = core::str::from_utf8(&message) {
+        solana_program_log::log(text);
+    }
 }
 
-#[cfg(feature = "pinocchio")]
+#[cfg(all(
+    feature = "pinocchio",
+    any(test, target_os = "solana", target_arch = "bpf")
+))]
 /// Formats the schema identity diagnostic without reading outside the found prefix.
-pub fn identity_mismatch_message(expected: [u8; 8], found: &[u8]) -> [u8; 65] {
+fn identity_mismatch_message(expected: [u8; 8], found: &[u8]) -> [u8; 65] {
     let mut message = *b"schema identity: expected=0000000000000000 found=0000000000000000";
     let hex = b"0123456789abcdef";
     for (start, bytes) in [(26, expected.as_slice()), (49, found)] {

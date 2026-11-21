@@ -29,16 +29,16 @@ pub fn run(id: &Address, accounts: &mut [AccountView], ix: &[u8]) -> ProgramResu
 mod reviewer {
     extern crate alloc;
     use blubber::pinocchio::{Funding, ReadStore, Store};
-    use blubber::{List, Map, Pubkey, Str};
+    use blubber::{Address, List, Map, Str};
     use core::hint::black_box;
-    use pinocchio::{error::ProgramError, AccountView, Address, ProgramResult};
+    use pinocchio::{error::ProgramError, AccountView, ProgramResult};
     #[blubber::schema(account)]
     pub struct Numbers {
         pub value: List<u64>,
     }
     #[blubber::schema(account)]
     pub struct PublicKeyMap {
-        pub value: Map<Pubkey, u64>,
+        pub value: Map<Address, u64>,
     }
     #[blubber::schema(account)]
     pub struct Words {
@@ -46,7 +46,7 @@ mod reviewer {
     }
     #[blubber::schema(account)]
     pub struct KeyWords {
-        pub value: Map<Pubkey, Str>,
+        pub value: Map<Address, Str>,
     }
     const TEXTS: [&str; 18] = [
         "",
@@ -78,8 +78,8 @@ mod reviewer {
         a
     }
     static VALUES: [&str; 1000] = values();
-    const fn pairs() -> [(Pubkey, &'static str); 1000] {
-        let mut a = [(Pubkey::from_bytes([0; 32]), ""); 1000];
+    const fn pairs() -> [(Address, &'static str); 1000] {
+        let mut a = [(Address::new_from_array([0; 32]), ""); 1000];
         let mut i = 0;
         while i < 1000 {
             let mut k = [42; 32];
@@ -89,13 +89,13 @@ mod reviewer {
                 k[j] = w[j];
                 j += 1;
             }
-            a[i] = (Pubkey::from_bytes(k), TEXTS[i % 18]);
+            a[i] = (Address::new_from_array(k), TEXTS[i % 18]);
             i += 1;
         }
         a
     }
-    static ENTRIES: [(Pubkey, &str); 1000] = pairs();
-    fn key_sum(k: Pubkey) -> u64 {
+    static ENTRIES: [(Address, &str); 1000] = pairs();
+    fn key_sum(k: Address) -> u64 {
         let b = k.to_bytes();
         let a = u64::from_le_bytes(b[..8].try_into().unwrap());
         let c = u64::from_le_bytes(b[8..16].try_into().unwrap());

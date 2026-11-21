@@ -1,326 +1,245 @@
-# Using Blubber
+# Guide
 
-Start with the fields you want to store. If one field is a string, the
-generated input borrows the string and the reader borrows its bytes from the
-account. Finish reading before you edit or resize the same storage.
+You are writing a Pinocchio handler that stores a growable list inside a Solana account and appends to it in place. This guide walks through the quickstart program (`programs/blubber-quickstart/src/lib.rs`) and its Mollusk test (`tests/mollusk/tests/quickstart.rs`), then explains the layout, sizing and funding rules for your own accounts.
 
-## Schemas
+If you are deciding whether Blubber fits your program, see the [README](../README.md) and the [performance numbers](performance.md#find-the-numbers). If you are checking safety assumptions or writer history, see the [trust model](trust-model.md#choose-a-load).
 
-Use `#[blubber::schema(account, namespace = "your-program:state", semantic_epoch = 1)]`
-for a persistent root. Use `#[blubber::schema]` for nested records and
-`#[derive(Clone, Copy, blubber::Fixed)]` for native fixed structs. The fixed
-derive encodes fields without Rust padding; it does not make native memory the
-wire representation. A `Pubkey` is a fixed 32-byte value. Map keys use canonical
-sorted encoding rather than insertion order.
+## Create an account
 
-Type and const generics are supported on nested schemas:
+The crates require Rust 1.89.0<!-- num:release.rust.minimum --> or newer. Add `blubber` 0.1.0<!-- num:release.blubber.version --> with the `pinocchio` feature to your program crate:
 
+`cargo add blubber@0.1.0 --features pinocchio`<!-- num-code:"cargo add blubber@{{num:release.blubber.version}} --features pinocchio" -->
+
+The crate is `no_std` by default and leaves heap allocation off. The default `derive` feature re-exports `#[blubber::schema]` and `#[derive(blubber::Fixed)]`. Enabling `pinocchio` adds the Pinocchio `AccountView` guards, account creation helpers, sizing options and rent settlement. Enable `alloc` if you need `VecStore` or owned values.
+
+First, declare the account schema. A schema describes the fields of a type and how to encode them. The account root describes the whole account payload, while a nested schema describes a field or item inside it.
+
+<!-- code:schema -->
 ```rust
-#[blubber::schema]
-struct Record<T: blubber::Schema, const N: usize> {
-    value: T,
-    tag: [u8; N],
+use blubber::List;
+
+/// An append-only queue of numbers.
+#[blubber::schema(account)]
+pub struct Queue {
+    /// Signer allowed to append.
+    pub authority: Address,
+    /// Values in insertion order.
+    pub values: List<u64>,
 }
 ```
 
-Generic schema markers do not implement `RootSchema` and cannot use `account`.
-Instantiate them inside a concrete account root. Freeze the namespace and
-semantic epoch before persisting accounts; [identity and migration](trust-model.md#account-identity)
-explains changes in bytes and meaning.
+`#[blubber::schema(account)]` generates an initializer and typed accessors for `Queue`. An initializer is the input struct for writing a new account, and it can borrow strings and slices from the caller. Here it is `QueueInit`, which takes a 32<!-- num:wire.address.bytes -->-byte `Address` and a slice of `u64` values.
 
-## Host storage
+Next, write the creation handler:
 
-The [README example](../README.md#initialize-edit-and-read) initializes a
-`SliceStore`, edits typed fields, commits and reopens a checked reader.
-`SliceStore` exposes the full caller-provided slice as capacity. `VecStore`
-requires `alloc` and grows with fallible allocation. Neither host store supplies
-runtime ownership or application authority checks.
-
-Use the generated `StateInit` to initialize once. Use `State::load` for a checked
-immutable reader and `State::load_mut` for a checked host editor. Every fallible
-operation returns `blubber::Result`; propagate errors with `?`. `commit` consumes
-the root and returns `CommitInfo`, including the used and physical lengths.
-
-## Pinocchio accounts
-
-Enable `pinocchio` alongside `derive`. Account views must come from the runtime
-entrypoint. The program supplies the expected owner independently of account
-contents, checks signer/seed/application authority, and selects a matching schema.
-The helper authenticates storage ownership; it does not decide who may edit your
-application state.
-
-The following handler helpers compile against the runtime API. The caller has
-already checked application authority. The checked edit scans the complete root
-before its callback, requests sixteen additional physical bytes for two `u64`
-items, commits once, and propagates both callback and settlement errors:
-
+<!-- code:create -->
 ```rust
-# #[cfg(feature = "pinocchio")]
-# mod runtime_example {
-use blubber::{List, Result};
-use blubber::pinocchio::{AccountView, Address, EditOptions, Funding, Headroom};
-
-#[blubber::schema(account, namespace = "example:runtime-queue", semantic_epoch = 1)]
-struct Queue { values: List<u64> }
-
-fn append_checked(account: &mut AccountView, owner: &Address) -> Result<()> {
-    let (_value, _receipt) = Queue::with_edit_checked_options(
-        account, owner,
-        EditOptions {
-            funding: Funding::Prepaid,
-            headroom: Headroom::UpTo(16),
-            refund: None,
-        },
-        |queue| {
-            queue.values_mut().push(10)?;
-            queue.values_mut().push(20)
+fn create(
+    program_id: &Address,
+    state: &mut AccountView,
+    authority: &AccountView,
+    payer: &AccountView,
+    system_program: &AccountView,
+) -> ProgramResult {
+    if !authority.is_signer() {
+        return Err(ProgramError::MissingRequiredSignature);
+    }
+    Queue::create(
+        state,
+        payer,
+        system_program,
+        program_id,
+        QueueInit {
+            authority: *authority.address(),
+            values: &[],
         },
     )?;
     Ok(())
 }
-
-fn sum_lazy(account: &AccountView, owner: &Address) -> Result<u64> {
-    Queue::with_read(account, owner, |queue| {
-        queue.values().try_iter().try_fold(0u64, |sum, value| {
-            value.map(|value| sum + value)
-        })
-    })
-}
-# }
 ```
 
-`with_read` and `with_edit` perform authenticated lazy loads. Choose
-`with_read_checked`, `with_edit_checked` or `with_edit_checked_options` when
-writer history is unknown. Checked options preserve the same funding, headroom
-and refund rules. A direct session uses `ReadStore::new` or `Store::new`, then
-`load::<State>` or `load_checked::<State>`. Commit the mutable root with `?`
-before any CPI. Shared and exclusive SDK guards prevent overlapping loans;
-closure results cannot borrow a temporary session.
+In `programs/blubber-quickstart/src/lib.rs`, `process_instruction` takes four accounts in order: the writable queue, the read-only authority signer, the writable payer signer and the System Program. Opcode 0<!-- num:quickstart.opcode.create --> runs `create` and requires the queue to sign too.
 
-`State::create`, `create_pda`, `allocate_account` and `allocate_pda` measure
-inputs before allocation CPI and return a commit receipt. The
-[creation and edit tour](../programs/blubber-demo/src/exercise.rs) supplies a
-larger executable example. Creation is bounded to the runtime's 10 KiB
-invocation growth allowance; the account cap is 10 MiB.
+Check `authority.is_signer()` before calling `Queue::create`, or a caller can record an authority address they do not control. `Queue::create` measures `QueueInit`, allocates the 48<!-- num:quickstart.queue.empty_bytes --> bytes an empty `Queue` needs, assigns the account to `program_id`, transfers rent from `payer` and writes the header and payload.
 
-## Reading lists, maps and strings
+Generated `Queue::create` and `Queue::create_pda` require zero starting lamports so they do not overwrite a funded account. For prefunded, data-empty System accounts, call generated `Queue::allocate_account` or `Queue::allocate_pda`, which keep existing lamports and top up the difference with the SIMD-0312 System instruction. The generated methods on `Queue` take `QueueInit` and initialise the account.
 
-`State::load(bytes)?` checks the envelope and complete active root, then returns
-a borrowed reader. Get fixed fields as copied Rust values and strings as `&str`.
-Use `try_get` for a fallible point read and `try_iter` for a fallible loop.
-An absent index/key is `Ok(None)`; detected invalid bytes return an error with
-an account-relative offset. Infallible `get` and `iter` panic on detected errors.
+## Grow the queue
 
+Opcode 1<!-- num:quickstart.opcode.push --> reads a little-endian `u64` from the instruction data and calls `push` with the authority and payer signatures:
+
+<!-- code:push -->
 ```rust
-use blubber::{List, SliceStore};
-#[blubber::schema(account)]
-struct Numbers { values: List<u64> }
-let mut bytes = [0; 64];
-let mut store = SliceStore::new(&mut bytes);
-Numbers::initialize(&mut store, NumbersInit { values: &[4, 9] })?.commit()?;
-let root = Numbers::load(&bytes)?;
-assert_eq!(root.values().try_get(0)?, Some(4));
-assert_eq!(root.values().try_get(2)?, None);
-let sum = root.values().try_iter().try_fold(0, |sum, value| {
-    value.map(|value| sum + value)
-})?;
-assert_eq!(sum, 13);
-# Ok::<(), blubber::Error>(())
-```
-
-Authenticated runtime readers use lazy entry by default. They check touched
-paths under valid current-schema writer history. `validate()` scans a selected
-subtree; account-root `verify()` scans the complete active encoding. Neither
-scans spare capacity. See the [trust model](trust-model.md).
-
-### Ordinary and batched string traversal
-
-Ordinary list/map `try_iter()` checks each visited child and stops after its
-first error. `try_iter_batched()` scans the entire packed string payload for
-UTF-8 during setup, even when the caller takes just one item. It still checks
-individual item ends and preserves the ordinary accepted prefix and first
-error offset. The aggregate scan can help a full traversal; partial reads pay
-for bytes they do not use.
-
-```rust
-use blubber::{List, Map, Schema, Str, View};
-let list_bytes = [2, 0, 0, 0, 1, 0, 0, 0, b'a', b'b'];
-let list = View::new(&list_bytes, *List::<Str>::LAYOUT, 12)?.read::<List<Str>>()?;
-assert_eq!(list.try_iter().next().transpose()?, Some("a"));
-assert_eq!(list.try_iter_batched().next().transpose()?, Some("a"));
-// Map: count, two (key, cumulative end) entries, then two payload bytes.
-let map_bytes = [2, 0, 0, 0, 1, 1, 0, 0, 0, 3, 2, 0, 0, 0, b'a', b'b'];
-let map = View::new(&map_bytes, *Map::<u8, Str>::LAYOUT, 12)?
-    .read::<Map<u8, Str>>()?;
-assert_eq!(map.try_iter().next().transpose()?, Some((1, "a")));
-assert_eq!(map.try_iter_batched().next().transpose()?, Some((1, "a")));
-# Ok::<(), blubber::Error>(())
-```
-
-`ListRef<Str>::try_concat_str()` returns the complete packed payload as `&str`
-without allocation, after schema/header and aggregate UTF-8 checks. It does
-not certify item ends. For example, an end splitting `é` can pass aggregate
-validation while an item read returns `InvalidUtf8`. Use iteration for item
-positions or errors, and `validate()` for the complete list. Empty lists
-return `""`; setup still performs header work. Aggregate and batched setup
-cost O(payload bytes).
-
-### Continue after a fixed-value error
-
-`MapRef<K, V>::try_values()` decodes fixed values without decoding keys.
-It consumes each physical slot before its codec runs. A value error consumes
-one slot and the next call visits the next slot; exhaustion is fused. Ordinary
-`try_iter()` decodes keys first and is permanently exhausted after an error.
-
-```rust
-use blubber::{ErrorKind, Map, Schema, View};
-// Three (u8, bool) entries. The second bool is invalid.
-let bytes = [3, 0, 0, 0, 1, 1, 2, 2, 3, 0];
-let map = View::new(&bytes, *Map::<u8, bool>::LAYOUT, 20)?
-    .read::<Map<u8, bool>>()?;
-let mut accepted = Vec::new();
-let mut errors = Vec::new();
-for value in map.try_values() {
-    match value {
-        Ok(value) => accepted.push(value),
-        Err(error) => errors.push(error),
+fn push(
+    program_id: &Address,
+    state: &mut AccountView,
+    authority: &AccountView,
+    payer: &AccountView,
+    system_program: &AccountView,
+    value: u64,
+) -> ProgramResult {
+    if !authority.is_signer() {
+        return Err(ProgramError::MissingRequiredSignature);
     }
-}
-assert_eq!(accepted, [true, false]);
-assert_eq!(errors.len(), 1);
-assert!(matches!(errors[0], blubber::Error::Fault { kind: ErrorKind::InvalidBool, .. }));
-let mut ordinary = map.try_iter();
-assert_eq!(ordinary.next().transpose()?, Some((1, true)));
-assert!(ordinary.next().is_some_and(|item| item.is_err()));
-assert!(ordinary.next().is_none());
-# Ok::<(), blubber::Error>(())
-```
-
-Values-only iteration allocates no memory. The `Vec`s above belong to the
-caller and only record the result. Setup checks fixed widths and extent; a
-setup error is yielded once. Value errors retain account-relative offsets.
-Key domains, ordering and uniqueness remain unchecked. Call `validate()` to
-certify them. Clones retain the same immutable bytes and position.
-
-## Editing accounts
-
-Initialize with the generated borrowed input, select matching fields or
-collections, propagate each error, then commit the root once. The
-[quickstart](../README.md#initialize-edit-and-read) shows the lifecycle; the
-[runtime section](#pinocchio-accounts) adds authority, budgets and rent.
-Use fallible reads when inspecting lazy state. End borrowed reads before edits
-or resize.
-
-### Scoped child edits
-
-Use `list.with_mut(index, |child| { ... })` for a short point update, especially
-an equal-size string replacement. It selects the child once and returns
-`Result<Option<R>>`: an absent index skips the callback, and a present child
-returns the callback's value. Children and borrowed reads stay inside the
-callback. Completed edits remain if the callback later returns an error.
-
-Use `list.reborrow().get_mut(index)` when you need to keep the child editor in
-the surrounding scope. Both APIs support growing setters. `with_mut` refreshes
-its integer span after a size change; `get_mut` retains its ordinary path-based
-behaviour. End borrowed reads before another edit or resize in either API.
-
-### Map selectors
-
-Borrowing selectors keep a named map available after the child editor's last
-use. Their child borrow excludes overlapping map or parent access:
-
-```rust
-# fn example(mut map: blubber::MapMut<'_, u16, blubber::Str>) -> blubber::Result<()> {
-map.get_mut(&1)?.ok_or(blubber::ErrorKind::MissingKey)?.push_str("!")?;
-map.entry(2)?.or_insert_with(|| "two")?.push_str("!")?;
-assert_eq!(map.get_mut(&2)?.ok_or(blubber::ErrorKind::MissingKey)?.get(), "two!");
-# Ok(()) }
-```
-
-Use consuming selectors when the child must outlive the map handle itself:
-
-```rust
-fn select(map: blubber::MapMut<'_, u16, blubber::Str>) -> blubber::Result<blubber::StrMut<'_>> {
-    map.into_entry(2)?.or_insert("two")
+    let signer = *authority.address();
+    // This program initializes the queue and is its only writer.
+    Queue::with_edit_options(
+        state,
+        program_id,
+        EditOptions {
+            funding: Funding::TopUp {
+                payer,
+                system_program,
+            },
+            headroom: Headroom::UpTo(8), // One u64, with no spare bytes at opening.
+            refund: None,
+        },
+        |queue| {
+            if queue.try_authority()? != signer {
+                return Err(ErrorKind::Unauthorized.into());
+            }
+            queue.values_mut().push(value)
+        },
+    )?;
+    Ok(())
 }
 ```
 
-A generated temporary works the same way: `root.labels_mut().into_get_mut(&key)?`
-can return a retained child. `root.labels_mut().get_mut(&key)?` is useful for an
-immediate call; bind the map first when retaining that borrowed child across
-statements. List selectors and lending cursors retain their consuming contracts.
-`at_mut(self, &key)` uses `into_get_mut` and converts absence to `MissingKey`.
+`blubber::pinocchio_sdk` provides `AccountView` as the runtime account handle. An SDK guard is the runtime borrow guard that controls shared reads and exclusive edits to account data. `Queue::with_edit_options` checks that `state` is owned by `program_id`, opens a mutable SDK guard, checks the account header and runs the closure on a temporary `QueueMut` editor without decoding the list into a `Vec`.
 
-Map entries support `or_insert_with` for a caller-borrowed initializer and
-`or_default` for the initializer's default. Each runs only when the key is
-absent. `and_modify` runs a fallible callback only when the key is present,
-then returns the entry for chaining with either insertion method. It reselects
-the value by its retained ordinal after growth. A callback error or unwind
-keeps completed edits; propagate errors to the caller. The `Entry` rustdoc
-examples show each combinator. On an occupied entry, chaining `and_modify`
-with `or_insert_with` resolves the value again. A hot path that keeps the
-modified editor can match `Entry::Occupied` and call `into_mut` once.
+Owner authentication and authority checks establish different facts. `with_edit_options` checks that your program owns `state`, while your handler must still check that `authority` signed and matches the stored `queue.try_authority()?` key, or any caller can append to anyone's queue.
 
-### Cursors and callbacks
+`try_authority()` and `try_get` return a `Result`, and `try_iter` yields a `Result` per item, so detected corruption becomes an error. On a list or map, `try_get` returns `Ok(None)` for a missing index or key in valid data.
 
-For a pass over many mutable elements, `cursor_mut()` retains the selection
-between steps. Each `next()?` lends one child; finish using it before asking
-for the next. A map cursor lends `(key, child)` pairs. Selection errors are
-returned once and exhaust the cursor; a later child operation error does not
-itself advance or exhaust it. Propagate either error in an instruction handler.
+This handler uses a lazy load (`with_edit_options`) because this program initialises `Queue` and is its only writer. Switch to a checked load (`with_edit_checked` or `with_edit_checked_options`) when you cannot vouch for every program version that wrote the account; see [Choose a load](trust-model.md#choose-a-load).
 
+Because `create` sized the account to 48<!-- num:quickstart.queue.empty_bytes --> bytes with zero spare bytes, appending one `u64` needs 8<!-- num:quickstart.queue.append_bytes --> new bytes. `Headroom::UpTo(8)` asks the runtime to resize the account by up to 8<!-- num:quickstart.queue.append_bytes --> bytes when the edit opens. `Funding::TopUp` transfers the extra rent from `payer` when the closure commits.
+
+Build the quickstart for both SBF architectures and run the Mollusk tests with:
+
+`bash scripts/reproduce.sh sbf`
+
+In `tests/mollusk/tests/quickstart.rs`, `creates_and_pushes_with_exact_lengths_and_rent` checks that creating the queue produces 48<!-- num:quickstart.queue.empty_bytes --> bytes, the first push grows it to 56<!-- num:quickstart.queue.first_append_bytes --> bytes and the second grows it to 64<!-- num:quickstart.queue.second_append_bytes --> bytes, with signer-funded rent and the expected values. The same test checks that a wrong authority returns `Unauthorized` and an empty payer returns `ProgramError::AccountNotRentExempt` without changing the account. See [errors and offsets](../SPEC.md#errors-and-offsets) for the runtime error mapping.
+
+## Define a schema
+
+Mark an account root with `#[blubber::schema(account)]` and a nested schema with `#[blubber::schema]`. A persistent account root must be a concrete struct because its layout determines the account discriminator, while a nested schema can use type and const generics. For a struct whose fields are all fixed-size, derive `#[derive(blubber::Fixed)]` to pack its fields consecutively without Rust struct padding.
+
+`Str`, `List<T>` and `Map<K, V>` are schema markers for UTF-8 strings, ordered lists and sorted maps. `Address` is the fixed-size 32<!-- num:wire.address.bytes -->-byte address type. Built-in schemas cover unsigned and signed integers, `bool`, `[u8; N]`, `Address`, `Fixed` structs, `Str`, `Option<T>`, `List<T>` and `Map<K, V>`.
+
+In a `Map<K, V>`, keys stay in sorted order so lookups can binary-search the key table without scanning every entry. Map keys must have an ordered encoding of fixed positive width (`MapKey`, implemented for integers, `bool`, `[u8; N]` and `Address`). Strings and variable-size types cannot be map keys in 0.1.0<!-- num:release.blubber.version -->.
+
+Every type in a nested layout is a node. Schema depth counts the nodes from the account root to a leaf, inclusive. By default, schemas support a depth of 8<!-- num:schema.default.depth --> nodes. Enable `max-depth-16` to raise the limit to 16<!-- num:schema.depth16.depth --> nodes without changing the encoded bytes. When you change a schema on an existing deployment, see [Migrate an account](trust-model.md#migrate-an-account).
+
+## How the bytes are laid out
+
+Every account starts with a 12<!-- num:wire.account.header_bytes -->-byte header: an 8<!-- num:wire.account.discriminator_bytes -->-byte discriminator that identifies the schema, followed by a 4<!-- num:wire.account.used_len_bytes -->-byte little-endian `used_len` that counts the header plus the root payload. Capacity is the account's total physical storage (`storage_len`). Spare is the physical space after `used_len`.
+
+```text
+|<------------------ storage_len (physical capacity) ------------------>|
++----------------------+-----------------------+------------------------+
+| Header (12 bytes)    | Root payload          | Spare capacity         |
+| disc (8) | used (4)  | (used_len - 12 bytes) | (storage_len - used)   |
++----------------------+-----------------------+------------------------+
+|<------------- used_len --------------------->|
+```
+
+Fixed-width lists such as `List<u64>` pack their items directly after a 4<!-- num:wire.list.count_bytes -->-byte little-endian count. Variable-width collections such as `List<Str>` use a directory. A directory is the offset table at the front of a variable-width collection that locates each item. After the 4<!-- num:wire.list.count_bytes -->-byte item count, the directory stores one 4<!-- num:wire.list.end_bytes -->-byte relative end offset (a stored end) for each item except the last. The last item needs no stored end because the parent region's own end already marks where it stops. That boundary is its implicit end.
+
+Here is how a `List<Str>` changes across the first two appends:
+
+```text
+Empty List<Str>:
+[ count = 0 (4B) ]
+
+After pushing "old" (3B):
+[ count = 1 (4B) ][ "old" (3B) ]
+(No stored end word: the list's own end marks the end of the payload.)
+
+After pushing "new" (3B):
+[ count = 2 (4B) ][ end_0 = 3 (4B) ][ "old" (3B) ][ "new" (3B) ]
+```
+
+Appending `"old"` to an empty `List<Str>` adds only its payload bytes. Appending `"new"` after `"old"` adds 7<!-- num:recipe.indexed_append.encoded_growth_bytes --> encoded bytes: 3<!-- num:recipe.indexed_append.payload_bytes --> bytes for `"new"` and 4<!-- num:wire.list.end_bytes --> bytes in the directory to record where `"old"` ends.
+
+An ancestor is an enclosing field or collection whose size or offsets depend on a child inside it. Inserting that new 4<!-- num:wire.list.end_bytes -->-byte stored end into the directory shifts `"old"` forward by 4<!-- num:wire.list.end_bytes --> bytes. Bytes after the list move by the full 7<!-- num:recipe.indexed_append.encoded_growth_bytes --> bytes, and Blubber updates existing end words in enclosing ancestors without adding any end words there. That is why an in-place edit can still move bytes after the edit point. Verus checks that a byte move preserves bytes outside its destination range.
+
+## Size and fund an edit
+
+Before an edit grows an account, separate three quantities: the spare bytes already sitting after `used_len`, the headroom (the extra bytes your handler asks the runtime to reserve) and the rent in lamports needed to keep the final physical size rent-exempt.
+
+Take the second append above (`"new"` after `"old"`), which adds 7<!-- num:recipe.indexed_append.encoded_growth_bytes --> encoded bytes. If the account opens with 4<!-- num:recipe.indexed_append.opening_spare_bytes --> spare bytes, the edit needs 3<!-- num:recipe.indexed_append.additional_room_bytes --> more physical bytes, so you request `Headroom::UpTo(3)` (see [Grow an indexed string list](recipes.md#grow-an-indexed-string-list)). If the buffer already has 7<!-- num:recipe.indexed_append.host_spare_bytes --> spare bytes at opening, it needs no new physical bytes and fits inside `Headroom::UpTo(0)`<!-- num-code:"Headroom::UpTo({{num:runtime.headroom.default_bytes}})" -->.
+
+`Queue::with_edit` and `EditOptions::from(funding)` use `Headroom::UpTo(0)` by default, which uses the existing physical allocation when the edit opens. A lease is a mutable edit session over an account's bytes. When you pass `EditOptions` to `with_edit_options` or `with_edit_checked_options`, pick the `Headroom` variant for your handler:
+
+- **`Headroom::UpTo(bytes)`** - asks the runtime to resize the account by up to `bytes` when the lease opens.
+- **`Headroom::Max`** - discovers the largest local growth window the SDK guard allows in this instruction.
+- **`Headroom::OnDemand`** - requires the `alloc` feature and a working allocator and re-leases the account during the edit when a write needs more room.
+
+Do not treat a requested `Headroom` as a guarantee that the runtime will grant that many bytes. Solana caps an account at 10<!-- num:runtime.account.max_mib --> MiB and caps growth per invocation at 10,240<!-- num:runtime.invocation.growth_bytes --> bytes above the account's length at invocation entry. Earlier growth of the same account can leave less room, and the SDK's local headroom check cannot predict the shared transaction growth limit.
+
+For initial sizing before an account exists, `Queue::space(reserve)` and `Queue::encoded_len_of(&init)` measure different things. `Queue::space(reserve)` is a `const fn` that adds `reserve` to the minimum empty account encoding without looking at an initializer. `Queue::encoded_len_of(&init)` validates a `QueueInit` value and returns the exact byte length its header and initial items will take.
+
+Commit is the step that finishes a mutable session. On a Pinocchio store it drops the SDK guard, attempts any physical trim and settles rent if needed. Scoped helpers (`with_edit`, `with_edit_options`, `with_edit_checked`, `with_edit_checked_options`) commit once when your closure returns `Ok(value)` and return `(value, CommitInfo)`. If you open a direct mutable session with `Queue::load_mut`, `Queue::load_checked_mut` or `Queue::initialize`, call `.commit()` yourself to finish it. On-chain, dropping an uncommitted session skips rent settlement. If your edit closure returns `Err(...)`, return that error from your handler so the Solana runtime rolls back any bytes changed during the callback.
+
+`Funding::Prepaid` is the default `Funding` value and uses existing lamports to cover rent. `Funding::TopUp { payer, system_program }` transfers any net rent deficit from `payer`, while `refund: Some(recipient)` in `EditOptions` sends excess lamports above the final rent requirement to `recipient`; see [Pay rent or refund excess](recipes.md#pay-rent-or-refund-excess).
+
+`CommitInfo` is the commit summary returned with your closure result. It carries `used_len`, `storage_len`, `topped_up`, `refunded` and `shrink_error: Option<Error>`, which records any physical trim error while keeping the logical shrink valid.
+
+## Try it on the host
+
+Host storage lets you run the same schema and edit code in unit tests on your machine without a Solana runtime. `SliceStore::new(&mut buf)` wraps a mutable byte slice for `no_std` tests, and `VecStore::new(&mut vec)` (with `alloc`) wraps a growable `Vec<u8>`. Call `Queue::initialize(&mut store, QueueInit { ... })`, run `values_mut().push(...)` and call `.commit()`. For a runnable host round trip, see the [crate doctest](../crates/blubber/src/lib.rs).
+
+## Read an account from a Rust client
+
+When an off-chain Rust client fetches account bytes, `Queue::load(bytes)` does not see the `AccountView` metadata that an on-chain handler checks. Check that the account address matches the address you expected and that its owner equals your program ID before calling `Queue::load`, or an RPC response can hand you bytes from an account your program does not own.
+
+<!-- code:queue-client-read -->
 ```rust
-use blubber::{List, SliceStore};
-#[blubber::schema(account)]
-struct Counters { values: List<u64> }
-let mut bytes = [0; 64];
-let mut store = SliceStore::new(&mut bytes);
-let mut root = Counters::initialize(&mut store, CountersInit { values: &[1, 2] })?;
-{
-    let mut cursor = root.values_mut().cursor_mut()?;
-    while let Some(mut value) = cursor.next()? {
-        let old = value.try_get()?;
-        value.set(old + 1)?;
+fn read_queue(address: Pubkey, account: &Account) -> Option<QueueRef<'_>> {
+    if address != STATE || account.owner != PROGRAM {
+        return None;
     }
+    let queue = Queue::load(&account.data).ok()?;
+    (queue.authority().to_bytes() == AUTHORITY.to_bytes()).then_some(queue)
 }
-assert_eq!(root.values().try_get(1)?, Some(3));
-root.commit()?;
-# Ok::<(), blubber::Error>(())
 ```
 
-`try_for_each_mut` scopes each child to a callback. It stops on the first
-callback error and keeps completed edits. Growing every indexed child may
-repeat suffix moves; use [whole-container rewrites](recipes.md#replacing-a-whole-collection)
-when the new inputs can be staged independently. The [performance guide](performance.md)
-compares these access patterns.
+Once you have checked the address and owner, pass the byte slice to `Queue::load(bytes)`. `Queue::load` validates the 12<!-- num:wire.account.header_bytes -->-byte header and scans the whole used root against `Queue`'s schema before returning `QueueRef`, so truncated or bad bytes return an error on load. You can then read `queue.authority()` and iterate `queue.values().try_iter()`.
 
-## Headroom and funding
+## Fix a version mismatch
 
-`UpTo(0)` performs no speculative opening resize and can use existing physical
-spare. `UpTo(n)` requests at most n additional bytes and can grant less. An edit
-that exceeds the granted capacity returns before writing. Include directory and
-parent growth, then subtract opening spare; the [indexed string recipe](recipes.md#indexed-string-growth)
-shows the arithmetic. `Max` probes the available SDK window; `OnDemand` requires
-`alloc` and a working runtime allocator. Local capacity never certifies remaining
-transaction growth or an ancestor CPI limit.
+Blubber 0.1.0<!-- num:release.blubber.version --> builds on Pinocchio 0.12. With the `pinocchio` feature, Blubber re-exports the SDK as `blubber::pinocchio_sdk`. Import the entrypoint macros, `AccountView`, `Address` and CPI types from there so your program uses the same Pinocchio as Blubber.
 
-`Funding::Prepaid` requires enough balance for final rent. `Funding::TopUp`
-validates a writable System-owned signer payer and executable System Program,
-then transfers at most the final net deficit. An optional refund recipient must
-be independently authorized by your program. A receipt's `shrink_error` is a
-diagnostic: settlement uses actual physical length, and funding failures return
-an error. Do not discard the commit result.
+Rust treats two copies of a crate at different major versions as different types, even when the type has the same name. Run `cargo tree -d` to list the duplicate crates.
 
-## Errors and completion
+Passing a Pinocchio 0.11 `AccountView` to `ReadStore::new` gives this error:
 
-Input, capacity and funding preflight errors preserve bytes and leave poison
-unchanged. Source corruption detected on a lazy mutable path sets sticky poison,
-even before writes. A later directory patch or encoder failure can leave changed
-bytes with the old published length. Completed earlier edits also remain after
-a callback error. Propagate errors for transaction rollback. Drop attempts
-trimming without rent settlement; it does not undo edits.
+```text
+error[E0308]: mismatched types
+expected `blubber::pinocchio::AccountView`, found `pinocchio::AccountView`
+note: there are multiple different versions of crate `solana_account_view` in the dependency graph
+```
 
-Treat SBF stack diagnostics as build failures. Frames must fit 4,096 bytes;
-split large handler frames with `#[inline(never)]`. Direct mapping removes frame
-gaps on v0. The [stack-check script](../scripts/sbf-stack.sh) rejects diagnostics.
-Measure nested schemas and your actual handler under your own CU and heap budget.
+Import the entrypoint and handler types from Blubber's re-export instead:
+
+```rust,no_run
+use blubber::pinocchio_sdk::{program_entrypoint, AccountView, Address};
+```
+
+If a CPI crate supplies the accounts, align it to the same account-view version.
+
+Schema keys use `blubber::Address`, the Solana Address 2.x type. Pinocchio 0.11 and 0.12 and `solana-pubkey` 4's `solana_pubkey::Pubkey` use that same type, so those values pass straight in. A value from `solana-address = "=1.0.0"` fails to compile:
+
+```text
+error[E0308]: mismatched types
+expected `blubber::Address`, found `solana_address::Address`
+note: there are multiple different versions of crate `solana_address` in the dependency graph
+```
+
+With Blubber's `Address` in scope, copy the 32<!-- num:wire.address.bytes --> bytes:
+
+<!-- doctest-ignore: old_key is a value from solana-address 1.0.0, checked in the version-mismatch reproduction. -->
+```rust,ignore
+let key = Address::from(old_key.to_bytes());
+```

@@ -2,7 +2,7 @@
 
 use blubber::{
     pinocchio::{Funding, Headroom, ReadStore, Store},
-    ErrorKind, Pubkey, ReadStorage, Resize,
+    ErrorKind, ReadStorage, Resize,
 };
 use pinocchio::{
     cpi::invoke,
@@ -43,7 +43,7 @@ pub(crate) fn run(id: &Address, accounts: &mut [AccountView], ix: &[u8]) -> Prog
     }
     let original = state.data_len();
     let ceiling = original + super::INCREASE;
-    let actor = Pubkey::from_bytes(payer.address().to_bytes());
+    let actor = *payer.address();
     assert_eq!(
         original as u32,
         MyAccount::encoded_len_of(&crate::state::seed(actor))?

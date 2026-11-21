@@ -1,11 +1,25 @@
 # Assurance
 
-[The specification](SPEC.md) defines format 1 and the current API contracts.
-This document separates production proofs, finite model checks and executed
-tests. Evidence is scoped to the source/tool/artifact hashes in its receipt.
-A retained run is not a claim that changed sources have already passed.
-The private gate runner enforces the coverage inventories and produces receipts.
-For application loading, writer and recovery choices, see the [trust model](docs/trust-model.md).
+## Use this assurance record
+
+This file maps Blubber's assurance claims to their proof or test records and states where that evidence stops. For the wire and runtime rules themselves, see [`SPEC.md#find-a-contract`](SPEC.md#find-a-contract).
+
+The byte kernel is the low-level byte-moving and validation code in `blubber-core`. Verus is the contract verifier that checks those functions against their specifications (1,707<!-- num:proof.verus.verified --> verified items, 0<!-- num:proof.verus.errors --> errors in the pinned run). Kani is the bounded model checker that checks finite widths and unwind bounds. Miri is the host execution checker. A ground truth model is an independent owned implementation that computes expected values or bytes. A differential test feeds the same edits to the model and to production storage, then compares the result. A benchmark receipt is the recorded inputs, tools, hashes and output for a pinned run.
+
+First-party production, test and generated crate roots forbid `unsafe` Rust. Dependencies and the comparison workspace sit outside that rule. There has been no external audit yet, and I plan an external review before 1.0<!-- num:roadmap.stable.version -->; see [`SECURITY.md#release-support-and-review`](https://github.com/moshthepitt/blubber/blob/v0.1.0/SECURITY.md#release-support-and-review).
+
+## Find a claim
+
+- **Validation and byte-splice postconditions (`blubber-core`):** Verus checks under `--no-cheating` that valid encodings are accepted, byte moves preserve bytes outside the target range, and the specified destructive phases do not unwind under their stated premises. See [`#production-proofs-and-bounds`](#production-proofs-and-bounds).
+- **Payload writer and account initialisation:** Under trusted projected input, an exact measurement matching the input byte length, and a destination range that holds that slot, Verus checks that the payload writer succeeds without unwinding, splices the input into the exact slot and preserves outside bytes. Differential tests in `crates/blubber/tests/prepared.rs` compare full initialised account bytes against the independent model at and above the minimum size, detect a no-op encoder, and check that nothing is written below the minimum. See [`#encoders-and-initialization`](#encoders-and-initialization).
+- **Bounded typed widths and unwind limits:** Kani checks finite harness widths and unwind bounds with required coverage. Variable typed graphs and callback wrappers beyond those bounds have separate proof and execution-test coverage. See [`#model-checking`](#model-checking).
+- **In-place edits, rent settlement, growth caps, allocation behaviour, schema identity and error rollback:** Native exhaustive tests, Miri, SBF runs, differential tests and fuzz targets exercise these paths in their recorded setups. See [`#native-exhaustive-and-runtime-testing`](#native-exhaustive-and-runtime-testing), [`#corrupted-byte-qa-evidence`](#corrupted-byte-qa-evidence) and [`fuzz/README.md#check-what-the-run-covered`](fuzz/README.md#check-what-the-run-covered).
+
+## Check the limits and rerun
+
+A Verus theorem or Kani harness holds only inside its premises. Compiler lowering, solver soundness, Pinocchio and Solana runtime behaviour, derived schema projection, custom codecs, writer history and application authority checks sit outside the byte-kernel proofs. They carry their own obligations; see [`#trust-boundaries`](#trust-boundaries) and [`docs/trust-model.md#use-raw-writes-or-custom-codecs`](docs/trust-model.md#use-raw-writes-or-custom-codecs).
+
+Every recorded result is tied to the pinned toolchain and inputs in [`#reproduce`](#reproduce) and [`benchmarks/CU.md#reproduce`](benchmarks/CU.md#reproduce). Run `bash scripts/reproduce.sh` with `test`, `verus`, `kani`, `miri`, `sbf`, `fuzz validate`, `fuzz edit`, `cu` or `cu compare`.
 
 ## Coverage by API area
 
@@ -24,7 +38,7 @@ records the production proof run.
 - 574 inventoried executable bodies in the production core.
 - 361 Kani harnesses across 8 cohorts; per-harness widths, unwind limits and covers are inventoried.
 - 13 source control markers and 72 directed mutation controls.
-- 92 classified Miri integration modules.
+- 87 classified Miri integration modules.
 <!-- assurance-counts:end -->
 
 The [Kani receipt](verification/results/kani/all.log) binds the individual logs
@@ -54,9 +68,7 @@ for [arithmetic](verification/results/kani/arithmetic.log),
 | `ReadStorage`, `Resize`, `SliceStore`, `VecStore`, `CommitInfo` and trait defaults | Host storage/relocation suites and private Miri controls cover object safety, initialized storage, zeroed regrowth, poison, first-commit closure, trim receipts, Drop/forget/swap and allocation failure. Safe Vec allocation is a trust boundary. |
 | Pinocchio ReadStore/Store typed `load/load_checked`, Funding, Headroom, refund binding, create/allocate signer/PDA; generated lazy/checked scoped helpers | `borrow_resize`, `rent`, `initialize`, `scoped`, `verification_policy` and `policy` exercise genuine guards, owner, identity and envelope checks, lazy touched checks, full checked scans, net rent/refund, leases, trim failures, rollback and aliases with both feature states. SDK/runtime behaviour remains outside the Verus/Kani adapter claim. |
 | `schema`/`Fixed` macros, generated constructors/accessors, constants, Ref/Mut/Init/Owned families and metadata support | `ui`, `derive_hygiene`, `review_hygiene`, encoding/reader/projection suites, host/MSRV consumers, real rust-analyzer and SBF depth/width matrix check representative expansions and diagnostics. Generated guards compile under forbid(unsafe_code). No proof quantifies over every macro input. |
-| `AccountSchema`, generated Prefix, `space` and fixed-copy metadata | `anchor_schema` and `ui` check identity/override, detached copies, fixed aliases/markers, omitted variable fields, preserved visibility, opt-out, native padding and checked sizing without SDK dependencies. The separate compile lane checks two live 1,024-byte prefixes and refresh on SBF v0/v3 in three memory profiles with no heap access. Metadata and copies have native/compiler/runtime evidence, without new Verus/Kani proofs. |
-| Native `Blubber<T>` / `Blubber<T, Checked>`, initialization and CPI reload | Lazy loads check copied-prefix domains. Checked loads scan the full root. Complete encoder/replay markers select initialization without a redundant lazy feature-off scan. Checked, feature-on and default-false graphs keep full validation. Native lifecycle/CPI, encoder, mutation and both Miri suites check exclusion, exact bytes, calls, funding, strict returned-path reload and terminal failures. |
-| Native `blubber_anchor::Blubber<T>`, SDK re-export and raw recipe | Compile tests check exact SDK types and the extracted raw recipe for the published 2.0.0-rc.2 SDK. SBF v0 and v3 tests check runtime behaviour and heap use. Runtime tests cover checked loads, account guard exclusion, scoped reads, fixed-capacity and managed edits, close and CPI. Initialization tests cover signers, PDAs, prefunded allocation, state transitions, borrowed initialization, opening space, rent, reuse and rollback. The compiled examples cover opaque IDL. The native adapter depends on a pinned SDK revision for safe mutable loads. |
+| `AccountSchema`, generated Prefix, `space` and fixed-copy metadata | `schema_encode` and `ui` check identity/override, detached copies, fixed aliases/markers, omitted variable fields, preserved visibility, opt-out, native padding and checked sizing with the runtime adapter disabled. Metadata and copies have compiler and host test evidence. |
 
 
 ## Production proofs and bounds
@@ -184,14 +196,11 @@ Generic nested schema encoding is supported and tested in
 [schema_encode.rs](crates/blubber/tests/schema_encode.rs), including nested
 lists, empty children, complete bytes and neighbouring frames.
 
-In [the native initialization path](crates/blubber-anchor/src/lib.rs),
-`initialized_view` calls production `encoding_publication::init_policy` with
-complete encoder/replay markers, the Checked policy and verify-on-load state.
-Only a covered Lazy feature-off graph omits the redundant post-write scan.
-Checked, feature-on and default-false graphs retain full validation.
-Covered native replay and fixed-child replay may reuse measured lengths;
-variable-child sizing required for exact slots remains. The private prepared
-initializer owns the exact input and preflight length across the safe handoff.
+Account initialization writes the payload through the verified
+`encoding_replay::write` after measurement and preflight. The writer's splice
+and `no_unwind` guarantees apply under the projected input contract. The
+folded `prepared_initialization_matches_independent_bytes_at_and_above_minimum`
+test compares the full account bytes and catches a no-op `InitSource::encode`.
 
 Schema/Fixed/MapKey audit, replay and order markers default conservatively.
 Derives combine every relevant child; map keys have an independent encoder
@@ -202,34 +211,6 @@ short/long encoding, changed widths, partial panic, New/Ready, prefix denial,
 reacquisition and successful fallback. Mutation runs compile and exercise these
 helpers. CPI reload always performs full validation independently of markers.
 
-### Native runtime fixtures
-
-Native account tests retain genuine SDK guards through constraints, callbacks
-and exit. Shared aliases may coexist; exclusive combinations fail. Drop
-releases exclusion, while a forgotten guard retains it until runtime teardown.
-Preflight allocation failures occur before guard release. Prefix invalidation
-precedes callbacks; returned poison/refresh failures and unwind cleanup leave
-typed access terminal. SDK invocation memory, copied-handle slots and allocator
-behaviour remain trust assumptions.
-
-Initialization fixtures cover signer/PDA targets, prefunding, payer aliases,
-wrong owner/seeds/bump, missing initialization, exact opening space, full-rent
-reuse and application authority. Edit/lifecycle fixtures check reservation
-floors, explicit reserve/trim, actual-length rent/refunds, single sizing
-authority, close, invalid regrowth and same-transaction reinitialization.
-Generated and checked SDK CPI fixtures cover signatures, duplicate handles,
-readonly/writable privileges, guarded CPI rejection, returned failures,
-reacquisition, saved original windows and rollback. Owning sessions run with
-safe RefCell guards under both Miri models; those tests manufacture no SDK
-account memory and prove no SDK body.
-
-Heap traces bind the exact tested ELF and include native slots, generated SDK
-vectors and serialized-map allocations. Their fixture-specific bounds do not
-supply an application-wide heap guarantee. The complete default SBF heap is
-32 KiB; each load/handoff/on-demand attempt and application allocation counts.
-Separate raw/native/demo program sizes have different instruction inventories
-and cannot establish adapter overhead by subtraction.
-
 ## Trust boundaries
 
 | Boundary | Assumption and evidence limit |
@@ -239,7 +220,6 @@ and cannot establish adapter overhead by subtraction.
 | rustc, LLVM, SBF tools | Correct macro expansion, compilation and lowering. Digests bind source/ELFs; machine code is not proved. Fresh/cached stack controls require fatal frame diagnostics at 4,096 bytes. |
 | Kani, CBMC | Correct symbolic execution/solver within each inventoried width/unwind bound. Model-checking exclusions above remain explicit. |
 | SDK account guards | Genuine runtime memory, shared/exclusive exclusion, copied handle identity, rejection-before-write resize and safe close/lamport APIs. Host tests do not manufacture SDK account memory. |
-| Owning native wrapper | Invocation memory validity, private persistent copied-handle slots, no escaping callback references, correct terminal and reacquisition transitions. [Wrapper trust](ASSURANCE.md#trust-boundaries) records the boundary. |
 | Runtime, System Program | Correct serialization, CPI/borrow enforcement, rent, growth accounting and transaction rollback in the pinned cohort. These are runtime tests, not Verus theorems. |
 | Schemas, encoders, application | Matching metadata/encoding, semantic field projection, correct application authorization, callback behaviour and approved writer history. Arbitrary custom code and upgrades are outside the functional claim. |
 
@@ -262,11 +242,11 @@ lazy load CU from the whole instruction.
 
 | n | Feature off whole CU | Feature off delta CU | Feature on whole CU | Feature on delta CU |
 | ---: | ---: | ---: | ---: | ---: |
-| 0 | 2506/2446 | 2056/1998 | 4871/4753 | 2058/2000 |
-| 1 | 2583/2522 | 2133/2074 | 5025/4905 | 2135/2076 |
-| 10 | 2790/2729 | 2340/2281 | 5439/5319 | 2342/2283 |
-| 100 | 4860/4799 | 4410/4351 | 9579/9459 | 4412/4353 |
-| 1000 | 25560/25499 | 25110/25051 | 50979/50859 | 25112/25053 |
+| 0 | 2511/2451 | 2062/2004 | 4879/4761 | 2064/2006 |
+| 1 | 2588/2527 | 2139/2080 | 5033/4913 | 2141/2082 |
+| 10 | 2795/2734 | 2346/2287 | 5447/5327 | 2348/2289 |
+| 100 | 4865/4804 | 4416/4357 | 9587/9467 | 4418/4359 |
+| 1000 | 25565/25504 | 25116/25057 | 50987/50867 | 25118/25059 |
 
 With the feature on, the fixture scans at load and again at explicit verification. These fixture sizes
 establish neither a maximum affordable account size nor a general per-byte
@@ -313,8 +293,7 @@ operations may leave unvisited corrupted bytes intact.
 | Miri | nightly-2025-12-08, both alias models, strict provenance |
 | SBF | cargo-build-sbf 4.0.0, platform-tools v1.53, LLVM 20.1.7, v0/v3 |
 | Runtime | Mollusk/bencher 0.16.2, Agave 4.3.0 |
-| Account runtime SDK | Pinocchio 0.11.2, account-view 2.0.0 with copy, System CPI 0.6.1 |
-| Native adapter SDK | Exact git revision in the unpublished adapter's manifest/lockfile |
+| Account runtime SDK | Pinocchio 0.12.0 with copy, account-view and instruction-view 3.x, pinocchio-system 0.7.0 |
 | Fuzz | cargo-fuzz 0.12.0, libfuzzer-sys 0.4.13; SDK-backed ASan jobs use host Rust 1.97.1 |
 | IDE | Standalone rust-analyzer 0.3.3081, host Rust 1.97.1 |
 

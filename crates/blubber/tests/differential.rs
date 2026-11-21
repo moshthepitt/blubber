@@ -21,7 +21,7 @@ mod phases;
 use blubber::raw::{Edit, Resize};
 use blubber::Resize as _;
 use blubber::{
-    Error, ErrorKind, List, Map, Pubkey, ReadStorage, Schema, SliceStore, Str, VecStore, View,
+    Address, Error, ErrorKind, List, Map, ReadStorage, Schema, SliceStore, Str, VecStore, View,
 };
 use blubber_core::raw::{InlinePath, Step};
 use blubber_model::{
@@ -589,6 +589,32 @@ fn replay<S: Bridge + blubber::RootSchema>(id: usize, discriminator: [u8; 8], st
             }
         }
     }
+}
+
+fn fixture_encoding<S: Bridge + blubber::RootSchema>(id: usize, discriminator: [u8; 8]) -> String {
+    use std::fmt::Write;
+
+    let schema = S::schema();
+    let value = oracle::sample(&schema, &mut Entropy(id as u64), true);
+    let arena = bumpalo::Bump::new();
+    let init = S::borrowed(&value, &arena);
+    let len = 12 + S::measure(&init).unwrap() as usize;
+    let mut bytes = vec![0; len];
+    let mut store = SliceStore::new(&mut bytes);
+    Edit::initialize::<S>(&mut store, discriminator, init)
+        .unwrap()
+        .commit()
+        .unwrap();
+    assert_eq!(
+        bytes,
+        schema.encode_account(discriminator, &value, len).unwrap(),
+        "fixture {id}"
+    );
+    let mut row = format!("{id:02} ");
+    for byte in bytes {
+        write!(row, "{byte:02x}").unwrap();
+    }
+    row
 }
 
 fn run_fixture<S: Bridge + blubber::RootSchema>(id: usize, discriminator: [u8; 8]) {

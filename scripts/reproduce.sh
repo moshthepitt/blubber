@@ -41,7 +41,7 @@ sbf_version() {
 
 build() {
     local name=$1 output=$2 package=blubber-$1
-    if [[ $name == blubber-demo ]]; then package=blubber-demo; fi
+    if [[ $name == blubber-* ]]; then package=$name; fi
     shift 2
     fresh_sbf_build "programs/$name/Cargo.toml" "$package" "$arch" "$output" \
         "$scratch/build-$arch-${output##*/}-$name.log" "$@"
@@ -58,11 +58,22 @@ build_policy_fuzz_fixtures() {
     export BLUBBER_POLICY_ELF_V3="$fixtures/v3/blubber_policy"
 }
 
+quickstart() {
+    local arch out
+    for arch in v0 v3; do
+        out="$scratch/quickstart-$arch"
+        build blubber-quickstart "$out"
+        RUST_LOG=${RUST_LOG:-error} SBF_OUT_DIR="$out" host test --locked \
+            -p blubber-mollusk --features sbf-tests --test quickstart
+    done
+}
+
 runtime() {
     local arch
     for arch in v0 v3; do
         local out="$scratch/runtime-$arch" variants="$scratch/variants-$arch"
         build blubber-demo "$out"
+        build blubber-quickstart "$out"
         build borrow-resize "$out"
         build cu-fixture "$out"
         build borrow-resize "$variants" --features alloc
@@ -122,7 +133,7 @@ measure() {
 compare() {
     local arch mode out
     local -a flags
-    local features=baselines,zeropod,wincode,pinapod,light,anchor-slab,manifest
+    local features=baselines,zeropod,wincode,pinapod,light,manifest
     export COMPARE_LIBS=0,1,2,3,4,5,6,7,8,9,10,11,12,13,14
     unset COMPARE_HEAP COMPARE_CALIBRATE
     for arch in v0 v3; do
@@ -139,6 +150,8 @@ compare() {
                 "$out/program.log" --features "$program_features"
             fresh_sbf_build benchmarks/compare/star/Cargo.toml compare-star "$arch" "$out" \
                 "$out/star.log" "${flags[@]}"
+            fresh_sbf_build benchmarks/compare/slab/Cargo.toml compare-slab "$arch" "$out" \
+                "$out/slab.log" "${flags[@]}"
             COMPARE_ARCH="$arch" COMPARE_OUT="$out/rows.json" SBF_OUT_DIR="$out" RUST_LOG=error \
                 host run --release --locked --manifest-path benchmarks/compare/Cargo.toml \
                 -p compare-harness --features competitors
@@ -159,6 +172,20 @@ case "${1:-}" in
         host test --workspace --locked
         host test -p blubber --doc --no-default-features --locked
         host test -p blubber -p blubber-doc-examples --doc --all-features --locked
+        ;;
+    docs)
+        [[ $# == 1 ]]
+        host fetch --manifest-path scripts/api-listing/Cargo.toml --locked
+        python3 scripts/public-api.py
+        if [[ -f verification/docs-inputs.json ]]; then
+            python3 scripts/docs-check.py
+        else
+            python3 scripts/check-docs.py
+        fi
+        ;;
+    install)
+        [[ $# == 1 ]]
+        python3 scripts/check-install.py --scratch "$scratch"
         ;;
     verus)
         [[ $# == 1 ]]
@@ -200,18 +227,27 @@ case "${1:-}" in
         for flags in '-Zmiri-strict-provenance' '-Zmiri-strict-provenance -Zmiri-tree-borrows'; do
             MIRIFLAGS="$flags" cargo miri test -p blubber --locked --no-default-features \
                 --features alloc,derive --lib "${tests[@]}" -- "${skips[@]}"
-            MIRIFLAGS="$flags" cargo miri test -p blubber-anchor --locked \
-                --no-default-features --features derive --lib tests::
         done
         ;;
     sbf)
-        [[ $# == 1 ]]
-        sbf_version
-        runtime
+        [[ $# -le 2 ]]
+        case "${2:-}" in
+            '') sbf_version; runtime ;;
+            smoke) sbf_version; quickstart ;;
+            *) echo 'Expected sbf or sbf smoke.' >&2; exit 2 ;;
+        esac
         ;;
     fuzz)
-        [[ $# -le 2 ]]
+        [[ $# -le 3 ]]
         target=${2:-validate}
+        seconds=300
+        if [[ $# == 3 ]]; then
+            if [[ $target != validate || $3 != smoke ]]; then
+                echo 'Expected fuzz validate smoke or fuzz [TARGET].' >&2
+                exit 2
+            fi
+            seconds=15
+        fi
         case "$target" in
             validate|edit)
                 export RUSTUP_TOOLCHAIN=nightly-2025-12-08
@@ -233,10 +269,13 @@ case "${1:-}" in
                 ;;
             *) echo "Unknown fuzz target: $target" >&2; exit 2 ;;
         esac
+        if [[ $seconds == 15 ]]; then
+            cargo fuzz check --fuzz-dir fuzz
+        fi
         corpus=$(mktemp -d "$scratch/corpus-$target.XXXXXX")
         cp fuzz/corpus/"$target"/* "$corpus/"
         cargo fuzz run "$target" "$corpus" "${features[@]}" --fuzz-dir fuzz -- \
-            -max_total_time=300 -max_len=65536 -seed="$seed" -timeout=30 -rss_limit_mb="$rss" \
+            -max_total_time="$seconds" -max_len=65536 -seed="$seed" -timeout=30 -rss_limit_mb="$rss" \
             -artifact_prefix="$corpus/"
         ;;
     cu)
@@ -249,7 +288,7 @@ case "${1:-}" in
         esac
         ;;
     *)
-        echo 'Usage: reproduce.sh test|verus|kani|miri|sbf|fuzz [TARGET]|cu [compare]' >&2
+        echo 'Usage: reproduce.sh test|docs|install|verus|kani|miri|sbf [smoke]|fuzz [TARGET [smoke]]|cu [compare]' >&2
         exit 2
         ;;
 esac

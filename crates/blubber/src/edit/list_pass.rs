@@ -130,7 +130,7 @@ impl AccountEdit<'_> {
     ) -> Result<R> {
         if self.checked_map_enabled() {
             let child = self.collection_child()?;
-            self.execute_checked_map(
+            self.execute_checked_map::<false, _>(
                 operation,
                 key,
                 None,
@@ -158,7 +158,7 @@ impl AccountEdit<'_> {
     ) -> Result<R> {
         if self.checked_map_enabled() {
             let child = self.collection_child()?;
-            self.execute_checked_map(
+            self.execute_checked_map::<true, _>(
                 operation,
                 key,
                 Some(hint),
@@ -203,7 +203,7 @@ impl AccountEdit<'_> {
         not(all(target_os = "solana", feature = "max-depth-16")),
         inline(always)
     )]
-    pub(super) fn execute_checked_map<R>(
+    pub(super) fn execute_checked_map<const ENTRY: bool, R>(
         &mut self,
         operation: blubber_core::raw::MapEdit,
         key: &[u8],
@@ -222,7 +222,7 @@ impl AccountEdit<'_> {
             removed: Err(ErrorKind::InvalidPlan.into()),
             encode: Some(encode),
         };
-        let detached = stage_checked_map(
+        let detached = stage_checked_map::<ENTRY, _, _>(
             self.store.edit_access(),
             (self.discriminator, self.minimum),
             &Layout::Flat {
@@ -246,7 +246,7 @@ impl AccountEdit<'_> {
 
 #[cfg_attr(target_os = "solana", inline(never))]
 #[allow(clippy::too_many_arguments)]
-fn stage_checked_map<'key, R, E: FnOnce(&mut [u8])>(
+fn stage_checked_map<'key, const ENTRY: bool, R, E: FnOnce(&mut [u8])>(
     access: crate::storage::private::EditAccess<'_>,
     (discriminator, minimum): ([u8; 8], u32),
     layout: &Layout,
@@ -273,7 +273,7 @@ fn stage_checked_map<'key, R, E: FnOnce(&mut [u8])>(
         resolved.prepare_map_checked(operation, key, input, u32::MAX, hint, access.poisoned);
     let limits = (access.hard_limit, access.limit, access.limit_error);
     match (blubber_core::MAX_DEPTH, core::mem::size_of::<R>()) {
-        (8, 0..=256) => finish_checked_map_small(
+        (8, 0..=256) => finish_checked_map_small::<ENTRY, _, _>(
             prepared,
             limits,
             #[cfg(feature = "pinocchio")]
@@ -299,7 +299,7 @@ fn stage_checked_map<'key, R, E: FnOnce(&mut [u8])>(
     not(all(target_os = "solana", feature = "max-depth-16")),
     inline(always)
 )]
-fn finish_checked_map_small<'key, R, E: FnOnce(&mut [u8])>(
+fn finish_checked_map_small<'key, const ENTRY: bool, R, E: FnOnce(&mut [u8])>(
     prepared: Result<blubber_core::raw::CheckedListPrepared<'_, 'key>>,
     limits: (usize, usize, ErrorKind),
     #[cfg(feature = "pinocchio")] preflight: crate::storage::private::Preflight<'_>,
@@ -319,6 +319,43 @@ fn finish_checked_map_small<'key, R, E: FnOnce(&mut [u8])>(
             stage,
         );
     }
+    if ENTRY {
+        return finish_checked_entry_map(
+            prepared,
+            limits,
+            #[cfg(feature = "pinocchio")]
+            preflight,
+            poisoned,
+            read_removed,
+            stage,
+        );
+    }
+    finish_list_body::<false, _, _>(
+        prepared,
+        limits,
+        #[cfg(feature = "pinocchio")]
+        preflight,
+        poisoned,
+        read_removed,
+        stage,
+    )
+}
+
+// Entry edits keep the search result live during plan preparation. Publish
+// in a separate frame to leave room for outgoing calls in the staging frame.
+#[cfg_attr(
+    all(target_os = "solana", not(target_feature = "static-syscalls")),
+    inline(never)
+)]
+#[cfg_attr(target_feature = "static-syscalls", inline(always))]
+fn finish_checked_entry_map<'key, R, E: FnOnce(&mut [u8])>(
+    prepared: Result<blubber_core::raw::CheckedListPrepared<'_, 'key>>,
+    limits: (usize, usize, ErrorKind),
+    #[cfg(feature = "pinocchio")] preflight: crate::storage::private::Preflight<'_>,
+    poisoned: &mut bool,
+    read_removed: impl FnOnce(Option<Span>, &[u8]) -> Result<R>,
+    stage: &mut ListStage<R, E>,
+) -> Result<Option<blubber_core::raw::CheckedListPlan<'key>>> {
     finish_list_body::<false, _, _>(
         prepared,
         limits,

@@ -1,11 +1,11 @@
 devnet-replay: ok
 cluster=https://api.devnet.solana.com
-source-head=4354ff2aae29ec6d1489e21474d8d309aee80146 source-sha256=dd1bba211857fcc0269668e86491997b7ca135291a62a0a09e4fa24b7e7cac71
-slot=523550826 feature-set=1591744305 mapping=direct
+source-head=3215f8e3a60f7d18193ee321e64bb7339a79cf99 source-sha256=83ad1a5837b09309b68e7cb74abdb41f2983541a1b4265ee11172c5e6c75dd1b
+slot=524394777 feature-set=1591744305 mapping=direct
 payer=HmmmSPo2951PrKvDSU3roXybCtNbRjrQQSmtjQbvWN6G
-base-peak-SOL=19.012595280 base-fees-estimate-SOL=0.243185000
-large-peak-SOL=72.075832960 large-fees-estimate-SOL=0.091485000
-balance-lamports=34559867040 total-fees-lamports=None
+base-peak-SOL=19.266626320 base-fees-estimate-SOL=0.244100000
+large-peak-SOL=72.329574000 large-fees-estimate-SOL=0.092110000
+balance-lamports=34349377120 total-fees-lamports=None
 cases-run=1284 passed=1284 mismatches=0 base=1284 large=0
 planned-base=1292 planned-large=24 approved-local-only=8
 cu-delta-min=150 max=150 sum=192600
@@ -13,16 +13,16 @@ Programs run sequentially; inputs close after each result; ProgramData rent retu
 Loader-v3 program shells may retain rent; estimates include this retained balance.
 feature=virtual_address_space_adjustments active=True activation-slot=463536000
 feature=account_data_direct_mapping active=True activation-slot=463968000
-elf=borrow-alloc-v0 sha256=65193f205d55c3697b76f9faf1ec1e98c86b5b97e7df18d34016e8e9b68207e9
-elf=borrow-alloc-v3 sha256=f601cd026189a2094b7eaf5f02e243d000da4b287c69db4a59d812b8a1980dd6
-elf=borrow-no-alloc-v0 sha256=7ed90fac3fe63c292c623f8d06629e1fbda9956319fcf1ff683ed81e58f70476
-elf=borrow-no-alloc-v3 sha256=0f0cd3df0db16bea3f37a10e019fee78ecb89e76baf83cd0340a0671870bebbe
-elf=input-owner sha256=0865cc2342cf2117114e0e90e06af434f340a11d56847838d563bd62137d31ab
-elf=policy-off-v0 sha256=63c0b3fcf300960e626dc327eafe1e4c1fddbc3912641349b6bb0b5a617404d7
-elf=policy-off-v3 sha256=d3fc4bc599fdb1491ab520636deca2801600c2caaf60a3f492c5438ecf2c394c
-elf=policy-on-v0 sha256=1b0839ccc16cc845785d8bebe86181059fc1253ac2ec78af89b7fc48c56b696e
-elf=policy-on-v3 sha256=6f57fe3fae1582ae3121f6d4cf9c18d11834dfa3798ddcbbb964f36aa15f27bc
-programs={"base-borrow-alloc-v0":{"id":"9L1fVx8MVG2q6yVU7DPUTbW9mCMEGkChp9N88yEF2pb7","state":"closed"},"base-borrow-alloc-v3":{"id":"6gpLtzDUdyZmPdC5ynirhb2kr2pa27C8NZ1dwyEsi2Hv","state":"closed"},"base-borrow-no-alloc-v0":{"id":"DWwCRxXvTkkT48cuXKN4dbp6rdS4J1TQkCxZYgbNhkgD","state":"closed"},"base-borrow-no-alloc-v3":{"id":"7kC6UkqqrvuLM66CCc3qcweALPf53beSKbCGzgGfzFmo","state":"closed"},"base-policy-off-v0":{"id":"BKcui5XBxK9JG1y3YBVXXQXfKTWEZYHCStf5L9eDazDx","state":"closed"},"base-policy-off-v3":{"id":"oVfGhphkxSv5bomU7WWbbsUQ6ZxcjCDcQhxxKLqr3R7","state":"closed"},"base-policy-on-v0":{"id":"GuB9ojLhWCNE3sNBrt6BonWejGL6GKV8Qf1Mj31j78u9","state":"closed"},"base-policy-on-v3":{"id":"EuJk4FuymwJpsJEtxAtaFy5x5t5NtSd7HnnEvjTQFee7","state":"closed"},"owner-borrow-alloc-v0-op13-s128-plain-w1-owner1-exec0-a0":{"id":"2mKs5ixzJEuyWvLCTtcouhUmhhTnF9fk6S52wdhM5vMS","state":"closed"},"owner-borrow-alloc-v0-op14-s128-plain-w1-owner1-exec0-a0":{"id":"BEeQtWckBnBdzfCDPRaSPksh12mgcbWC2UkmMHvXbmzB","state":"closed"},"owner-borrow-no-alloc-v0-op13-s128-plain-w1-owner1-exec0-a0":{"id":"5bzCXsv3PT7SYgUHaC62CV7JA9GyTsreWA6Wh4HSCsJt","state":"closed"},"owner-borrow-no-alloc-v0-op14-s128-plain-w1-owner1-exec0-a0":{"id":"Eq3Jd735waAGvidst2hw3YkksdRnXVD54EmB9JiaStXw","state":"closed"},"owner-borrow-alloc-v3-op13-s128-plain-w1-owner1-exec0-a0":{"id":"4xYQP6AkQLfrPmmAssfR6wDvtssLc1iiP5Qy4ZnTxWF5","state":"closed"},"owner-borrow-alloc-v3-op14-s128-plain-w1-owner1-exec0-a0":{"id":"F1WeTqX1BU25H82N7xG4xLfLVypthifp43qtuKpY2eZq","state":"closed"},"owner-borrow-no-alloc-v3-op13-s128-plain-w1-owner1-exec0-a0":{"id":"B1NBferUAec51gX3SBXaKGenFUpKSxd1cYs17k4SzoY4","state":"closed"},"owner-borrow-no-alloc-v3-op14-s128-plain-w1-owner1-exec0-a0":{"id":"Cfr87sfpU4p25keVveT8X3mX2THW6vN786miA4Weuerd","state":"closed"}}
+elf=borrow-no-alloc-v0 sha256=aa2dc9a1c2689e4d8bb9389b77f705b558fb2892540e0393c5fb3308b2cb100a
+elf=borrow-alloc-v0 sha256=d3f429cefa2a0c18285d2658d1236ebfdde47d3a92469e05080b1eaed57a4fa8
+elf=policy-off-v0 sha256=ba7eebbd080453a3ece485371b97c5ad5fe86a9107b4a3276c71267e8f99b073
+elf=policy-on-v0 sha256=4e093aa24c574f680c19234f9e96da20833d99a9f3c7b31e7af0946bb0d2f23c
+elf=borrow-no-alloc-v3 sha256=e62952b2190b49f570bce01a2ad6ae280379979a773245b8070fc8cdb892ec83
+elf=borrow-alloc-v3 sha256=4a75ab583dec89ec8a00f4e179e82fae8d4e2895c1bf34f499de46f275d6a6b9
+elf=policy-off-v3 sha256=062604f40587fba0a30ea42344b13fac7fdf5e87ab65f4137fa2a52a67fe7251
+elf=policy-on-v3 sha256=c27175b890fcd5326440e0b5a4b89f8453ec4558c2237ad2abdd921e9a3ae0d5
+elf=input-owner sha256=3eb5d0701f54da2e2bdbdb08b53b39b910ec2a99e47552f69f2e0d11f8c86666
+programs={"base-borrow-no-alloc-v0":{"id":"Aup8ZtM87w2JhTRSuZe1KTYAUryboacJY6XqX24MbhXK","state":"closed"},"base-borrow-alloc-v0":{"id":"4Fhv1XDLqvYeNp7bt9rG1AevZigqnFxmkYchBwtFyzby","state":"closed"},"base-policy-off-v0":{"id":"8Wf5uVnB7YwVKQxQUQPgZ81RSddV5JzXXinwpoKHYC42","state":"closed"},"base-policy-on-v0":{"id":"BNgn6kdCA1CCsTEsrQudz4waMhuLaQeSsw1YiAzQEF1f","state":"closed"},"base-borrow-no-alloc-v3":{"id":"CnZhWQq87bvhTmcyfoNFLx27Zz2QoWn8p2zNX8iWvvoM","state":"closed"},"base-borrow-alloc-v3":{"id":"78EtfbbeWt9zkMzRkSnAWfN4JTGweoDdUZGoQPWEqV2G","state":"closed"},"base-policy-off-v3":{"id":"7UGycuTF9zo2G7KM2spYEAE741bu9z2nqXLCnYuZ3sw5","state":"closed"},"base-policy-on-v3":{"id":"AsJ7fz7tsTgijdBCDp81YpumVFxD5GfVECu1nBixVsGq","state":"closed"},"owner-borrow-alloc-v0-op13-s128-plain-w1-owner1-exec0-a0":{"id":"E7sh75zBpEYw8Jpun1FWajdXs2geQmK1hnZ4uAfBGd5M","state":"closed"},"owner-borrow-alloc-v0-op14-s128-plain-w1-owner1-exec0-a0":{"id":"FCGCNC9Dy1xmg1UPQnubdemDqHmbp4Laq8en9SNdPB3L","state":"closed"},"owner-borrow-no-alloc-v0-op13-s128-plain-w1-owner1-exec0-a0":{"id":"BUx8HTZVeKPe6dZcw6GFCqMXYuN6HfnCm93wyha2QbDN","state":"closed"},"owner-borrow-no-alloc-v0-op14-s128-plain-w1-owner1-exec0-a0":{"id":"6kL8U7BvAUzAe2GXEmKjhynFS1DtfDaH8GXJXHCdaQU3","state":"closed"},"owner-borrow-alloc-v3-op13-s128-plain-w1-owner1-exec0-a0":{"id":"5ZcAmUKN9zTmUE5nP58SGNeQ9N9qM31aLbTcDdyw6jPh","state":"closed"},"owner-borrow-alloc-v3-op14-s128-plain-w1-owner1-exec0-a0":{"id":"CSEReiga9kNnM3bFhBNFMJ3KSdTVofv1C24effyJ7RT3","state":"closed"},"owner-borrow-no-alloc-v3-op13-s128-plain-w1-owner1-exec0-a0":{"id":"Hgg8eWKp78VeWa5FjSzHfUj7DbnzmxJEZMZwUpngUAwR","state":"closed"},"owner-borrow-no-alloc-v3-op14-s128-plain-w1-owner1-exec0-a0":{"id":"5RKiTT5Wkr2LAtHsBHYLdobZ5retKemDv4HkgYFgrupi","state":"closed"}}
 local-only=borrow-no-alloc-v0/op13-s128-plain-w1-owner0-exec1 reason=fixture-owned executable data account cannot be created on devnet
 local-only=borrow-no-alloc-v0/op14-s128-plain-w0-owner0-exec1 reason=fixture-owned executable data account cannot be created on devnet
 local-only=borrow-alloc-v0/op13-s128-plain-w1-owner0-exec1 reason=fixture-owned executable data account cannot be created on devnet
@@ -31,6 +31,6 @@ local-only=borrow-no-alloc-v3/op13-s128-plain-w1-owner0-exec1 reason=fixture-own
 local-only=borrow-no-alloc-v3/op14-s128-plain-w0-owner0-exec1 reason=fixture-owned executable data account cannot be created on devnet
 local-only=borrow-alloc-v3/op13-s128-plain-w1-owner0-exec1 reason=fixture-owned executable data account cannot be created on devnet
 local-only=borrow-alloc-v3/op14-s128-plain-w0-owner0-exec1 reason=fixture-owned executable data account cannot be created on devnet
-rent-slot=523543587 rate=5080 threshold=1.0 burn=50 bytes=d813000000000000000000000000f03f32
+rent-slot=524394777 rate=5080 threshold=1.0 burn=50 bytes=d813000000000000000000000000f03f32
 seed-balances=summary.json records=1284 historical-cases=0
 fixture-cu-delta={"min":0,"max":0,"sum":0,"count":1284}

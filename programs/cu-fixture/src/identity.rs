@@ -1,7 +1,7 @@
 //! identity vectors, shared by host, MSRV and fresh SBF fixtures.
 #![forbid(unsafe_code)]
 #![allow(dead_code)]
-use blubber::{AccountSchema, List, Map, Pubkey, Str};
+use blubber::{AccountSchema, Address, List, Map, Str};
 
 /// Source-independent vector exported as ordinary constant data.
 pub type Vector = (&'static str, [u8; 8], &'static str, u32, &'static [u8]);
@@ -82,7 +82,7 @@ state!(packed, value: Packed);
 state!(generic, value: Generic<u64>);
 state!(bytes, value: List<u8>);
 state!(list, value: List<u8>);
-state!(pubkey, value: Pubkey);
+state!(pubkey, value: Address);
 state!(array, value: [u8;32]);
 
 /// Number of nonempty, pinned identity vectors.

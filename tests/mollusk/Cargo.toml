@@ -19,8 +19,13 @@ solana-instruction.workspace = true
 solana-pubkey.workspace = true
 
 [dev-dependencies]
+solana-svm-log-collector = "4.3.0"
+borsh = "1.8.1"
+solana-sdk-ids = "3.1.0"
+solana-system-interface = { version = "3.3.0", features = ["bincode"] }
 blubber-borrow-resize = { path = "../../programs/borrow-resize" }
 blubber-demo = { path = "../../programs/blubber-demo" }
+blubber-quickstart = { path = "../../programs/blubber-quickstart" }
 pinocchio.workspace = true
 blubber = { workspace = true, features = ["pinocchio"] }
 mollusk-svm = { workspace = true, features = ["inner-instructions", "register-tracing"] }
@@ -55,6 +60,10 @@ required-features = ["sbf-tests"]
 
 [[test]]
 name = "invocation_boundaries"
+required-features = ["sbf-tests"]
+
+[[test]]
+name = "quickstart"
 required-features = ["sbf-tests"]
 
 [[test]]

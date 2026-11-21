@@ -70,13 +70,13 @@ pub struct EmptyStrings {
 #[blubber::schema(account)]
 pub struct MyAccount {
     /// Owner identifier.
-    pub authority: blubber::Pubkey,
+    pub authority: blubber::Address,
     /// Counter.
     pub counter: u64,
     /// Borrowed records.
     pub records: List<Record>,
     /// Fixed values.
-    pub balances: Map<blubber::Pubkey, u64>,
+    pub balances: Map<blubber::Address, u64>,
     /// Variable values.
     pub labels: Map<u16, Str>,
     /// Raw UTF-8.
@@ -256,7 +256,7 @@ fn nested_inputs_borrow_local_strings_slices_options_and_records() {
 #[test]
 fn account_constants_and_measurement_distinguish_root_from_envelope() {
     let input = MyAccountInit {
-        authority: blubber::Pubkey::from_bytes([0; 32]),
+        authority: blubber::Address::new_from_array([0; 32]),
         counter: 0,
         records: &[],
         balances: &[],

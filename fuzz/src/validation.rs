@@ -1,7 +1,7 @@
 //! Complete validation plus bounded lazy access, including corrupt states.
 
 use super::{account, bridge::Bridge, Packed, Record, ID};
-use blubber::{List, Map, MapKey, Pubkey, Schema, Str, View};
+use blubber::{Address, List, Map, MapKey, Schema, Str, View};
 
 pub(crate) trait Walk: Schema {
     fn visit(value: Self::Read<'_>, budget: &mut usize);
@@ -12,7 +12,7 @@ macro_rules! leaves {
         fn visit(_: Self::Read<'_>, _: &mut usize) {}
     })* };
 }
-leaves!(bool, u8, u16, u32, u64, u128, i8, i16, i32, i64, i128, Pubkey, Str, Packed);
+leaves!(bool, u8, u16, u32, u64, u128, i8, i16, i32, i64, i128, Address, Str, Packed);
 impl<const N: usize> Walk for [u8; N] {
     fn visit(_: Self::Read<'_>, _: &mut usize) {}
 }

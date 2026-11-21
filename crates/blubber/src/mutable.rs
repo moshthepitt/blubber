@@ -978,15 +978,22 @@ impl<'a, K: MapKey, V: Schema> MapMut<'a, K, V> {
         if self.edit.try_fixed_map::<V>(query.as_ref(), &value)? {
             return Ok(None);
         }
-        self.edit.map_edit::<V, _>(
-            blubber_core::raw::MapEdit::Insert,
-            query.as_ref(),
-            Some(&value),
-            {
+        self.insert_planned(query.as_ref(), &value)
+    }
+
+    // The v0 fast path leaves the planner's temporaries in a separate frame.
+    // V3 reserves a full frame per call, so keep this step in the caller.
+    #[cfg_attr(
+        all(target_os = "solana", not(target_feature = "static-syscalls")),
+        inline(never)
+    )]
+    #[cfg_attr(target_feature = "static-syscalls", inline(always))]
+    fn insert_planned(&mut self, key: &[u8], value: &V::Init<'_>) -> Result<Option<V::Removed>> {
+        self.edit
+            .map_edit::<V, _>(blubber_core::raw::MapEdit::Insert, key, Some(value), {
                 #[inline(always)]
                 |view| view.map(V::read_removed).transpose()
-            },
-        )
+            })
     }
 
     /// Removes a matching key and checks its old value before compaction.
@@ -1060,7 +1067,8 @@ impl<'a, K: MapKey, V: Schema> MapMut<'a, K, V> {
     /// Borrows this map for an exclusive occupied or vacant selection.
     ///
     /// The map can be reused after the selection's last use. Bind a temporary
-    /// map before retaining its entry, or use [`Self::into_entry`].
+    /// map before retaining its entry, or use [`Self::into_entry`]. The
+    /// [`Entry`] methods describe when each insertion or edit callback runs.
     #[inline(always)]
     pub fn entry(&mut self, key: K) -> Result<Entry<'_, K, V>> {
         self.reborrow().into_entry(key)
@@ -1070,6 +1078,15 @@ impl<'a, K: MapKey, V: Schema> MapMut<'a, K, V> {
     ///
     /// Selection checks local extents, probed keys and insertion neighbors. Handles retain
     /// only an owned key and integer path, so value edits may relocate storage.
+    /// The selected editor can outlive the map handle.
+    ///
+    /// ```
+    /// use blubber::{MapMut, Result, Str, StrMut};
+    ///
+    /// fn select(map: MapMut<'_, u16, Str>) -> Result<StrMut<'_>> {
+    ///     map.into_entry(2)?.or_insert("two")
+    /// }
+    /// ```
     pub fn into_entry(mut self, key: K) -> Result<Entry<'a, K, V>> {
         let query = key.encode_key();
         let found = self.edit.select_source(|edit| {
@@ -1095,7 +1112,31 @@ impl<'a, K: MapKey, V: Schema> MapMut<'a, K, V> {
     /// Borrows this map to select a value, returning absence for a missing key.
     ///
     /// The map can be reused after the child's last use. For a retained child
-    /// from a temporary map, use [`Self::into_get_mut`] or bind the map first.
+    /// from a generated field, bind the map first. A temporary such as
+    /// `root.labels_mut().get_mut(&key)?` supports an immediate edit within the
+    /// same statement. Use [`Self::into_get_mut`] to keep that child longer.
+    ///
+    /// ```
+    /// # #[cfg(feature = "derive")]
+    /// # fn main() -> blubber::Result<()> {
+    /// use blubber::{ErrorKind, Map, SliceStore, Str};
+    ///
+    /// #[blubber::schema(account)]
+    /// struct Labels { labels: Map<u16, Str> }
+    ///
+    /// # let mut bytes = [0; 64];
+    /// # let mut store = SliceStore::new(&mut bytes);
+    /// # let mut root = Labels::initialize(&mut store, LabelsInit { labels: &[(1, "one")] })?;
+    /// let mut map = root.labels_mut();
+    /// map.get_mut(&1)?.ok_or(ErrorKind::MissingKey)?.push_str("!")?;
+    /// map.entry(2)?.or_insert_with(|| "two")?.push_str("!")?;
+    /// assert_eq!(map.get_mut(&2)?.ok_or(ErrorKind::MissingKey)?.get(), "two!");
+    /// # root.commit()?;
+    /// # Ok(())
+    /// # }
+    /// # #[cfg(not(feature = "derive"))]
+    /// # fn main() {}
+    /// ```
     #[inline(always)]
     pub fn get_mut(&mut self, key: &K) -> Result<Option<V::Mut<'_>>> {
         self.reborrow().into_get_mut(key)
@@ -1104,6 +1145,9 @@ impl<'a, K: MapKey, V: Schema> MapMut<'a, K, V> {
     /// Consumes this handle to select a value, returning absence for a missing key.
     ///
     /// Selection checks the query and touched keys; global order requires validation.
+    /// This works on a temporary generated field. The returned child borrows the
+    /// parent for the lifetime of the consumed map.
+    ///
     /// For loops over many entries, use [`Self::cursor_mut`],
     /// [`Self::try_for_each_mut`] or [`Self::fill_values`] to avoid repeating
     /// lookup and selection. [`ListMut::get_mut`] gives a measured selection/set
@@ -1146,7 +1190,8 @@ impl<'a, K: MapKey, V: Schema> MapMut<'a, K, V> {
         Ok(Some(V::project(crate::projection::Projection::new(edit))))
     }
 
-    /// Selects a value, returning `MissingKey` when absent.
+    /// Consumes the map to select a value with [`Self::into_get_mut`], returning
+    /// `MissingKey` when absent.
     #[inline(always)]
     pub fn at_mut(self, key: &K) -> Result<V::Mut<'a>> {
         self.into_get_mut(key)?.ok_or(ErrorKind::MissingKey.into())
@@ -1250,6 +1295,41 @@ impl<T: Schema> core::fmt::Debug for ListMut<'_, T> {
         f.debug_struct("ListMut")
             .field("schema", &core::any::type_name::<Self>())
             .finish_non_exhaustive()
+    }
+}
+
+#[cfg(feature = "alloc")]
+impl<K: MapKey> MapMut<'_, K, Str> {
+    /// Replaces every string using its old value, preserving keys and entry count.
+    ///
+    /// The map's directory and keys are admitted before any callback runs. The
+    /// callback runs once per visited value in entry order. It receives the old
+    /// string and the remaining space in a heap buffer of `output_capacity`
+    /// bytes. Write the replacement at the start of that slice and return its
+    /// length. A returned length larger than the slice produces `Capacity`.
+    /// An admitted empty map calls the callback zero times and allocates nothing.
+    ///
+    /// The old strings are read in one batched pass. Staging allocates the byte
+    /// buffer once and tracks end offsets if replacement lengths differ. One
+    /// UTF-8 scan checks the packed output, with checked replacement boundaries.
+    /// Callback allocations count toward the runtime heap limit too. Callback,
+    /// allocation and output errors preserve the account and leave poison clear.
+    /// Invalid output returns `InvalidUtf8` with an offset into the staged bytes.
+    /// Detected source corruption sets sticky poison on lazy paths. Checked
+    /// admission preserves the pre-write frame. See the
+    /// [failure contract](ListMut#failure-contract) for capacity, funding and
+    /// backend errors.
+    pub fn rewrite_values_with(
+        &mut self,
+        output_capacity: usize,
+        transform: impl FnMut(&str, &mut [u8]) -> Result<usize>,
+    ) -> Result<()> {
+        self.edit.rewrite_with::<Map<K, Str>, _>(
+            |view, admitted| {
+                crate::rewrite::stage_strings::<K>(view, admitted, output_capacity, transform)
+            },
+            |staged, stream| staged.encode(stream, K::SIZE),
+        )
     }
 }
 

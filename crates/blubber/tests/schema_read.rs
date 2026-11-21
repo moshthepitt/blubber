@@ -215,7 +215,10 @@ fn mutable_root_reads_commit_and_closed_loads_use_the_same_contract() {
     let mut bytes = demo::golden();
     let mut store = SliceStore::new(&mut bytes);
     let root = MyAccount::load_mut(&mut store).unwrap();
-    assert_eq!(root.authority(), blubber::Pubkey::from_bytes([0x11; 32]));
+    assert_eq!(
+        root.authority(),
+        blubber::Address::new_from_array([0x11; 32])
+    );
     assert_eq!(root.counter(), 1);
     assert_eq!(root.note(), "ok");
     assert_eq!(root.records().get(0).unwrap().name(), "A");

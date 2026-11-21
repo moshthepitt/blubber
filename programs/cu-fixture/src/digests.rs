@@ -1,5 +1,5 @@
 //! Canonical word digests, read dynamically on host and SBF.
-use blubber::{List, Map, Pubkey, RootSchema, Str};
+use blubber::{Address, List, Map, RootSchema, Str};
 use blubber_core::CheckedLayout;
 
 #[allow(dead_code)]
@@ -43,11 +43,11 @@ pub fn table(index: usize) -> Option<(&'static str, CheckedLayout<'static>)> {
         1 => ("sentinels", Sentinels::__layout()),
         2 => ("fixed_list", blubber::__layout_of!(List<Packed>)),
         3 => ("indexed_list", blubber::__layout_of!(List<Str>)),
-        4 => ("fixed_map", blubber::__layout_of!(Map<Pubkey, u64>)),
+        4 => ("fixed_map", blubber::__layout_of!(Map<Address, u64>)),
         5 => ("indexed_map", blubber::__layout_of!(Map<u16, Str>)),
         6 => (
             "generic",
-            blubber::__layout_of!(Generic<Map<Pubkey, Option<Str>>>),
+            blubber::__layout_of!(Generic<Map<Address, Option<Str>>>),
         ),
         7 => (
             "depth8",

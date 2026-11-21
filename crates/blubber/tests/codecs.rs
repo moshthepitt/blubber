@@ -2,7 +2,7 @@
 
 #![forbid(unsafe_code)]
 
-use blubber::{Error, ErrorKind, Fixed, Kind, List, Map, MapKey, Pubkey, Schema, Str};
+use blubber::{Address, Error, ErrorKind, Fixed, Kind, List, Map, MapKey, Schema, Str};
 use blubber_core::{check_layout, validate, KeyDomain, Layout, Leaf, MAX_DEPTH};
 use core::fmt::Debug;
 
@@ -167,22 +167,22 @@ fn raw_arrays_support_arbitrary_positive_widths() {
 
 #[test]
 fn pubkey_is_a_const_sdk_independent_raw_value() {
-    const KEY: Pubkey = Pubkey::from_bytes([0x81; 32]);
+    const KEY: Address = Address::new_from_array([0x81; 32]);
     const BYTES: [u8; 32] = KEY.to_bytes();
     assert_eq!(BYTES, [0x81; 32]);
     assert_eq!(KEY.as_ref(), BYTES);
     assert_eq!(KEY.encode(), BYTES);
     assert_eq!(KEY.encode_key(), BYTES);
-    assert_eq!(encoded::<Pubkey>(&KEY), BYTES);
-    exact_width::<Pubkey>();
-    roundtrips(&[Pubkey::default(), KEY, Pubkey::from_bytes([0xff; 32])]);
+    assert_eq!(encoded::<Address>(&KEY), BYTES);
+    exact_width::<Address>();
+    roundtrips(&[Address::default(), KEY, Address::new_from_array([0xff; 32])]);
     let mut high_first = [0; 32];
     high_first[0] = 1;
     let mut high_last = [0; 32];
     high_last[31] = 0xff;
     roundtrips(&[
-        Pubkey::from_bytes(high_first),
-        Pubkey::from_bytes(high_last),
+        Address::new_from_array(high_first),
+        Address::new_from_array(high_last),
     ]);
 }
 
@@ -205,14 +205,14 @@ fn builtin_descriptors_match_fixed_codecs() {
     fixed::<i64>();
     fixed::<i128>();
     fixed::<bool>();
-    fixed::<Pubkey>();
+    fixed::<Address>();
     fixed::<[u8; 257]>();
     assert!(matches!(i128::LAYOUT, Layout::Leaf(Leaf::Signed(16))));
     assert!(matches!(u128::LAYOUT, Layout::Leaf(Leaf::Unsigned(16))));
     assert!(matches!(bool::KEY_LAYOUT.domain, KeyDomain::Bool));
     assert!(matches!(i8::KEY_LAYOUT.domain, KeyDomain::Signed));
     assert!(matches!(u8::KEY_LAYOUT.domain, KeyDomain::Unsigned));
-    assert!(matches!(Pubkey::KEY_LAYOUT.domain, KeyDomain::Raw));
+    assert!(matches!(Address::KEY_LAYOUT.domain, KeyDomain::Raw));
     assert_eq!(<[u8; 257]>::KEY_LAYOUT.width, 257);
     assert_eq!(encoded::<i32>(&-2), [0xfe, 0xff, 0xff, 0xff]);
     assert_eq!(encoded::<u128>(&u128::MAX), [0xff; 16]);
@@ -428,7 +428,7 @@ fn descriptor_depth_is_checked_even_for_absent_values() {
 
 #[test]
 #[cfg(feature = "pinocchio")]
-fn sdk_addresses_roundtrip_as_values_keys_and_compatibility_pubkeys() {
+fn sdk_addresses_roundtrip_as_values_and_keys() {
     use pinocchio::Address;
     let addresses = [
         Address::new_from_array([0; 32]),
@@ -437,10 +437,8 @@ fn sdk_addresses_roundtrip_as_values_keys_and_compatibility_pubkeys() {
     ];
     roundtrips(&addresses);
     for address in addresses {
-        let key = Pubkey::from(address);
-        assert_eq!(Address::from(key), address);
-        assert_eq!(address.encode(), key.encode());
-        assert_eq!(address.encode_key(), key.encode_key());
+        assert_eq!(address.encode(), address.to_bytes());
+        assert_eq!(address.encode_key(), address.to_bytes());
         assert_eq!(encoded::<Address>(&address), address.to_bytes());
     }
     assert_eq!(<Address as MapKey>::KEY_LAYOUT.width, 32);

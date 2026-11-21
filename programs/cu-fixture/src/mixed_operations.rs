@@ -5,7 +5,7 @@ extern crate alloc;
 
 use crate::schemas::{KeyWords, Numbers, PublicKeyMap, Words};
 use blubber::pinocchio::{Funding, ReadStore, Store};
-use blubber::Pubkey;
+use blubber::ErrorKind;
 use core::hint::black_box;
 use pinocchio::{error::ProgramError, AccountView, Address, ProgramResult};
 
@@ -40,8 +40,8 @@ const fn values() -> [&'static str; 1000] {
     values
 }
 
-const fn entries(common: bool) -> [(Pubkey, &'static str); 1000] {
-    let mut entries = [(Pubkey::from_bytes([0; 32]), ""); 1000];
+const fn entries(common: bool) -> [(Address, &'static str); 1000] {
+    let mut entries = [(Address::new_from_array([0; 32]), ""); 1000];
     let mut i = 0;
     while i < entries.len() {
         let mut key = [42; 32];
@@ -52,17 +52,17 @@ const fn entries(common: bool) -> [(Pubkey, &'static str); 1000] {
             key[at + j] = word[j];
             j += 1;
         }
-        entries[i] = (Pubkey::from_bytes(key), TEXTS[i % 18]);
+        entries[i] = (Address::new_from_array(key), TEXTS[i % 18]);
         i += 1;
     }
     entries
 }
 
 static VALUES: [&str; 1000] = values();
-static ENTRIES: [(Pubkey, &str); 1000] = entries(false);
-static COMMON_ENTRIES: [(Pubkey, &str); 1000] = entries(true);
+static ENTRIES: [(Address, &str); 1000] = entries(false);
+static COMMON_ENTRIES: [(Address, &str); 1000] = entries(true);
 
-fn key_sum(key: Pubkey) -> u64 {
+fn key_sum(key: Address) -> u64 {
     let b = key.to_bytes();
     let a = u64::from_le_bytes(b[..8].try_into().unwrap());
     let c = u64::from_le_bytes(b[8..16].try_into().unwrap());
@@ -434,7 +434,7 @@ fn edit_indexed(
     Ok(out)
 }
 
-// Same old-value recipe and callback for keyed and keyless comparison.
+// Per-value callback rows retained for comparison with the batched recipe.
 fn grow_from_old_values(store: &mut Store<'_>, op: u8, n: usize) -> ProgramResult {
     use alloc::{string::String, vec::Vec};
     let mut root = KeyWords::load_checked_mut(store)?;
@@ -475,6 +475,55 @@ fn grow_from_old_values(store: &mut Store<'_>, op: u8, n: usize) -> ProgramResul
     Ok(())
 }
 
+fn grow_from_old_values_batched(store: &mut Store<'_>, op: u8, n: usize) -> blubber::Result<()> {
+    use alloc::vec::Vec;
+
+    fn grow(old: &str) -> blubber::Result<[u8; 17]> {
+        let old: &[u8; 8] = old
+            .as_bytes()
+            .try_into()
+            .map_err(|_| ErrorKind::InvalidBoundary)?;
+        let mut value = [b'!'; 17];
+        value[..8].copy_from_slice(old);
+        value[8..16].copy_from_slice(old);
+        Ok(value)
+    }
+
+    let mut root = KeyWords::load_checked_mut(store)?;
+    if op == 74 {
+        let mut staged = Vec::with_capacity(n);
+        for item in root.value().try_iter_batched() {
+            let (_, old) = item?;
+            staged.push(grow(old)?);
+        }
+        let text =
+            core::str::from_utf8(staged.as_flattened()).map_err(|_| ErrorKind::InvalidUtf8)?;
+        let mut values = Vec::with_capacity(n);
+        for i in 0..n {
+            values.push(
+                text.get(17 * i..17 * (i + 1))
+                    .ok_or(ErrorKind::InvalidUtf8)?,
+            );
+        }
+        root.value_mut().rewrite_values(&values)?;
+    } else {
+        root.value_mut()
+            .rewrite_values_with(17 * n, |old, output| {
+                let old: &[u8; 8] = old
+                    .as_bytes()
+                    .try_into()
+                    .map_err(|_| ErrorKind::InvalidBoundary)?;
+                let output = output.first_chunk_mut::<17>().ok_or(ErrorKind::Capacity)?;
+                output[..8].copy_from_slice(old);
+                output[8..16].copy_from_slice(old);
+                output[16] = b'!';
+                Ok(17)
+            })?;
+    }
+    root.commit()?;
+    Ok(())
+}
+
 // Order-sensitive consumption of every returned key and value byte.
 fn iteration_bytes(mut result: u64, bytes: &[u8]) -> u64 {
     for &byte in black_box(bytes) {
@@ -485,6 +534,24 @@ fn iteration_bytes(mut result: u64, bytes: &[u8]) -> u64 {
 
 /// Dispatches the ordinary inventory, including indexed shared iteration.
 pub fn run(id: &Address, accounts: &mut [AccountView], ix: &[u8]) -> ProgramResult {
+    if let [3, op @ (74 | 75), lo, hi, common] = ix {
+        let n = u16::from_le_bytes([*lo, *hi]) as usize;
+        if n > 1000 || *common > 1 {
+            return Err(ProgramError::InvalidInstructionData);
+        }
+        let [state] = accounts else {
+            return Err(ProgramError::NotEnoughAccountKeys);
+        };
+        let mut store = Store::new_with_headroom(
+            state,
+            id,
+            Funding::Prepaid,
+            blubber::pinocchio::Headroom::UpTo(9 * n),
+        )?;
+        grow_from_old_values_batched(&mut store, *op, n)?;
+        pinocchio::cpi::set_return_data(&0u64.to_le_bytes());
+        return Ok(());
+    }
     if let [layout @ (1 | 3), op @ (0 | 6 | 7 | 26 | 27), lo, hi, common] = ix {
         if u16::from_le_bytes([*lo, *hi]) > 1000 || *common > 1 {
             return Err(ProgramError::InvalidInstructionData);

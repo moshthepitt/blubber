@@ -1,108 +1,59 @@
-# Compute units
+# Compute-unit datasets
 
-Acceptance fixtures run on Mollusk 0.16.2 / Agave 4.3.0, SBF platform-tools
-v1.53 (Rust 1.89.0-dev, LLVM 20.1.7) and host Rust 1.97.1. Release builds use
-overflow checks, fat LTO and one codegen unit. Unless a table says otherwise,
-the meter is 1,400,000 CU and heap is 32 KiB. Rent uses the harness's live sysvar.
-These are harness observations rather than cluster measurements.
+Take the `map_fixed_n1000_lookup_hit_front_plain` row in [`benchmarks/data/scaling-v0.csv`](data/scaling-v0.csv). It probes a plain key near the front of a fixed-value map on SBF v0 and takes 2,000<!-- num:scaling.v0.n1000.map_lookup.front_hit --> CU for the whole instruction. SBF is Solana's on-chain build target, and v0 and v3 are two SBF binary architectures.
 
-Typed rows include opening, load, one edit and commit. Headroom defaults to
-`UpTo(0)`; growing fixtures select explicit budgets. State is prefunded, so
-there is no funding CPI unless the row says TopUp. Checked rows scan the root;
-ordinary authenticated runtime loads use lazy touched checks. Raw lease rows
-exercise explicit sizing/funding/refund policies independently of typed editing.
+I think a measurement's scope depends on the workload, the caller and the run setup, so check the column rules below before comparing rows. For narrative summaries, see [`docs/performance.md#find-the-numbers`](../docs/performance.md#find-the-numbers). For cross-library methods, see [`benchmarks/COMPARE.md#method`](COMPARE.md#method). For caller-side map rewrites, see [`benchmarks/TRAVERSAL.md#ordinary-caller-costs`](TRAVERSAL.md#ordinary-caller-costs).
 
-The summary uses the basic measurements retained on 2026-11-18. The receipts
-record the funding and headroom used by each fixture.
-[v0 receipt](../verification/results/performance/cu-v0.log) · [v3 receipt](../verification/results/performance/cu-v3.log).
+## Choose a dataset
 
-<!-- basic-cu:start -->
+Each family has a v0 and a v3 CSV under `benchmarks/data/`:
 
-| Whole instruction | SBF v0 CU | SBF v3 CU |
-|---|---|---|
-| Scalar set | 625 | 623 |
-| Eight-byte string, same size | 531 | 529 |
-| Checked scalar set | 975 | 973 |
-| Checked eight-byte string, same size | 724 | 722 |
-| String growth, eight to 32 bytes | 845 | 843 |
-| String shrink, eight to one byte | 823 | 821 |
-| List<u64>, n=100, push | 1,174 | 1,172 |
-| Map<Pubkey,u64>, n=100, append | 1,589 | 1,585 |
-| Map<Pubkey,u64>, n=100, middle | 2,602 | 2,601 |
-| Map<Pubkey,u64>, n=100, front | 2,161 | 2,167 |
-| Map<Pubkey,u64>, n=100, common-prefix append | 1,600 | 1,596 |
-| Patch100, borrow and both directory passes | 1,845 | 1,939 |
-| Complete tour | 140,368 | 139,947 |
-| Raw lease, prepaid unchanged | 785 | 777 |
-| Raw lease, top-up grow 200 bytes | 2,329 | 2,321 |
-| Raw lease, refund shrink to 64 bytes | 1,079 | 1,069 |
-| Raw lease, retain 32 bytes | 2,369 | 2,361 |
+- **Scaling** - [`benchmarks/data/scaling-v0.csv`](data/scaling-v0.csv) and [`benchmarks/data/scaling-v3.csv`](data/scaling-v3.csv) measure collections across size and depth. Search for a scenario name such as `map_fixed_n1000_lookup_hit_front_plain` to find its row.
+- **Lease** - [`benchmarks/data/lease-v0.csv`](data/lease-v0.csv) and [`benchmarks/data/lease-v3.csv`](data/lease-v3.csv) measure headroom, account growth and rent settlement.
+- **Extended** - [`benchmarks/data/extended-v0.csv`](data/extended-v0.csv) and [`benchmarks/data/extended-v3.csv`](data/extended-v3.csv) measure allocator choices, checked mutable paths, `ref_methods` and `to_owned`.
+- **Runtime** - [`benchmarks/data/runtime-v0.csv`](data/runtime-v0.csv) and [`benchmarks/data/runtime-v3.csv`](data/runtime-v3.csv) measure invocation, transaction, sequence and scalar runs, including expected errors.
 
-<!-- basic-cu:end -->
+## Read a row
 
-Opening `UpTo(0)` performs no speculative resize. Positive budgets can use the
-invocation growth window and may grant less than requested. SDK-local capacity
-does not certify transaction growth resources or ancestor CPI growth limits. Commit
-trims and settles rent against actual physical length. Failed final shrink is
-diagnostic in the receipt; funding/settlement errors return errors. Drop makes
-a best-effort trim without rent settlement.
+CU is the runtime work measure. Whole CU is the instruction total. Idle is a matching setup-and-finish control run, and delta subtracts idle from whole CU. Check the baseline policy before comparing deltas, because subtracting an idle with a different opening or validation policy leaves that extra work in the delta:
 
-The 2026-11-11 scaling measurements retain whole and baseline CU separately.
-The extended runtime measurements from the same run cover collection and option
-cases, sequences and invocation behaviour.
-[Scaling v0](CU-v0.md) · [Scaling v3](CU-v3.md) · [Runtime v0](CU-v0-runtime.md) · [Runtime v3](CU-v3-runtime.md).
+- Scaling CSVs pick a read, checked read or mutable idle for the operation family and require the baseline to preserve the starting bytes.
+- Lease CSVs use the `same` action with matching headroom, funding, refund and reservation settings.
+- Extended CSVs use a lazy idle for checked mutable rows, so their delta includes validation. The `ref_methods` and `to_owned` rows use checked idles.
+- Runtime CSVs report whole CU only and have no idle or delta columns.
 
-Some scaling rows use a 20,000,000-CU exploration meter and exceed the default transaction
-budget. Their presence does not show that the workload fits a deployable
-transaction. Calibrated phase markers belong to separate diagnostic ELFs and
-never determine whole-instruction acceptance.
+Diagnostic phase columns come from separately built calibrated markers. Use them to see where time goes inside an operation, because they are not uninstrumented instruction totals. In those columns, `moved_bytes` counts relocated byte ranges, and `ends` counts visited offset entries including unchanged ones.
 
-[Ordinary traversal measurements](TRAVERSAL.md) retain both caller layouts,
-n=0/1/10/100/1000, matching idles, whole slopes and eight explicitly tracked
-map groups. [Comparison tables](COMPARE.md) use their own account shape,
-40,000,000-CU meter and 256 KiB heap. [The performance guide](../docs/performance.md)
-explains API choices and staging costs. Never compare totals without their
-load, caller, allocation and runtime contracts.
+Capacity is available storage. Used length covers the header and live payload. Spare is the physical space beyond used length, so storage and raw-lease physical byte columns include spare while used-byte columns do not. Depth counts schema nodes from root to leaf.
 
-Run `bash scripts/reproduce.sh cu` for fresh v0 and v3 measurements with
-byte and result checks. The [assurance document](../ASSURANCE.md) records
-the runtime assumptions.
+Lease CSVs also record opened and peak bytes, re-leases, zeroing, funding CPIs, top-ups, refunds, probe and resize counts, and allocator slot bytes. Heap is dynamic memory, and OOM means a run exhausted it. Extended CSVs record the allocator policy.
 
-## Full validation above a lazy load
+Runtime CSVs record scope, expected results, and before-and-after bytes and lamports. Tests show that account growth is capped by the 10<!-- num:runtime.account.max_mib --> MiB account limit, the 10,240<!-- num:runtime.invocation.growth_bytes -->-byte invocation limit and shared runtime limits. A local headroom request can therefore grant less room. On bank rent errors, the account columns show the state the harness returned. Profile 0<!-- num:runtime.profile.copy --> copies account data, profile 1<!-- num:runtime.profile.simd0460 --> uses SIMD-0460 copy, and profile 2<!-- num:runtime.profile.direct --> uses direct mapping, which maps the account data buffer directly into guest memory.
 
-These differences come from the 2026-11-11 scaling measurements.
-[Scaling v0](CU-v0.md) · [Scaling v3](CU-v3.md).
+## Sample rows
 
-<!-- validation v0 -->
-Full validation above lazy read baseline, SBF v0, in CU. Every fixture checks complete bytes against the independent model.
+<!-- cu-samples:start -->
 
-| Layout / key prefix | n=10 | n=100 | n=1,000 |
-|---|---:|---:|---:|
-| list_fixed / plain | 273 | 273 | 273 |
-| list_indexed / plain | 873 | 2014 | 15289 |
-| map_fixed / plain | 629 | 2519 | 21419 |
-| map_fixed / common | 710 | 3410 | 30410 |
-| address_fixed / plain | 629 | 2519 | 21419 |
-| address_fixed / common | 710 | 3410 | 30410 |
-| map_indexed / plain | 1171 | 4382 | 38357 |
-| map_indexed / common | 1252 | 5273 | 47348 |
-| address_indexed / plain | 1171 | 4382 | 38357 |
-| address_indexed / common | 1252 | 5273 | 47348 |
-<!-- /validation v0 -->
+| SBF | Scenario | Whole CU | Baseline CU | Difference CU |
+|---|---|---|---|---|
+| v0 | `list_fixed_n10_validate_all_plain` | 494 | 221 | 273 |
+| v3 | `list_fixed_n10_validate_all_plain` | 490 | 217 | 273 |
+| v0 | `map_fixed_n1000_lookup_hit_front_plain` | 2,000 | 225 | 1,775 |
+| v3 | `map_fixed_n1000_lookup_hit_front_plain` | 1,996 | 221 | 1,775 |
+| v0 | `lease_n1000_UpTo32_grow8_prepaid` | 794 | 548 | 246 |
+| v3 | `lease_n1000_UpTo32_grow8_prepaid` | 794 | 549 | 245 |
+| v0 | `list_fixed_n1_get_mut_front_plain_no_alloc` | 1,817 | 485 | 1,332 |
+| v3 | `list_fixed_n1_get_mut_front_plain_no_alloc` | 1,813 | 481 | 1,332 |
+| v0 | `fresh_windows_profile2` | 1,166 | n/a | n/a |
+| v3 | `fresh_windows_profile2` | 1,162 | n/a | n/a |
 
-<!-- validation v3 -->
-Full validation above lazy read baseline, SBF v3, in CU. Every fixture checks complete bytes against the independent model.
+<!-- cu-samples:end -->
 
-| Layout / key prefix | n=10 | n=100 | n=1,000 |
-|---|---:|---:|---:|
-| list_fixed / plain | 273 | 273 | 273 |
-| list_indexed / plain | 865 | 2006 | 15281 |
-| map_fixed / plain | 629 | 2519 | 21419 |
-| map_fixed / common | 710 | 3410 | 30410 |
-| address_fixed / plain | 629 | 2519 | 21419 |
-| address_fixed / common | 710 | 3410 | 30410 |
-| map_indexed / plain | 1162 | 4373 | 38348 |
-| map_indexed / common | 1243 | 5264 | 47339 |
-| address_indexed / plain | 1162 | 4373 | 38348 |
-| address_indexed / common | 1243 | 5264 | 47339 |
-<!-- /validation v3 -->
+## Reproduce
+
+Run [`scripts/reproduce.sh`](../scripts/reproduce.sh) from the repository root. It checks the SBF toolchain first.
+
+- `bash scripts/reproduce.sh cu` runs the uninstrumented compute-unit fixtures on v0 and v3 with a raised meter so longer scaling cases finish.
+- `bash scripts/reproduce.sh sbf` runs the SBF invocation cases through the Mollusk runtime suite with the default transaction-scale meter.
+
+A receipt records the inputs, tools, hashes and evidence for a run. The committed CU run logs are [`verification/results/performance/cu-v0.log`](../verification/results/performance/cu-v0.log) and [`verification/results/performance/cu-v3.log`](../verification/results/performance/cu-v3.log).

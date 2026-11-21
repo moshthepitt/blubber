@@ -26,7 +26,7 @@ fn rent_skip_requires_all_three_conditions_after_the_actual_trim() {
                     (target, Ok(()))
                 }
             });
-            assert_eq!(error.is_some(), fail);
+            assert_eq!(error.is_err(), fail);
             // Opening length is 128, before speculative growth to 200. Neither
             // the requested 100-byte trim nor used_len can justify skipping.
             assert!(!settlement_unchanged(128, 99, physical, 99, false));
@@ -36,9 +36,8 @@ fn rent_skip_requires_all_three_conditions_after_the_actual_trim() {
 
 #[test]
 fn final_physical_storage_controls_rent_even_after_failed_trim() {
-    let mut rent = [0; 17];
-    rent[..8].copy_from_slice(&19u64.to_le_bytes());
-    rent[8..16].copy_from_slice(&1f64.to_le_bytes());
+    const RATE: u64 = 19;
+    let rent = Rent::from_bytes(&RATE.to_le_bytes()).unwrap();
     for retained in [0, 160] {
         for fail in [false, true] {
             let (physical, error) = trim(200, 100usize.max(retained), |target| {
@@ -50,16 +49,23 @@ fn final_physical_storage_controls_rent_even_after_failed_trim() {
             });
             let expected = if fail { 200 } else { 100usize.max(retained) };
             assert_eq!(physical, expected);
-            assert_eq!(error, fail.then(|| ProgramError::InvalidRealloc.into()));
             assert_eq!(
-                rent::from_bytes(rent, physical),
+                error,
+                if fail {
+                    Err(ProgramError::InvalidRealloc)
+                } else {
+                    Ok(())
+                }
+            );
+            assert_eq!(
+                rent.try_minimum_balance(physical),
                 Ok((128 + expected as u64) * 19)
             );
         }
     }
     assert_eq!(
         trim(200, 200, |_| panic!("equal-length resize")),
-        (200, None)
+        (200, Ok(()))
     );
 }
 
@@ -80,7 +86,7 @@ fn refund_checks_both_balances_before_writing() {
 #[test]
 fn every_remaining_window_is_found_with_bounded_monotone_probes() {
     // Every possible remaining byte count after earlier growth, including zero.
-    for remaining in 0..=MAX_INCREASE {
+    for remaining in 0..=MAX_PERMITTED_DATA_INCREASE {
         for headroom in [
             Headroom::Max,
             Headroom::UpTo(0),
@@ -115,7 +121,7 @@ fn every_remaining_window_is_found_with_bounded_monotone_probes() {
 
 #[test]
 fn every_probe_range_width_and_hard_cap_are_checked() {
-    for width in 0..=MAX_INCREASE {
+    for width in 0..=MAX_PERMITTED_DATA_INCREASE {
         let current = MAX_STORAGE - width;
         let (target, cap) = probe_target(current, Headroom::Max).unwrap();
         assert_eq!(target, MAX_STORAGE);
@@ -288,13 +294,16 @@ fn on_demand_releases_once_per_growth_and_always_reacquires() {
 #[test]
 fn on_demand_retries_exact_only_for_invalid_realloc() {
     for (needed, expected) in [
-        (64 + MAX_INCREASE, Ok(())),
-        (65 + MAX_INCREASE, Err(ProgramError::InvalidRealloc)),
+        (64 + MAX_PERMITTED_DATA_INCREASE, Ok(())),
+        (
+            65 + MAX_PERMITTED_DATA_INCREASE,
+            Err(ProgramError::InvalidRealloc),
+        ),
     ] {
         let mut calls = 0;
         let result = resize_with_retry(needed, growth_target(64, needed), |len| {
             calls += 1;
-            if len > 64 + MAX_INCREASE {
+            if len > 64 + MAX_PERMITTED_DATA_INCREASE {
                 Err(ProgramError::InvalidRealloc)
             } else {
                 Ok(())

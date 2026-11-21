@@ -9,6 +9,10 @@ use mollusk_svm::{result::ProgramResult, Mollusk};
 use solana_account::Account;
 use solana_instruction::{AccountMeta, Instruction};
 use solana_pubkey::Pubkey;
+use solana_sdk_ids::system_program::ID as SYSTEM;
+
+#[path = "support/invalid_rent.rs"]
+mod invalid_rent;
 
 #[test]
 fn growing_edits_preflight_prepaid_and_topup_before_writes() {
@@ -148,8 +152,7 @@ fn growing_edits_preflight_prepaid_and_topup_before_writes() {
 }
 
 #[test]
-#[allow(deprecated)]
-fn fixed_overwrite_does_not_query_unsupported_rent() {
+fn fixed_overwrite_does_not_query_out_of_range_rent() {
     let Some(artifact) = std::env::var_os("BLUBBER_FUNDING_ELF") else {
         return;
     };
@@ -179,7 +182,6 @@ fn fixed_overwrite_does_not_query_unsupported_rent() {
     };
     for profile in 0..3 {
         let mut vm = Mollusk::default();
-        vm.sysvars.rent.exemption_threshold = 1.5f64.to_le_bytes();
         vm.feature_set.virtual_address_space_adjustments = profile != 0;
         vm.feature_set.account_data_direct_mapping = profile == 2;
         vm.program_cache =
@@ -204,13 +206,14 @@ fn fixed_overwrite_does_not_query_unsupported_rent() {
                     },
                 ),
                 mollusk_svm::program::keyed_account_for_system_program(),
+                invalid_rent::sysvar(&vm),
             ];
             let ix = Instruction {
                 program_id: owner,
                 accounts: vec![
                     AccountMeta::new(key, false),
                     AccountMeta::new(payer, true),
-                    AccountMeta::new_readonly(Pubkey::default(), false),
+                    AccountMeta::new_readonly(SYSTEM, false),
                 ],
                 data: vec![42, 22, 0, mode],
             };
@@ -229,9 +232,16 @@ fn fixed_overwrite_does_not_query_unsupported_rent() {
                 hex(&expected),
                 hex(found)
             );
+            let logger = solana_svm_log_collector::LogCollector::new_ref();
+            vm.logger = Some(logger.clone());
             let result = vm.process_instruction(&ix, &mismatched);
             assert!(matches!(result.program_result, ProgramResult::Failure(_)));
-            assert_eq!(result.return_data, diagnostic.as_bytes());
+            assert!(result.return_data.is_empty());
+            assert!(logger
+                .borrow()
+                .get_recorded_content()
+                .iter()
+                .any(|line| line == &format!("Program log: {diagnostic}")));
             assert_eq!(result.resulting_accounts, mismatched);
         }
     }
@@ -283,7 +293,7 @@ fn initialization_funding_ignores_the_uninitialized_used_word() {
                 accounts: vec![
                     AccountMeta::new(key, false),
                     AccountMeta::new(payer, true),
-                    AccountMeta::new_readonly(Pubkey::default(), false),
+                    AccountMeta::new_readonly(SYSTEM, false),
                 ],
                 data: vec![43, u8::from(case >= 2)],
             };

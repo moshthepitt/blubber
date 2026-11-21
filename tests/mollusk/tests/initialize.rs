@@ -10,15 +10,17 @@ use mollusk_svm::{
 use solana_account::Account;
 use solana_instruction::{AccountMeta, Instruction};
 use solana_pubkey::Pubkey;
+use solana_sdk_ids::system_program::ID as SYSTEM;
 
+#[path = "support/invalid_rent.rs"]
+mod invalid_rent;
 #[path = "support/rent.rs"]
 mod rent_check;
 
 const OWNER: Pubkey = Pubkey::new_from_array([7; 32]);
 const STATE: Pubkey = Pubkey::new_from_array([8; 32]);
 const PAYER: Pubkey = Pubkey::new_from_array([9; 32]);
-const SYSTEM: Pubkey = Pubkey::new_from_array([0; 32]);
-const WINDOW: usize = 10_240;
+use pinocchio::account::MAX_PERMITTED_DATA_INCREASE as WINDOW;
 const MAX: usize = 10_485_760;
 
 fn modes() -> Vec<u8> {
@@ -61,13 +63,7 @@ impl Case {
         } else {
             pda
         };
-        let account = |lamports, data, owner| Account {
-            lamports,
-            data,
-            owner,
-            executable: false,
-            rent_epoch: 0,
-        };
+        let account = |lamports, data, owner| Account::new_with_data(lamports, data, &owner);
         let (data, balance, owner) = if action == 3 {
             let mut data = vec![0xa5; 64];
             data[..8].fill(0);
@@ -201,17 +197,13 @@ fn keypair_and_pda_creation_initialize_borrowed_values_in_every_mode_and_mapping
 }
 
 #[test]
-fn funded_system_pda_transfers_only_the_deficit_then_allocates_and_assigns() {
+fn funded_system_pda_allocates_and_transfers_only_the_deficit() {
     for mode in modes() {
         for profile in 0..3 {
             for balance in [1, (128 + 64) * 19, 1_000_000] {
                 let mut case = Case::new(2, mode, profile);
                 case.accounts[0].1.lamports = balance;
-                case.success(if balance < (128 + 64) * 19 {
-                    &[2, 8, 1]
-                } else {
-                    &[8, 1]
-                });
+                case.success(&[13]);
             }
         }
     }
@@ -244,7 +236,7 @@ fn the_complete_sixteen_seed_group_is_preserved_for_signed_cpis() {
         case.ix.accounts[0].pubkey = address;
         case.ix.data[16] = bump;
         case.ix.data[17] = 4;
-        case.success(if action == 1 { &[0] } else { &[2, 8, 1] });
+        case.success(if action == 1 { &[0] } else { &[13] });
     }
 }
 
@@ -464,20 +456,18 @@ fn on_demand_exact_retry_succeeds_at_the_window_and_fails_before_init_writes() {
 }
 
 #[test]
-#[allow(deprecated)]
-fn creation_and_prefunded_allocation_match_legacy_and_simd0194_runtime_rent() {
-    for (rate, threshold) in [(3480, 2f64), (6960, 1f64), (19, 2f64), (19, 1f64)] {
+fn creation_and_prefunded_allocation_match_runtime_rent() {
+    for rate in [6960, 19] {
         for mode in modes() {
             for profile in 0..3 {
                 for action in 0..=2 {
                     let mut case = Case::new(action, mode, profile);
                     case.mollusk.sysvars.rent.lamports_per_byte = rate;
-                    case.mollusk.sysvars.rent.exemption_threshold = threshold.to_le_bytes();
                     if action == 2 {
                         case.accounts[0].1.lamports = 1;
                     }
-                    case.success(if action == 2 { &[2, 8, 1] } else { &[0] });
-                    let result = case.run(None, if action == 2 { &[2, 8, 1] } else { &[0] });
+                    case.success(if action == 2 { &[13] } else { &[0] });
+                    let result = case.run(None, if action == 2 { &[13] } else { &[0] });
                     let state = result.get_account(&case.accounts[0].0).unwrap();
                     assert!(
                         state.lamports
@@ -490,16 +480,13 @@ fn creation_and_prefunded_allocation_match_legacy_and_simd0194_runtime_rent() {
 }
 
 #[test]
-#[allow(deprecated)]
-fn unsupported_creation_rent_parameters_fail_before_cpi() {
-    for threshold in [0.5f64, 1.5, 2.5] {
-        for action in 0..=2 {
-            let mut case = Case::new(action, 0, 1);
-            case.mollusk.sysvars.rent.exemption_threshold = threshold.to_le_bytes();
-            case.run(
-                Some(pinocchio::error::ProgramError::UnsupportedSysvar.into()),
-                &[],
-            );
-        }
+fn out_of_range_creation_rent_fails_before_cpi() {
+    for action in 0..=2 {
+        let mut case = Case::new(action, 0, 1);
+        case.accounts.push(invalid_rent::sysvar(&case.mollusk));
+        case.run(
+            Some(pinocchio::error::ProgramError::InvalidArgument.into()),
+            &[],
+        );
     }
 }

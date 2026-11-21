@@ -1,6 +1,6 @@
 [workspace]
 resolver = "2"
-members = ["program", "harness", "star"]
+members = ["program", "harness", "star", "slab"]
 
 [profile.release]
 overflow-checks = true

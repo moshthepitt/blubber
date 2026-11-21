@@ -1,5 +1,5 @@
 //! Fresh-instruction compute fixtures with the ordinary no-heap account API.
-#![cfg_attr(all(target_os = "solana", not(feature = "policy")), no_std)]
+#![cfg_attr(target_os = "solana", no_std)]
 #![forbid(unsafe_code)]
 
 /// Representative integer tables and their canonical digests.
@@ -23,11 +23,7 @@ pub mod mixed_alternate;
 #[cfg(feature = "mixed-operations")]
 pub mod mixed_operations;
 /// D21 checked policy and verification fixtures.
-#[cfg(any(
-    feature = "policy",
-    feature = "policy-pinocchio",
-    not(target_os = "solana")
-))]
+#[cfg(any(feature = "policy-pinocchio", not(target_os = "solana")))]
 pub mod policy;
 /// Q8 byte-kernel measurements, separate from public typed API measurements.
 #[cfg(feature = "rewrite-kernel")]
@@ -76,11 +72,11 @@ pinocchio::program_entrypoint!(traversal::run, 1);
 pinocchio::no_allocator!();
 #[cfg(all(target_os = "solana", feature = "alloc"))]
 pinocchio::default_allocator!();
-#[cfg(all(target_os = "solana", not(feature = "policy")))]
+#[cfg(target_os = "solana")]
 pinocchio::nostd_panic_handler!();
 
 /// Runs one edit with Store/open/load/commit included in the measured instruction.
-/// Opcodes: scalar 0, strings 1..=3, list 4, Pubkey map 5..=8, Address map 9..=12.
+/// Opcodes: scalar 0, strings 1..=3, list 4, Address map 5..=8, Address map 9..=12.
 /// Validated-default scalar and string edits use 30 and 31.
 pub fn process_instruction(
     program_id: &Address,
@@ -91,11 +87,7 @@ pub fn process_instruction(
     if let Some((&90, data)) = instruction_data.split_first() {
         return entry_combinators::run(program_id, accounts, data);
     }
-    #[cfg(any(
-        feature = "policy",
-        feature = "policy-pinocchio",
-        not(target_os = "solana")
-    ))]
+    #[cfg(any(feature = "policy-pinocchio", not(target_os = "solana")))]
     if let [33, op] = instruction_data {
         return policy::run(program_id, accounts, *op);
     }
@@ -211,7 +203,7 @@ pub fn process_instruction(
             let mut root = PublicKeyMap::load_trusted_mut(&mut store)?;
             mark(2);
             root.value_mut()
-                .insert(blubber::Pubkey::from_bytes(key(*opcode - 5)), 123)?;
+                .insert(blubber::Address::new_from_array(key(*opcode - 5)), 123)?;
             mark(3);
             root.commit()?;
         }

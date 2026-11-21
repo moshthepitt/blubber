@@ -1,7 +1,7 @@
 //! Retained geometry preserves point results and exact first faults.
 #![forbid(unsafe_code)]
 
-use blubber::{Error, ErrorKind, List, Map, Pubkey, Schema, Str, View};
+use blubber::{Address, Error, ErrorKind, List, Map, Schema, Str, View};
 
 #[test]
 fn point_offsets_and_full_width_indices() {
@@ -140,28 +140,31 @@ fn point_probe_equality_full_keys_halves_and_misses() {
     let fixed: Vec<_> = keys
         .iter()
         .enumerate()
-        .map(|(i, k)| (Pubkey::from_bytes(*k), i as u64))
+        .map(|(i, k)| (Address::new_from_array(*k), i as u64))
         .collect();
-    let variable: Vec<_> = keys.iter().map(|k| (Pubkey::from_bytes(*k), "é")).collect();
-    let fixed_bytes = super::encoded::<Map<Pubkey, u64>>(&fixed.as_slice());
-    let variable_bytes = super::encoded::<Map<Pubkey, Str>>(&variable.as_slice());
-    let fixed = View::new(&fixed_bytes, <Map<Pubkey, u64>>::LAYOUT, 19)
+    let variable: Vec<_> = keys
+        .iter()
+        .map(|k| (Address::new_from_array(*k), "é"))
+        .collect();
+    let fixed_bytes = super::encoded::<Map<Address, u64>>(&fixed.as_slice());
+    let variable_bytes = super::encoded::<Map<Address, Str>>(&variable.as_slice());
+    let fixed = View::new(&fixed_bytes, <Map<Address, u64>>::LAYOUT, 19)
         .unwrap()
-        .read::<Map<Pubkey, u64>>()
+        .read::<Map<Address, u64>>()
         .unwrap();
-    let variable = View::new(&variable_bytes, <Map<Pubkey, Str>>::LAYOUT, 19)
+    let variable = View::new(&variable_bytes, <Map<Address, Str>>::LAYOUT, 19)
         .unwrap()
-        .read::<Map<Pubkey, Str>>()
+        .read::<Map<Address, Str>>()
         .unwrap();
     for (i, key) in keys.iter().enumerate() {
-        let query = Pubkey::from_bytes(*key);
+        let query = Address::new_from_array(*key);
         assert_eq!(fixed.try_get(&query), Ok(Some(i as u64)));
         assert_eq!(variable.try_get(&query), Ok(Some("é")));
         for at in 0..32 {
             let mut absent = *key;
             absent[at] ^= 0x80;
             if keys.binary_search(&absent).is_err() {
-                let query = Pubkey::from_bytes(absent);
+                let query = Address::new_from_array(absent);
                 assert_eq!(fixed.try_get(&query), Ok(None));
                 assert_eq!(variable.try_get(&query), Ok(None));
             }
@@ -169,8 +172,8 @@ fn point_probe_equality_full_keys_halves_and_misses() {
     }
     assert_eq!(fixed.try_len(), Ok(keys.len()));
     assert_eq!(fixed.try_iter().count(), keys.len());
-    assert_eq!(fixed.try_get(&Pubkey::from_bytes([0; 32])), Ok(None));
-    assert_eq!(fixed.try_get(&Pubkey::from_bytes([255; 32])), Ok(None));
+    assert_eq!(fixed.try_get(&Address::new_from_array([0; 32])), Ok(None));
+    assert_eq!(fixed.try_get(&Address::new_from_array([255; 32])), Ok(None));
 }
 
 std::thread_local! {

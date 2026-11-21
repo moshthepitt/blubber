@@ -1,6 +1,6 @@
 //! Full-domain pairs for each built-in key, with explicit array instantiations.
 
-use blubber::{Fixed, MapKey, Pubkey};
+use blubber::{Address, Fixed, MapKey};
 use core::fmt::Debug;
 
 fn pair<T: MapKey + Debug>(left: T, right: T) {
@@ -59,8 +59,8 @@ fn map_key_bool() {
 #[kani::unwind(34)]
 fn map_key_pubkey() {
     pair(
-        Pubkey::from_bytes(kani::any()),
-        Pubkey::from_bytes(kani::any()),
+        Address::new_from_array(kani::any()),
+        Address::new_from_array(kani::any()),
     );
 }
 
@@ -79,8 +79,9 @@ fn map_key_address_projection() {
     assert_eq!(a == b, a_bytes == b_bytes);
     assert_eq!(a.encode(), a_bytes);
     assert_eq!(a.encode_key(), a_bytes);
-    assert_eq!(Pubkey::from(a).to_bytes(), a_bytes);
-    assert_eq!(pinocchio::Address::from(Pubkey::from(a)), a);
+    let schema_key: Address = a;
+    assert_eq!(schema_key.to_bytes(), a_bytes);
+    assert_eq!(schema_key, a);
     kani::cover!(a_bytes == b_bytes, "equal SDK values");
     kani::cover!(
         a_bytes[..31] == b_bytes[..31] && a_bytes[31] < b_bytes[31],
@@ -97,12 +98,12 @@ fn map_key_address_projection() {
 fn map_key_pubkey_projection() {
     let a_bytes: [u8; 32] = kani::any();
     let b_bytes: [u8; 32] = kani::any();
-    let a = Pubkey::from_bytes(a_bytes);
-    let b = Pubkey::from_bytes(b_bytes);
-    assert_eq!(a.as_ref(), &a_bytes);
-    assert_eq!(b.as_ref(), &b_bytes);
+    let a = Address::new_from_array(a_bytes);
+    let b = Address::new_from_array(b_bytes);
+    assert_eq!(AsRef::<[u8]>::as_ref(&a), &a_bytes);
+    assert_eq!(AsRef::<[u8]>::as_ref(&b), &b_bytes);
     assert_eq!(a.to_bytes(), a_bytes);
-    assert_eq!(Pubkey::from_bytes(a.to_bytes()), a);
+    assert_eq!(Address::new_from_array(a.to_bytes()), a);
     assert_eq!(a.cmp(&b), a_bytes.cmp(&b_bytes));
     assert_eq!(a == b, a_bytes == b_bytes);
     assert_eq!(a.encode(), a_bytes);

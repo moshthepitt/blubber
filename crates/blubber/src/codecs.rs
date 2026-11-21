@@ -60,7 +60,7 @@ pub trait Fixed: Sized + Copy + 'static {
 /// A fixed key whose canonical byte order agrees with its Rust total order.
 ///
 /// Integers use big-endian bytes, with the sign bit flipped for signed keys.
-/// Raw arrays and [`Pubkey`] retain their bytes. Fixed structs are not keys.
+/// Raw arrays and [`Address`](crate::Address) retain their bytes. Fixed structs are not keys.
 pub trait MapKey: Fixed + Ord {
     /// Selects the canonical key encoder contract for the complete key graph.
     ///
@@ -306,113 +306,35 @@ impl<const N: usize> MapKey for [u8; N] {
     }
 }
 
-/// An SDK-independent public key, ordered lexicographically by its 32 bytes.
-#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash)]
-pub struct Pubkey([u8; 32]);
-
-impl Pubkey {
-    /// Constructs a key from its complete raw encoding.
-    pub const fn from_bytes(bytes: [u8; 32]) -> Self {
-        Self(bytes)
-    }
-
-    /// Returns the complete raw encoding.
-    pub const fn to_bytes(self) -> [u8; 32] {
-        self.0
-    }
-}
-
-impl AsRef<[u8]> for Pubkey {
-    fn as_ref(&self) -> &[u8] {
-        &self.0
-    }
-}
-
-impl Fixed for Pubkey {
+impl Fixed for crate::Address {
     const __ENCODER_AUDITED: bool = true;
-    const SIZE: u32 = 32;
+    const SIZE: u32 = <[u8; 32] as Fixed>::SIZE;
     type Encoded = [u8; 32];
 
     #[inline(always)]
     fn decode(bytes: &[u8]) -> Result<Self> {
-        Ok(Self(exact_array(bytes)?))
+        Ok(Self::new_from_array(<[u8; 32] as Fixed>::decode(bytes)?))
     }
 
     #[inline(always)]
     fn encode(self) -> Self::Encoded {
-        blubber_core::encoding_leaf::array_bytes(self.0)
+        blubber_core::encoding_leaf::array_bytes(*self.as_array())
     }
 }
 
-impl MapKey for Pubkey {
+impl MapKey for crate::Address {
     const __KEY_ENCODER_AUDITED: bool = true;
     const __ORDER_REUSABLE: bool = true;
     const KEY_DESCRIPTOR: Option<crate::identity::WireKey> = Some(crate::identity::WireKey {
         layout: Self::KEY_LAYOUT,
         codec: None,
     });
-    const KEY_LAYOUT: KeyLayout = KeyLayout {
-        width: Self::SIZE,
-        domain: KeyDomain::Raw,
-    };
+    const KEY_LAYOUT: KeyLayout = <[u8; 32] as MapKey>::KEY_LAYOUT;
     type KeyBytes = [u8; 32];
 
     #[inline(always)]
     fn encode_key(self) -> Self::KeyBytes {
-        blubber_core::encoding_leaf::array_bytes(self.0)
-    }
-
-    #[inline(always)]
-    fn decode_key(bytes: &[u8]) -> Result<Self> {
-        Self::decode(bytes)
-    }
-}
-
-#[cfg(feature = "pinocchio")]
-impl From<::pinocchio::Address> for Pubkey {
-    fn from(address: ::pinocchio::Address) -> Self {
-        Self(address.to_bytes())
-    }
-}
-
-#[cfg(feature = "pinocchio")]
-impl From<Pubkey> for ::pinocchio::Address {
-    fn from(key: Pubkey) -> Self {
-        Self::new_from_array(key.0)
-    }
-}
-
-#[cfg(feature = "pinocchio")]
-impl Fixed for ::pinocchio::Address {
-    const __ENCODER_AUDITED: bool = true;
-    const SIZE: u32 = 32;
-    type Encoded = [u8; 32];
-
-    #[inline(always)]
-    fn decode(bytes: &[u8]) -> Result<Self> {
-        Ok(Self::new_from_array(exact_array(bytes)?))
-    }
-
-    #[inline(always)]
-    fn encode(self) -> Self::Encoded {
-        blubber_core::encoding_leaf::array_bytes(self.to_bytes())
-    }
-}
-
-#[cfg(feature = "pinocchio")]
-impl MapKey for ::pinocchio::Address {
-    const __KEY_ENCODER_AUDITED: bool = true;
-    const __ORDER_REUSABLE: bool = true;
-    const KEY_DESCRIPTOR: Option<crate::identity::WireKey> = Some(crate::identity::WireKey {
-        layout: Self::KEY_LAYOUT,
-        codec: None,
-    });
-    const KEY_LAYOUT: KeyLayout = <Pubkey as MapKey>::KEY_LAYOUT;
-    type KeyBytes = [u8; 32];
-
-    #[inline(always)]
-    fn encode_key(self) -> Self::KeyBytes {
-        blubber_core::encoding_leaf::array_bytes(self.to_bytes())
+        blubber_core::encoding_leaf::array_bytes(*self.as_array())
     }
 
     #[inline(always)]

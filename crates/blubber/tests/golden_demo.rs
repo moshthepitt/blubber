@@ -6,7 +6,7 @@
 #[path = "support/demo.rs"]
 mod demo;
 
-use blubber::{Pubkey, Schema, SliceStore};
+use blubber::{Address, Schema, SliceStore};
 use demo::{Limits, MyAccount};
 
 #[test]
@@ -34,13 +34,13 @@ fn complete_local_readers_decode_the_independent_golden_bytes() {
     let account = MyAccount::load(&bytes).unwrap();
     assert_eq!(account.used_len(), 167);
     assert_eq!(account.storage_len(), 171);
-    assert_eq!(account.authority(), Pubkey::from_bytes([0x11; 32]));
+    assert_eq!(account.authority(), Address::new_from_array([0x11; 32]));
     assert_eq!(account.counter(), 1);
     let record = account.records().get(0).unwrap();
     assert_eq!(record.name(), "A");
     assert_eq!(record.tags().iter().collect::<Vec<_>>(), [7, 9]);
     assert_eq!(
-        account.balances().get(&Pubkey::from_bytes([0x22; 32])),
+        account.balances().get(&Address::new_from_array([0x22; 32])),
         Some(5)
     );
     assert_eq!(

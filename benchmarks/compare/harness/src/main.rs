@@ -426,14 +426,12 @@ fn main() {
             .unwrap()
             .trim()
         );
-        let mut vm = Mollusk::new(
-            &owner,
-            if lib == 2 {
-                "compare_star"
-            } else {
-                "compare_program"
-            },
-        );
+        let program = match lib {
+            2 => "compare_star",
+            9 => "compare_slab",
+            _ => "compare_program",
+        };
+        let mut vm = Mollusk::new(&owner, program);
         vm.compute_budget.compute_unit_limit = 40_000_000;
         vm.compute_budget.heap_size = 256 * 1024;
         let name = match lib {

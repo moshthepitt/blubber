@@ -10,13 +10,14 @@ use mollusk_svm::{
 use solana_account::Account;
 use solana_instruction::{error::InstructionError, AccountMeta, Instruction};
 use solana_pubkey::Pubkey;
+use solana_sdk_ids::system_program::ID as SYSTEM;
+use solana_system_interface::instruction::{allocate, assign, transfer};
 
 const OWNER: Pubkey = Pubkey::new_from_array([7; 32]);
 const STATE: Pubkey = Pubkey::new_from_array([8; 32]);
 const PAYER: Pubkey = Pubkey::new_from_array([9; 32]);
-const SYSTEM: Pubkey = Pubkey::new_from_array([0; 32]);
 const INITIAL: usize = 128;
-const WINDOW: usize = 10_240;
+use pinocchio::account::MAX_PERMITTED_DATA_INCREASE as WINDOW;
 const MAX: usize = 10_485_760;
 
 fn runtime(profile: u8) -> Mollusk {
@@ -72,22 +73,6 @@ fn inputs(balance: u64) -> Vec<(Pubkey, Account)> {
     ]
 }
 
-// System Program's pinned bincode wire tags: Transfer=2, Allocate=8, Assign=1.
-// Host construction is independent of the SBF Pinocchio CPI implementation.
-fn system(tag: u32, key: Pubkey, argument: &[u8]) -> Instruction {
-    let mut data = tag.to_le_bytes().to_vec();
-    data.extend_from_slice(argument);
-    Instruction {
-        program_id: SYSTEM,
-        accounts: vec![AccountMeta::new(key, true)],
-        data,
-    }
-}
-fn transfer(lamports: u64) -> Instruction {
-    let mut ix = system(2, PAYER, &lamports.to_le_bytes());
-    ix.accounts.push(AccountMeta::new(STATE, false));
-    ix
-}
 fn assert_bytes(accounts: &[(Pubkey, Account)], key: Pubkey, len: usize) {
     let data = &accounts.iter().find(|(k, _)| *k == key).unwrap().1.data;
     assert_eq!(data.len(), len);
@@ -206,7 +191,7 @@ pub(crate) fn later_instruction_failure_reverts_commits_and_system_transfers(emi
         let accounts = inputs(100_000_000_000);
         let result = vm.process_transaction_instructions(
             &[
-                transfer(123),
+                transfer(&PAYER, &STATE, 123),
                 instruction(0, INITIAL + 100),
                 instruction(3, 7),
             ],
@@ -236,7 +221,10 @@ pub(crate) fn prepaid_requires_funding_before_commit_even_when_bank_rent_is_defe
         let after = vm.sysvars.rent.minimum_balance(target);
         let accounts = inputs(before);
         let failed = vm.process_transaction_instructions(
-            &[instruction(0, target), transfer(after - before)],
+            &[
+                instruction(0, target),
+                transfer(&PAYER, &STATE, after - before),
+            ],
             &accounts,
             Some(&PAYER),
         );
@@ -254,23 +242,20 @@ pub(crate) fn prepaid_requires_funding_before_commit_even_when_bank_rent_is_defe
             &failed.resulting_accounts,
         );
         for instructions in [
-            [transfer(after - before), instruction(0, target)],
-            [instruction(4, target), transfer(after - before)],
+            [
+                transfer(&PAYER, &STATE, after - before),
+                instruction(0, target),
+            ],
+            [
+                instruction(4, target),
+                transfer(&PAYER, &STATE, after - before),
+            ],
         ] {
             let result =
                 vm.process_transaction_instructions(&instructions, &accounts, Some(&PAYER));
             assert!(result.program_result.is_ok(), "{:?}", result.program_result);
             assert_bytes(&result.resulting_accounts, STATE, target);
-            assert_eq!(
-                result
-                    .resulting_accounts
-                    .iter()
-                    .find(|(key, _)| *key == STATE)
-                    .unwrap()
-                    .1
-                    .lamports,
-                after
-            );
+            assert_eq!(result.get_account(&STATE).unwrap().lamports, after);
             record(
                 emit,
                 (
@@ -315,8 +300,7 @@ pub(crate) fn signed_aggregate_growth_is_twenty_mib_and_shrink_restores_budget(e
         accounts[0] = account(STATE, SYSTEM, 0, 100_000_000_000);
         accounts.push(account(second, SYSTEM, 0, 100_000_000_000));
         accounts.push(account(third, SYSTEM, 0, 100_000_000_000));
-        let allocate = |key, len: usize| system(8, key, &(len as u64).to_le_bytes());
-        let mut instructions = vec![allocate(STATE, MAX), allocate(second, MAX)];
+        let mut instructions = vec![allocate(&STATE, MAX as u64), allocate(&second, MAX as u64)];
         let result = vm.process_transaction_instructions(&instructions, &accounts, Some(&PAYER));
         assert!(result.program_result.is_ok(), "{:?}", result.program_result);
         record(
@@ -326,7 +310,7 @@ pub(crate) fn signed_aggregate_growth_is_twenty_mib_and_shrink_restores_budget(e
             &accounts,
             &result.resulting_accounts,
         );
-        instructions.push(allocate(third, 1));
+        instructions.push(allocate(&third, 1));
         let result = vm.process_transaction_instructions(&instructions, &accounts, Some(&PAYER));
         assert_eq!(
             result.program_result,
@@ -344,22 +328,12 @@ pub(crate) fn signed_aggregate_growth_is_twenty_mib_and_shrink_restores_budget(e
             &result.resulting_accounts,
         );
         instructions.pop();
-        instructions.push(system(1, STATE, OWNER.as_ref()));
+        instructions.push(assign(&STATE, &OWNER));
         instructions.push(instruction(0, MAX - 1));
-        instructions.push(allocate(third, 1));
+        instructions.push(allocate(&third, 1));
         let result = vm.process_transaction_instructions(&instructions, &accounts, Some(&PAYER));
         assert!(result.program_result.is_ok(), "{:?}", result.program_result);
-        assert_eq!(
-            result
-                .resulting_accounts
-                .iter()
-                .find(|(key, _)| *key == third)
-                .unwrap()
-                .1
-                .data
-                .len(),
-            1
-        );
+        assert_eq!(result.get_account(&third).unwrap().data.len(), 1);
         record(
             emit,
             ("aggregate_shrink_reuse", profile, "transaction"),
@@ -421,8 +395,8 @@ pub(crate) fn exhausted_transaction_budget_rejects_max_but_allows_zero(emit: boo
         accounts.push(account(third, SYSTEM, 0, 100_000_000_000));
         for action in [5, 6, 7] {
             let instructions = [
-                system(8, second, &(MAX as u64).to_le_bytes()),
-                system(8, third, &(MAX as u64).to_le_bytes()),
+                allocate(&second, MAX as u64),
+                allocate(&third, MAX as u64),
                 instruction(action, 0),
             ];
             let result =
@@ -443,13 +417,7 @@ pub(crate) fn exhausted_transaction_budget_rejects_max_but_allows_zero(emit: boo
                     "profile={profile}: {:?}",
                     result.program_result
                 );
-                let state = &result
-                    .resulting_accounts
-                    .iter()
-                    .find(|(key, _)| *key == STATE)
-                    .unwrap()
-                    .1
-                    .data;
+                let state = &result.get_account(&STATE).unwrap().data;
                 assert_eq!(&state[8..12], &16u32.to_le_bytes());
                 assert_eq!(&state[12..16], &42u32.to_le_bytes());
             }

@@ -2,7 +2,7 @@
 
 #![forbid(unsafe_code)]
 
-use blubber::{List, ListMut, Map, MapKey, Pubkey, Schema, Str};
+use blubber::{Address, List, ListMut, Map, MapKey, Schema, Str};
 use blubber_model::{
     ApiEdit, ApiReturn, Callbacks, Edit as ModelEdit, IntWidth, Key, KeySchema,
     PathSegment as Segment, Schema as ModelSchema, Value,
@@ -218,11 +218,11 @@ macro_rules! fixed {
 
 fixed!(bool, ModelSchema::Bool, Bool, |v| v, |v: &bool| *v);
 fixed!(
-    Pubkey,
+    Address,
     ModelSchema::Pubkey,
     Pubkey,
-    |v: Pubkey| v.to_bytes(),
-    |v: &[u8; 32]| Pubkey::from_bytes(*v)
+    |v: Address| v.to_bytes(),
+    |v: &[u8; 32]| Address::new_from_array(*v)
 );
 
 impl<const N: usize> Bridge for [u8; N] {
@@ -302,7 +302,7 @@ impl NativeKey for bool {
     }
 }
 
-impl NativeKey for Pubkey {
+impl NativeKey for Address {
     fn schema() -> KeySchema {
         KeySchema::Pubkey
     }
@@ -310,7 +310,7 @@ impl NativeKey for Pubkey {
         let Key::Pubkey(value) = value else {
             panic!("pubkey key")
         };
-        Self::from_bytes(*value)
+        Self::new_from_array(*value)
     }
     fn value(value: Self) -> Key {
         Key::Pubkey(value.to_bytes())

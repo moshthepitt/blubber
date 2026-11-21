@@ -21,7 +21,7 @@ pinocchio::nostd_panic_handler!();
 
 pub mod funding_preflight;
 
-const INCREASE: usize = 10_240;
+use pinocchio::account::MAX_PERMITTED_DATA_INCREASE as INCREASE;
 const MAX: usize = 10_485_760;
 
 #[blubber::schema(account, discriminator = [76, 69, 65, 83, 69, 48, 48, 49])]

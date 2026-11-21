@@ -1,10 +1,5 @@
 crate	module	classification	skip_tests	reason
 blubber	ancestor_pass	included	-	Both alias models; safe host fixtures.
-blubber-anchor	anchor	excluded	-	Requires adapter fixtures; production session code runs in the separate Miri anchor lane.
-blubber-anchor	anchor_cohort	excluded	-	Requires adapter SDK probes; native feature lanes run this fixture; Miri uses the production session subset.
-blubber-anchor	anchor_errors	excluded	-	Requires adapter SDK error fixtures; native feature lanes; Miri uses the production session subset.
-blubber-anchor	anchor_init	excluded	-	Requires adapter initialization fixtures; native feature lanes; Miri uses the production session subset.
-blubber-anchor	anchor_schema	excluded	-	Macro schema and wire fixtures run in workspace/all-features; the bounded Miri derive/storage cohort covers generated memory paths.
 blubber	codecs	included	-	Both alias models; safe host fixtures.
 blubber	corrupt_histories	included	-	Both alias models; safe host fixtures.
 blubber	corrupt_reads	included	-	Both alias models; safe host fixtures.
@@ -82,6 +77,7 @@ blubber-mollusk	funding_preflight	excluded	-	SBF ELF/runtime fixtures execute in
 blubber-mollusk	identity	excluded	-	SBF ELF/runtime fixtures execute in the native Mollusk lanes.
 blubber-mollusk	initialize	excluded	-	SBF ELF/runtime fixtures execute in the native Mollusk lanes.
 blubber-mollusk	invocation_boundaries	excluded	-	SBF ELF/runtime fixtures execute in the native Mollusk lanes.
+blubber-mollusk	quickstart	excluded	-	SBF ELF/runtime fixtures execute in the native Mollusk lanes.
 blubber-mollusk	rent	excluded	-	SBF ELF/runtime fixtures execute in the native Mollusk lanes.
 blubber-mollusk	runtime_edits	excluded	-	SBF ELF/runtime fixtures execute in the native Mollusk lanes.
 blubber-mollusk	schema_digest	excluded	-	SBF ELF/runtime fixtures execute in the native Mollusk lanes.
@@ -89,5 +85,4 @@ blubber-mollusk	scoped	excluded	-	SBF ELF/runtime fixtures execute in the native
 blubber-mollusk	stack_matrix	excluded	-	SBF ELF/runtime fixtures execute in the native Mollusk lanes.
 blubber-mollusk	tour	excluded	-	SBF ELF/runtime fixtures execute in the native Mollusk lanes.
 blubber-mollusk	verification_policy	excluded	-	SBF ELF/runtime fixtures execute in the native Mollusk lanes.
-blubber-anchor	ui	excluded	-	Runs the compiler and reads diagnostic files; adapter UI lane.
 blubber-model	api	excluded	-	Independent API oracle runs through native differential and workspace tests.

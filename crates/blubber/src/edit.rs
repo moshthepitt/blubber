@@ -210,7 +210,7 @@ impl<'a> AccountEdit<'a> {
     ) -> Result<Self> {
         check_state(store, false)?;
         let root_len = S::measure(&init)?;
-        Self::initialize_encoding::<S>(store, discriminator, init, root_len)
+        Self::initialize_encoding::<S>(store, discriminator, InitSource { init }, root_len)
     }
 
     pub(crate) fn initialize_measured<S: RootSchema>(
@@ -229,13 +229,13 @@ impl<'a> AccountEdit<'a> {
         } else {
             measured.prepared.into_measured()
         };
-        Self::initialize_encoding::<S>(store, discriminator, source.init, root_len)
+        Self::initialize_encoding::<S>(store, discriminator, source, root_len)
     }
 
     fn initialize_encoding<S: RootSchema>(
         store: &'a mut dyn Resize,
         discriminator: [u8; 8],
-        init: S::Init<'_>,
+        source: InitSource<'_, S>,
         root_len: u32,
     ) -> Result<Self> {
         let used = crate::schema::checked_add(12, root_len)?;
@@ -263,7 +263,8 @@ impl<'a> AccountEdit<'a> {
         store.set_poisoned(true);
         let bytes = store.bytes_mut();
         bytes.fill(0);
-        S::encode(&init, &mut bytes[12..used as usize]);
+        // Measurement and any required replay completed before storage changed.
+        blubber_core::encoding_replay::write(&source, bytes, 12, root_len, false)?;
         bytes[..8].copy_from_slice(&discriminator);
         bytes[8..12].copy_from_slice(&used.to_le_bytes());
         #[cfg(feature = "verify-on-load")]
@@ -1299,7 +1300,7 @@ impl<'a> AccountEdit<'a> {
             return Err(ErrorKind::InvalidBoundary.into());
         }
         *access.poisoned = true;
-        Self::encode_list_child::<T>(input, tail.destination());
+        T::encode(input, tail.destination());
         tail.finish();
         *access.poisoned = false;
         Ok(true)
@@ -1690,7 +1691,7 @@ impl<'a> AccountEdit<'a> {
         let child = self.collection_child()?;
         let lazy = self.lazy;
         if self.checked_map_enabled() {
-            return self.execute_checked_map(
+            return self.execute_checked_map::<false, _>(
                 blubber_core::raw::MapEdit::Remove,
                 key,
                 None,

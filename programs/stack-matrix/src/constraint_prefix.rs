@@ -58,7 +58,7 @@ pub(super) fn run(id: &Address, accounts: &mut [AccountView], ix: &[u8]) -> Prog
     let [state] = accounts else {
         return Err(ProgramError::NotEnoughAccountKeys);
     };
-    if state.owner() != id || !state.is_writable() {
+    if !state.owned_by(id) || !state.is_writable() {
         return Err(ProgramError::InvalidAccountData);
     }
     let mut data = state.try_borrow_mut()?;

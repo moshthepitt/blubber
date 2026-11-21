@@ -1,4 +1,4 @@
-use blubber::{List, Map, Pubkey, Str};
+use blubber::{Address, List, Map, Str};
 
 /// Native limits encoded without Rust padding.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, blubber::Fixed)]
@@ -22,13 +22,13 @@ pub struct Record {
 #[blubber::schema(account)]
 pub struct MyAccount {
     /// Authority allowed to run the exercise.
-    pub authority: Pubkey,
+    pub authority: Address,
     /// Example counter.
     pub counter: u64,
     /// Variable-size records.
     pub records: List<Record>,
     /// Balances ordered by public key.
-    pub balances: Map<Pubkey, u64>,
+    pub balances: Map<Address, u64>,
     /// Labels ordered by numeric key.
     pub labels: Map<u16, Str>,
     /// Uncounted UTF-8 note.
@@ -42,7 +42,7 @@ pub struct MyAccount {
 }
 
 /// Borrows static inputs and copies the account's stored `authority`.
-pub fn seed(authority: Pubkey) -> MyAccountInit<'static> {
+pub fn seed(authority: Address) -> MyAccountInit<'static> {
     const RECORDS: &[RecordInit<'static>] = &[
         RecordInit {
             name: "one",

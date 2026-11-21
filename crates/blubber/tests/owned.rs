@@ -9,7 +9,7 @@ mod demo;
 blubber::__root_schema!(__ConcreteRoot0, List<demo::Limits>);
 
 use blubber::Resize as _;
-use blubber::{Error, ErrorKind, List, Map, Pubkey, ReadStorage, Schema, SliceStore, Str, View};
+use blubber::{Address, Error, ErrorKind, List, Map, ReadStorage, Schema, SliceStore, Str, View};
 use demo::{MyAccount, MyAccountOwned, RecordOwned};
 
 fn encoded<S: Schema>(value: &S::Owned) -> Vec<u8> {
@@ -24,11 +24,11 @@ fn complete_demo_owned_mirror_matches_independent_golden_and_field_types() {
     let bytes = demo::golden();
     let root = MyAccount::load(&bytes).unwrap();
     let owned: MyAccountOwned = root.to_owned().unwrap();
-    assert_eq!(owned.authority, Pubkey::from_bytes([0x11; 32]));
+    assert_eq!(owned.authority, Address::new_from_array([0x11; 32]));
     assert_eq!(owned.counter, 1);
     assert_eq!(owned.records[0].name, "A");
     assert_eq!(owned.records[0].tags, [7, 9]);
-    assert_eq!(owned.balances, [(Pubkey::from_bytes([0x22; 32]), 5)]);
+    assert_eq!(owned.balances, [(Address::new_from_array([0x22; 32]), 5)]);
     assert_eq!(owned.labels, [(1, String::from("x")), (256, String::new())]);
     assert_eq!(owned.note, "ok");
     assert_eq!(owned.attachment, [0xaa, 0xbb]);
@@ -219,7 +219,7 @@ fn owned_map_edits_preserve_old_value_semantics_for_both_layouts() {
     assert_eq!(root.labels_mut().insert_owned(1, &text), Ok(Some(())));
     assert_eq!(root.labels_mut().remove_owned(&1), Ok(Some(text.clone())));
     assert_eq!(root.labels_mut().remove_owned(&9), Ok(None));
-    let key = Pubkey::from_bytes([0x22; 32]);
+    let key = Address::new_from_array([0x22; 32]);
     assert_eq!(root.balances_mut().insert_owned(key, &99), Ok(Some(5)));
     assert_eq!(root.balances_mut().remove_owned(&key), Ok(Some(99)));
     assert_eq!(root.labels().to_owned().unwrap()[0].0, 2);

@@ -1,10 +1,10 @@
 use crate::state::{Limits, MyAccountMut, RecordInit};
-use blubber::{ErrorKind, Pubkey, Result};
+use blubber::{Address, ErrorKind, Result};
 
 /// Runs the complete read/edit tour after checking the stored authority.
 ///
 /// Expects an account initialized from [`crate::state::seed`].
-pub fn exercise(acct: &mut MyAccountMut<'_>, actor: Pubkey) -> Result<()> {
+pub fn exercise(acct: &mut MyAccountMut<'_>, actor: Address) -> Result<()> {
     if acct.authority() != actor {
         return Err(ErrorKind::Unauthorized.into());
     }
@@ -20,7 +20,7 @@ pub fn exercise(acct: &mut MyAccountMut<'_>, actor: Pubkey) -> Result<()> {
         }
     }
     for (key, amount) in acct.balances() {
-        let _: (Pubkey, u64) = (key, amount);
+        let _: (Address, u64) = (key, amount);
     }
     // Last uses of the borrowed reads precede the first edit.
 
@@ -29,7 +29,9 @@ pub fn exercise(acct: &mut MyAccountMut<'_>, actor: Pubkey) -> Result<()> {
         enabled: true,
         limit: 200,
     })?;
+    // docs:start nested-string-edit
     acct.records_mut().at_mut(1)?.name_mut().set("longer")?;
+    // docs:end nested-string-edit
     acct.records_mut()
         .at_mut(1)?
         .tags_mut()

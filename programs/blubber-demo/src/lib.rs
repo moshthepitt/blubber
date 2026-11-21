@@ -9,15 +9,15 @@ pub mod exercise;
 pub mod state;
 
 use blubber::pinocchio::{EditOptions, Funding, Headroom};
-use pinocchio::{error::ProgramError, AccountView, Address, ProgramResult};
+use blubber::pinocchio_sdk::{error::ProgramError, AccountView, Address, ProgramResult};
 use state::{seed, MyAccount};
 
 #[cfg(target_os = "solana")]
-pinocchio::program_entrypoint!(process_instruction, 3);
+blubber::pinocchio_sdk::program_entrypoint!(process_instruction, 3);
 #[cfg(target_os = "solana")]
-pinocchio::no_allocator!();
+blubber::pinocchio_sdk::no_allocator!();
 #[cfg(target_os = "solana")]
-pinocchio::nostd_panic_handler!();
+blubber::pinocchio_sdk::nostd_panic_handler!();
 
 /// Dispatches creation (0), read-only validation (1), or the edit tour (2).
 ///
@@ -46,7 +46,7 @@ pub fn process_instruction(
     if !payer.is_signer() {
         return Err(ProgramError::MissingRequiredSignature);
     }
-    let actor = (*payer.address()).into();
+    let actor = *payer.address();
     match *opcode {
         0 => {
             let _receipt =

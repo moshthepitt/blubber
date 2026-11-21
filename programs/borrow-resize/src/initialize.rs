@@ -3,11 +3,7 @@
 blubber::__root_schema!(__ConcreteRoot0, Map<u16, Str>);
 
 use super::*;
-use blubber::{
-    pinocchio::{allocate_pda, create_account, create_pda},
-    raw::Edit,
-    List, Map, Str,
-};
+use blubber::{__private::create, raw::Edit, List, Map, Str};
 
 #[blubber::schema(account, discriminator = [73, 78, 73, 84, 48, 48, 48, 49])]
 struct Initial {
@@ -45,9 +41,9 @@ pub(super) fn run(id: &Address, accounts: &mut [AccountView], ix: &[u8]) -> Prog
     let _state_guard = (control == 2).then(|| state_alias.try_borrow().unwrap());
     let _payer_guard = (control == 3).then(|| payer_alias.try_borrow().unwrap());
     match action {
-        0 => create_account(state, payer, system_program, id, space)?,
-        1 => create_pda(state, payer, system_program, id, space, seeds)?,
-        2 => allocate_pda(state, payer, system_program, id, space, seeds)?,
+        0 => create(state, payer, system_program, id, space, false, None)?,
+        1 => create(state, payer, system_program, id, space, false, Some(seeds))?,
+        2 => create(state, payer, system_program, id, space, true, Some(seeds))?,
         3 => (),
         _ => return Err(ProgramError::InvalidInstructionData),
     }
@@ -95,7 +91,7 @@ pub(super) fn run(id: &Address, accounts: &mut [AccountView], ix: &[u8]) -> Prog
     let expected = word(ix, 12);
     if expected != 0 {
         let error = result.expect_err("initialization unexpectedly succeeded");
-        assert_eq!(ProgramError::from(error), ProgramError::Custom(expected));
+        assert_eq!(error.custom_code(), Some(expected));
         assert_eq!(store.storage_len(), opened, "failed init changed length");
         assert!(!store.is_poisoned());
         // Host fixtures use a known nonzero spare pattern. Compare every byte

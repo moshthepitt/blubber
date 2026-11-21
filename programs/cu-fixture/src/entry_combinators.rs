@@ -1,13 +1,13 @@
 //! Permanent entry combinator calls and explicit-match controls.
 use blubber::Entry;
-use blubber::{Map, Pubkey, Str};
+use blubber::{Map, Str};
 use core::hint::black_box;
 use pinocchio::{error::ProgramError, AccountView, Address, ProgramResult};
 /// Fixed-value map and a retained suffix.
 #[blubber::schema(account)]
 pub struct Fixed {
     /// Values under test.
-    pub values: Map<Pubkey, u64>,
+    pub values: Map<Address, u64>,
     /// Suffix preserved by every edit.
     pub tail: Str,
 }
@@ -15,19 +15,19 @@ pub struct Fixed {
 #[blubber::schema(account)]
 pub struct Indexed {
     /// Values under test.
-    pub values: Map<Pubkey, Str>,
+    pub values: Map<Address, Str>,
     /// Suffix preserved by every edit.
     pub tail: Str,
 }
 /// Generates sorted distinct full-width keys.
-pub fn key(n: u16, common: bool) -> Pubkey {
+pub fn key(n: u16, common: bool) -> Address {
     let mut key = [42; 32];
     if common {
         key[31] = n as u8;
     } else {
         key[..2].copy_from_slice(&n.to_be_bytes());
     }
-    Pubkey::from_bytes(key)
+    Address::new_from_array(key)
 }
 #[inline(never)]
 fn make<T>(built: &mut u32, value: T) -> T {
@@ -132,7 +132,7 @@ pub fn run(owner: &Address, accounts: &mut [AccountView], data: &[u8]) -> Progra
 #[inline(never)]
 fn fixed<const CONTROL: bool>(
     store: &mut blubber::pinocchio::Store<'_>,
-    k: Pubkey,
+    k: Address,
     op: u8,
     present: bool,
 ) -> ProgramResult {
@@ -144,7 +144,7 @@ fn fixed<const CONTROL: bool>(
 #[inline(never)]
 fn indexed<const CONTROL: bool>(
     store: &mut blubber::pinocchio::Store<'_>,
-    k: Pubkey,
+    k: Address,
     op: u8,
     present: bool,
     grow: bool,

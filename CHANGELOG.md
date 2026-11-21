@@ -1,21 +1,17 @@
 # Changelog
 
-## 0.1.0
+## 0.1.0<!-- num:release.blubber.version -->
 
-Initial release candidate for `blubber-core`, `blubber-derive` and `blubber`.
+### What ships
 
-- Borrowed typed readers and editors for format-1 integers, booleans, byte arrays,
-  public keys, fixed structs, strings, options, lists and sorted maps.
-- Schema derives with borrowed inputs, nested type/const generics and
-  namespace/semantic-epoch account identity. Account roots are concrete.
-- Pinocchio account guards, creation helpers, rent settlement and explicit
-  commit receipts. Default headroom is `UpTo(0)`; larger budgets are explicit.
-- Authenticated lazy runtime entry under valid current-schema writer history,
-  checked alternatives, root `verify()` and opt-in `verify-on-load`.
-- Scoped child edits, lending cursors, entry combinators and whole-container
-  fill/rewrite operations, with documented partial-progress and poison rules.
-- A Verus-checked byte kernel, bounded typed checks and runtime evidence whose
-  scope and assumptions are documented in [ASSURANCE.md](ASSURANCE.md).
+`blubber`, `blubber-core` and `blubber-derive` 0.1.0<!-- num:release.blubber.version --> are on crates.io and docs.rs. The package check passes an external archive consumer check with the package inventory's feature selections. See [`README.md#release-status`](README.md#release-status).
 
-The separate `blubber-anchor` adapter is unpublished and uses an exact SDK git
-revision. Its [README](crates/blubber-anchor/README.md) describes availability.
+- Account schemas via `#[blubber::schema]` and `Fixed`, with encodings for scalars, `Str`, `List` and `Map`. Tests check that the default account identity depends on the canonical encoding description, namespace and application-controlled epoch.
+- Typed borrowed views and in-place editors over account bytes, so edits do not decode the account into a `Vec`.
+- Authenticated Pinocchio lifecycle and editing helpers. You can request extra bytes beyond the current length when an edit opens with `Headroom::UpTo`. Commit settles rent on the final physical size.
+
+### Edits and initialisation
+
+With `alloc`, `MapMut<K, Str>::rewrite_values_with` stages replacements computed from the old strings in one caller-sized byte buffer before rewriting the map. A callback error or insufficient output buffer leaves the account bytes untouched. See [`docs/recipes.md#replace-a-collection`](docs/recipes.md#replace-a-collection).
+
+Verus is a formal verification tool for Rust. It checks the byte-moving core and the shared initialisation payload writer under their stated premises, including trusted projected input, an exact byte measurement and a destination slot of that size for the payload writer. See [`ASSURANCE.md#encoders-and-initialization`](ASSURANCE.md#encoders-and-initialization).

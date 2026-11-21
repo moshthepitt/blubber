@@ -1,119 +1,61 @@
-# How Blubber compares
+# Benchmark comparison
 
-This report uses retained observations from the [complete CSV](compare/results/all.csv)
-and its [receipt](compare/results/receipt.json). Run
-`bash scripts/reproduce.sh cu compare` to collect fresh observations.
+## Reproduce the comparison
 
-## Method
-
-One Mollusk 0.16.2 harness runs every library under Agave 4.3.0, platform-tools
-v1.53, SBF v0 and v3. Release settings match the blubber fixture:
-`overflow-checks=true`, fat LTO and one codegen unit. Each instruction gets
-40,000,000 CU and a 256 KiB heap, with one writable state account owned by the
-program and enough prepaid lamports for growth. No rent-transfer CPI is needed.
-The high CU limit lets slow operations finish for measurement; a successful row
-here does not establish that it fits a lower production budget.
-
-The primary metric is whole instruction CU. The signed operation delta subtracts
-a matching load-only idle, including the normal close/commit work. Mutable
-blubber idles include Store creation, the selected mutable load and commit.
-Wincode's borrowed mutable numeric views use a borrowed mutable idle; owned
-mutations use an owned decode idle. Star Frame has its own native older-SDK
-entrypoint and uses its documented SharedWrapper/ExclusiveWrapper API directly.
-All other adapters share the same fixture entrypoint. Dispatch and return-data
-costs remain in whole numbers. Published rows use no `sol_log_compute_units` brackets. Diagnostic profiles
-use separate scratch ELFs and do not supply table totals.
-
-Calibration replays the published caller ELFs and their original inputs. The new
-comparison callers have separate source and ELF hashes: numeric reads use checked
-`Iterator::sum`, while the published mixed caller uses wrapping sums, and the
-old-dependent growth recipe calls the shared `grow` helper from a different
-dispatcher. Published map traversals also checksum every copied key byte; W2
-here sums values only. Published string traversals use word-based byte-sum
-helpers, while these comparison callers share a byte iterator checksum. The
-callers therefore do different checksum work. Same-version blubber totals can
-differ by more than 1%; they are not a changed toolchain or lazy-load substitution. The exact
-calibration isolates the harness/platform cohort, while the remaining effects of input values and caller code have not been
-separately profiled.
-
-Each operation starts from a fresh account. Numbers are 1..=n. Keys encode even
-ordinals in the first four bytes in big-endian order, followed by 28 bytes of
-42; the odd key immediately before the middle key is absent and becomes the
-insert target. Strings are eight-byte lowercase hexadecimal ordinals. Read
-checksums sum numeric values or UTF-8 bytes. Empty lookups return zero, and empty
-removals or single-element replacements are no-ops. A full fixed-capacity insert
-is a failed row, never a successful growth measurement.
-
-| Workload | Operations |
-|---|---|
-| W1 `list<u64>` | load + sum all; get middle; set all to 123; push 123; remove front |
-| W2 `map<Pubkey,u64>` | lookup middle; insert absent middle key; remove middle; set all values to 123; iterate value sum |
-| W3 `list<String>` (initially 8 bytes) | read all; replace middle with `sameSIZE`; replace middle with `replacement grows` (17 bytes); replace all with `replacement grows`; extra row derives `old + old + !` from every old string |
-| W4 `map<Pubkey,String>` (initially 8 bytes) | lookup middle; insert `sameSIZE`; grow every old value to `old + old + !` |
-
-The independent host oracle constructs the same expected logical collection for
-every library and checks read checksums. It compares complete expected encodings
-for Borsh, zeropod, wincode, Star Frame and blubber (the latter uses the independent
-blubber model). Sokoban, Light and PinaPod outputs are decoded with their checked
-readers and compared with the independent logical result. Idle and failed
-instructions must preserve every account byte. Inactive fixed-capacity slots
-are not required to have a common encoding across libraries.
-
-Heap watermarks come from separate diagnostic ELFs. A final safe one-byte
-allocation exposes the forward bump position through a pointer-to-integer
-conversion. No handwritten unsafe is needed. Observing the watermark can inhibit
-allocation elision, so these are diagnostic allocation measurements, not a claim
-that the diagnostic and whole-CU ELFs have identical optimisation. OOM has no
-successful final watermark.
-
-## Load policy and scope
-
-Blubber checked scans the whole root on reads and edits. Blubber lazy
-uses lazy access under valid current-schema writer history.
-Lazy lookup assumes canonical map order; touched checks do not certify that
-history. The redundant mixed-policy label is omitted from presentation and
-remains in the raw observations for receipt traceability.
-
-Libraries differ in encoding, capacity and validation. Fixed baselines reserve
-1000 slots; PinaPod string slots reserve seventeen bytes. Critbit projects
-fixed-suffix Pubkeys to 128 bits. A capacity or heap failure stays a failed row.
-The table is a comparison of these concrete methods, not other access patterns.
+Raw measurements are in [`compare/results/all.csv`](compare/results/all.csv). The benchmark receipt in [`compare/results/receipt.json`](compare/results/receipt.json) records the inputs, tools, binary hashes and evidence for this run setup. Run `bash scripts/reproduce.sh cu compare` from the repository root to rebuild the whole-instruction, heap and calibration runs for both SBF architectures into the target directory's `reproduce` scratch area.
 
 <!-- compare-summary:start -->
 
-Blubber lazy list sum costs 10,566 CU versus 10,295 for Bytemuck; map lookup costs 974 versus 426 for Zeropod. Blubber lazy string-list growth costs 45,185 CU versus 202,917 for Star Frame. Old-dependent string-map growth costs 521,411 versus 878,116 for Zeropod. These are v0 whole-instruction totals for the measured methods and load policies.
+Blubber lazy list sum costs 10,566 CU versus 10,295 for Bytemuck; map lookup costs 974 versus 426 for Zeropod. Blubber lazy string-list growth costs 45,153 CU versus 202,917 for Star Frame, which the maintainer helped build. Old-dependent string-map growth costs 283,205 versus 878,116 for Zeropod. These are v0 whole-instruction totals for the measured methods and load policies.
 
 <!-- compare-summary:end -->
 
-Native adapter measurements use a different account shape, 32 KiB heap and
-runtime budget. They live in the [adapter README](../crates/blubber-anchor/README.md#native-costs).
-[ASSURANCE.md](../ASSURANCE.md) states the Blubber proof/test boundaries.
-The handwritten comparison sources forbid unsafe code; dependencies and
-competitor derives can use it. Source syntax counts below exclude dependencies
-and expanded macros and do not establish correctness.
+## Method
+
+The harness runs on Mollusk 0.16.2<!-- num:cmp.environment.mollusk -->, Agave 4.3.0<!-- num:cmp.environment.agave --> and platform-tools 1.53<!-- num:cmp.environment.platform_tools -->. It configures an instruction meter of 40,000,000<!-- num:cmp.environment.cu_meter --> CU and a 256<!-- num:cmp.environment.heap_kib --> KiB heap so large rewrites finish instead of hitting the default 32<!-- num:runtime.default.heap_kib --> KiB production limit. Each run starts with one fresh, writable program-owned account with enough prepaid rent for growth, so no rent-transfer CPI runs.
+
+A CU is the Solana runtime measure of compute work. The primary metric is whole CU, the total for the entire instruction. Each operation has a matched idle control for load and close. Successful operation rows also report the signed delta. A separate diagnostic build measures dynamic heap memory as forward bump consumption, including alignment and abandoned allocations before a sentinel. OOM means a run exhausted that heap and left no final watermark. See [`benchmarks/CU.md#read-a-row`](CU.md#read-a-row) for the primary harness.
+
+Calibration replays the primary traversal fixtures, whereas the comparison fixtures include their own dispatch and checksum work. Indexed list strings start as hexadecimal ordinals of 8<!-- num:cmp.fixture.initial_string --> bytes, and the constant fill replaces every list item with one 17<!-- num:cmp.fixture.longer_string -->-byte string. Rewriting from the old value computes a distinct replacement per item.
+
+In the map rewrite, both [`blubber_adapter.rs`](compare/program/src/blubber_adapter.rs) and [`blubber_checked_adapter.rs`](compare/program/src/blubber_checked_adapter.rs) call `MapMut<K, Str>::rewrite_values_with`. On SBF v0 at 1,000 items, lazy Blubber uses fewer whole CU than Zeropod (283,205<!-- num:cmp.v0.n1000.map_grow_from_old.lazy --> CU versus 878,116<!-- num:cmp.v0.n1000.map_grow_from_old.zeropod --> CU), a lower operation delta after subtracting the matched idle (282,406<!-- num:cmp.v0.n1000.map_grow_from_old.lazy.delta --> CU versus 452,564<!-- num:cmp.v0.n1000.map_grow_from_old.zeropod.delta --> CU), and less heap (17,000<!-- num:cmp.v0.n1000.map_grow_from_old.lazy.heap_bytes --> bytes versus 195,912<!-- num:cmp.v0.n1000.map_grow_from_old.zeropod.heap_bytes --> bytes). Borsh hits OOM on that row. For the separate checked caller, see [`benchmarks/TRAVERSAL.md#ordinary-caller-costs`](TRAVERSAL.md#ordinary-caller-costs).
+
+A sorted map stores keys in a single valid ordered encoding. Middle-key fixtures derive ordered keys from even ordinals and use an absent odd key for insertion. A middle-key lookup in a nonempty fixture hits Blubber's first binary-search probe. Critbit uses key projection to map those fixture keys to a smaller integer representation. For other lookup positions and shared prefixes, see [`benchmarks/CU.md#read-a-row`](CU.md#read-a-row).
+
+An independent host oracle checks logical results, read checksums and full expected bytes where supported. It also requires idle and failed runs to leave every byte untouched. For Sokoban, Light Zero Copy and PinaPod, the harness checks decoded logical values because inactive fixed slots differ across libraries.
+
+## Load policy and scope
+
+A lazy load checks the account header up front and checks fields as you read them. A checked load scans the complete used encoding before returning a view or calling your edit closure. In the tables below, Star Frame is a comparator I helped build. The Bytemuck fixture reserves all 1,000 slots up front (8,008<!-- num:cmp.v0.n100.list_sum.bytemuck.account_bytes --> bytes at 100 items, versus 816<!-- num:cmp.v0.n100.list_sum.lazy.account_bytes --> bytes for lazy Blubber) and fails when pushed past capacity.
+
+The [`#source-inventory`](#source-inventory) table counts pre-expansion `unsafe` tokens in pinned `src/` files, excluding dependencies and expanded derives, and records the MIT licence for both Blubber rows. See [`ASSURANCE.md#trust-boundaries`](../ASSURANCE.md#trust-boundaries).
+
+## Find losses and failed runs
+
+Compare successful rows by whole CU. Unsupported cases have no result, and [`#failed-observations`](#failed-observations) lists recorded failures. Read each number alongside its load policy, account byte size and run status. For the loss shortlist within the same load policy, see [`benchmarks/compare/GAPS.md#gaps-within-the-same-load-policy`](compare/GAPS.md#gaps-within-the-same-load-policy).
 
 <!-- compare-tables:start -->
 
 ## Source inventory
 
-The source review and measurements refer to the pinned commits. The last upstream commits are a separate observation from 2026-10-30 (default branches, or anchor-next for the Anchor slab). Unsafe counts are pre-expansion `unsafe` syntax tokens in `src/`, including macro bodies and test modules, after stripping comments and literals. They exclude dependencies and expanded derives. Counts describe source, not safety.
+The source review and measurements refer to the pinned commits. This comparison includes Star Frame, which the maintainer helped build. Unsafe counts are pre-expansion `unsafe` syntax tokens in `src/`, including macro bodies and test modules, after stripping comments and literals. They exclude dependencies and expanded derives. Counts describe source, not safety.
 
-| Library | Version | Pinned commit | Pinned date | Last upstream repo commit | License | Unsafe syntax |
-|---|---|---|---|---|---|---|
-| Borsh | 1.8.1 | [fe778bec428d](https://github.com/near/borsh-rs/tree/fe778bec428d5b44cd4922c896af0a7c39a863dd) | 2026-08-26 | [2026-10-23](https://github.com/near/borsh-rs/commit/0baa89c98d90d26f185801708469e0a81f78aaf5) | MIT OR Apache-2.0 | 6 |
-| Blubber lazy | 0.1.0 | [cecc6280885b](../README.md) | 2026-11-14 | local worktree | not declared | 0 |
-| Blubber checked | 0.1.0 | [cecc6280885b](../README.md) | 2026-11-14 | local worktree | not declared | 0 |
-| Star Frame | 0.30.0 | [6936d582a942](https://github.com/staratlasmeta/star_frame/tree/6936d582a942760b67728059be651473645ee099) | 2026-02-26 | [2026-10-27](https://github.com/staratlasmeta/star_frame/commit/d13c1f13a76e7fb106ab62876989899b300e4727) | Apache-2.0 | 164 |
-| Bytemuck | 1.25.2 | [f363643e951a](https://github.com/Lokathor/bytemuck/tree/f363643e951a7ac9e4b9921de982f2b0918902e3) | 2026-07-19 | [2026-09-11](https://github.com/Lokathor/bytemuck/commit/ea3616110b0134e9991fdb66be8892dbc427c5ac) | Zlib OR Apache-2.0 OR MIT | 332 |
-| Sokoban | 0.3.3 | [f8ecce2c50c1](https://github.com/Ellipsis-Labs/sokoban/tree/f8ecce2c50c12e6b8731b59ecdb3a1f43769a094) | 2024-08-23 | [2024-08-23](https://github.com/Ellipsis-Labs/sokoban/commit/f8ecce2c50c12e6b8731b59ecdb3a1f43769a094) | MIT OR Apache-2.0 | 29 |
-| Zeropod | 0.4.0 | [8a607caf7861](https://github.com/blueshift-gg/zeropod/tree/8a607caf7861c932786e3f7d8759a7c066671b25) | 2026-10-14 | [2026-10-14](https://github.com/blueshift-gg/zeropod/commit/8a607caf7861c932786e3f7d8759a7c066671b25) | Apache-2.0 | 173 |
-| Wincode | 0.6.3 | [2d9cc7a2e974](https://github.com/anza-xyz/wincode/tree/2d9cc7a2e974d726ced31ac1ad3c645113f685f0) | 2026-10-19 | [2026-10-28](https://github.com/anza-xyz/wincode/commit/70a904c555c7d07f8e72eb02b886f695577b475e) | Apache-2.0 | 457 |
-| PinaPod | 0.4.7 | [c1b89cc19693](https://github.com/pina-rs/pinapod/tree/c1b89cc19693f0952eb9990e23e48acbd992f2c7) | 2026-10-21 | [2026-10-29](https://github.com/pina-rs/pinapod/commit/23ec6efe815ac5ebe2678be0fcc5db65c2b5d855) | Apache-2.0 | 84 |
-| Light | 0.6.0 | [b0fe3f2ed33a](https://github.com/Lightprotocol/light-protocol/tree/b0fe3f2ed33acaf4b2ad7e025a2dccefdd0e0515) | 2026-01-20 | [2026-10-14](https://github.com/Lightprotocol/light-protocol/commit/bec7b830250126e1f6a2993872599f45af6e0aa0) | Apache-2.0 | 0 |
-| Anchor slab | 2.0.0-rc.2 | [7d68eb325f29](https://github.com/otter-sec/anchor/tree/7d68eb325f297013a5e0903ddd698fe26218f5a3) | 2026-10-22 | [2026-10-30](https://github.com/otter-sec/anchor/commit/602813667faa88d1c31b554a018a3fcc1b21e548) | Apache-2.0 | 112 |
-| Critbit | 0.3.3 | [f8ecce2c50c1](https://github.com/Ellipsis-Labs/sokoban/tree/f8ecce2c50c12e6b8731b59ecdb3a1f43769a094) | 2024-08-23 | [2024-08-23](https://github.com/Ellipsis-Labs/sokoban/commit/f8ecce2c50c12e6b8731b59ecdb3a1f43769a094) | MIT OR Apache-2.0 | 29 |
-| Manifest | 1.2.0 | [5f4272ec0674](https://github.com/CKS-Systems/manifest/tree/5f4272ec067459dc6ed761331319678edcd25f51) | 2026-10-22 | [2026-10-29](https://github.com/Bonasa-Tech/manifest/commit/ff62612100a82a46babb646fc312ab9ceea041db) | GPLv3 (repository LICENSE; declared lib/LICENSE absent) | 7 |
-| Manifest checked | 1.2.0 | [5f4272ec0674](https://github.com/CKS-Systems/manifest/tree/5f4272ec067459dc6ed761331319678edcd25f51) | 2026-10-22 | [2026-10-29](https://github.com/Bonasa-Tech/manifest/commit/ff62612100a82a46babb646fc312ab9ceea041db) | GPLv3 (repository LICENSE; declared lib/LICENSE absent) | 7 |
+| Library | Version | Pinned commit | Pinned date | License | Unsafe syntax |
+|---|---|---|---|---|---|
+| Borsh | 1.8.1 | [fe778bec428d](https://github.com/near/borsh-rs/tree/fe778bec428d5b44cd4922c896af0a7c39a863dd) | 2026-08-26 | MIT OR Apache-2.0 | 6 |
+| Blubber lazy | 0.1.0 | [e906f7deca37](../README.md) | 2026-11-19 | MIT | 0 |
+| Blubber checked | 0.1.0 | [e906f7deca37](../README.md) | 2026-11-19 | MIT | 0 |
+| Star Frame | 0.30.0 | [6936d582a942](https://github.com/staratlasmeta/star_frame/tree/6936d582a942760b67728059be651473645ee099) | 2026-02-26 | Apache-2.0 | 164 |
+| Bytemuck | 1.25.2 | [f363643e951a](https://github.com/Lokathor/bytemuck/tree/f363643e951a7ac9e4b9921de982f2b0918902e3) | 2026-07-19 | Zlib OR Apache-2.0 OR MIT | 332 |
+| Sokoban | 0.3.3 | [f8ecce2c50c1](https://github.com/Ellipsis-Labs/sokoban/tree/f8ecce2c50c12e6b8731b59ecdb3a1f43769a094) | 2024-08-23 | MIT OR Apache-2.0 | 29 |
+| Zeropod | 0.4.0 | [8a607caf7861](https://github.com/blueshift-gg/zeropod/tree/8a607caf7861c932786e3f7d8759a7c066671b25) | 2026-10-14 | Apache-2.0 | 173 |
+| Wincode | 0.6.3 | [2d9cc7a2e974](https://github.com/anza-xyz/wincode/tree/2d9cc7a2e974d726ced31ac1ad3c645113f685f0) | 2026-10-19 | Apache-2.0 | 457 |
+| PinaPod | 0.4.7 | [c1b89cc19693](https://github.com/pina-rs/pinapod/tree/c1b89cc19693f0952eb9990e23e48acbd992f2c7) | 2026-10-21 | Apache-2.0 | 84 |
+| Light | 0.6.0 | [b0fe3f2ed33a](https://github.com/Lightprotocol/light-protocol/tree/b0fe3f2ed33acaf4b2ad7e025a2dccefdd0e0515) | 2026-01-20 | Apache-2.0 | 0 |
+| Anchor slab | 2.0.0-rc.2 | [7d68eb325f29](https://github.com/otter-sec/anchor/tree/7d68eb325f297013a5e0903ddd698fe26218f5a3) | 2026-10-22 | Apache-2.0 | 112 |
+| Critbit | 0.3.3 | [f8ecce2c50c1](https://github.com/Ellipsis-Labs/sokoban/tree/f8ecce2c50c12e6b8731b59ecdb3a1f43769a094) | 2024-08-23 | MIT OR Apache-2.0 | 29 |
+| Manifest | 1.2.0 | [5f4272ec0674](https://github.com/CKS-Systems/manifest/tree/5f4272ec067459dc6ed761331319678edcd25f51) | 2026-10-22 | GPLv3 (repository LICENSE; declared lib/LICENSE absent) | 7 |
+| Manifest checked | 1.2.0 | [5f4272ec0674](https://github.com/CKS-Systems/manifest/tree/5f4272ec067459dc6ed761331319678edcd25f51) | 2026-10-22 | GPLv3 (repository LICENSE; declared lib/LICENSE absent) | 7 |
 
 ## Storage and load policy
 
@@ -121,7 +63,7 @@ The source review and measurements refer to the pinned commits. The last upstrea
 |---|---|---|
 | Borsh | dynamic owned | whole decode; lengths and UTF-8; default BTreeMap does not enforce input key order |
 | Blubber lazy | unsized borrowed | O(1) envelope/discriminator; caller guarantees valid program-written bytes; touched paths checked lazily |
-| Blubber checked | unsized borrowed | explicit checked reads and mutable load: complete root, strict keys and UTF-8 |
+| Blubber checked | unsized borrowed | explicit checked reads and mutable loads: complete root, strict keys and UTF-8 |
 | Star Frame | unsized borrowed | fixed bit patterns and geometry; indexed children/UTF-8 checked on access; no map key-order scan |
 | Bytemuck | fixed 1000 | POD size/alignment; adapter length<=1000; u64 has no invalid bit patterns |
 | Sokoban | fixed 1000 | POD size/alignment; no tree-link, colour, or key-order validation |
@@ -141,8 +83,8 @@ The upstream entries describe source review at each pinned commit. The compariso
 | Library | Formal verification evidence | Reallocation handling | Pinocchio / Anchor v2 |
 |---|---|---|---|
 | Borsh | No proof inventory found in inspected crate | exact resize, encode on mutation | raw bytes / raw bytes |
-| Blubber lazy | Verus kernel; bounded Kani typed checks (repository gates) | default UpTo(0); these mutable rows explicitly select Max; commit trims | native Pinocchio / Anchor v2 lazy and checked managed lifecycle (git pin) |
-| Blubber checked | Verus kernel; bounded Kani typed checks (repository gates) | default UpTo(0); these mutable rows explicitly select Max; commit trims | native Pinocchio / Anchor v2 lazy and checked managed lifecycle (git pin) |
+| Blubber lazy | Verus kernel; bounded Kani typed checks (repository gates) | default UpTo(0); these mutable rows explicitly select Max; commit trims | native Pinocchio / Anchor v2 lazy and checked managed lifecycle (pinned SDK) |
+| Blubber checked | Verus kernel; bounded Kani typed checks (repository gates) | default UpTo(0); these mutable rows explicitly select Max; commit trims | native Pinocchio / Anchor v2 lazy and checked managed lifecycle (pinned SDK) |
 | Star Frame | Miri tests present; no formal proof inventory found | native SDK resizes during edits; no reserve | native older SDK / custom integration |
 | Bytemuck | No formal proof inventory found in inspected crate | none; full capacity reserved | raw bytes / raw bytes |
 | Sokoban | No formal proof inventory found in inspected crate | none; full capacity reserved | raw bytes / raw bytes |
@@ -203,11 +145,11 @@ Blubber checked scans the whole root on reads and edits. Blubber lazy checks tou
 | W2 | remove | 10 | 2,861 (+1,452) | 2,171 (+1,452) |
 | W2 | remove | 100 | 4,751 (+1,452) | 2,171 (+1,452) |
 | W2 | remove | 1000 | 24,257 (+2,058) | 2,777 (+2,058) |
-| W2 | set_all | 0 | 1,670 (+507) | 1,278 (+559) |
-| W2 | set_all | 1 | 1,825 (+621) | 1,392 (+673) |
-| W2 | set_all | 10 | 2,066 (+657) | 1,428 (+709) |
-| W2 | set_all | 100 | 4,316 (+1,017) | 1,788 (+1,069) |
-| W2 | set_all | 1000 | 26,816 (+4,617) | 5,388 (+4,669) |
+| W2 | set_all | 0 | 1,672 (+509) | 1,228 (+509) |
+| W2 | set_all | 1 | 1,828 (+624) | 1,343 (+624) |
+| W2 | set_all | 10 | 2,069 (+660) | 1,379 (+660) |
+| W2 | set_all | 100 | 4,319 (+1,020) | 1,739 (+1,020) |
+| W2 | set_all | 1000 | 26,819 (+4,620) | 5,339 (+4,620) |
 | W2 | iterate_sum | 0 | 1,033 (+23) | 638 (+23) |
 | W2 | iterate_sum | 1 | 1,146 (+59) | 710 (+55) |
 | W2 | iterate_sum | 10 | 1,513 (+221) | 854 (+199) |
@@ -228,31 +170,31 @@ Blubber checked scans the whole root on reads and edits. Blubber lazy checks tou
 | W3 | grow_one | 10 | 4,050 (+2,315) | 3,187 (+2,385) |
 | W3 | grow_one | 100 | 6,046 (+3,170) | 3,637 (+2,835) |
 | W3 | grow_one | 1000 | 28,267 (+12,116) | 8,533 (+7,731) |
-| W3 | grow_all | 0 | 1,995 (+629) | 1,813 (+1,011) |
-| W3 | grow_all | 1 | 2,493 (+985) | 2,155 (+1,353) |
-| W3 | grow_all | 10 | 3,081 (+1,346) | 2,615 (+1,813) |
-| W3 | grow_all | 100 | 7,102 (+4,226) | 6,485 (+5,683) |
-| W3 | grow_all | 1000 | 49,177 (+33,026) | 45,185 (+44,383) |
-| W3 | grow_all_old | 0 | 2,640 (+1,274) | 2,452 (+1,650) |
-| W3 | grow_all_old | 1 | 3,603 (+2,095) | 3,259 (+2,457) |
-| W3 | grow_all_old | 10 | 8,210 (+6,475) | 7,738 (+6,936) |
-| W3 | grow_all_old | 100 | 52,488 (+49,612) | 51,865 (+51,063) |
-| W3 | grow_all_old | 1000 | 496,277 (+480,126) | 492,279 (+491,477) |
+| W3 | grow_all | 0 | 1,951 (+585) | 1,625 (+823) |
+| W3 | grow_all | 1 | 2,490 (+982) | 2,128 (+1,326) |
+| W3 | grow_all | 10 | 3,073 (+1,338) | 2,583 (+1,781) |
+| W3 | grow_all | 100 | 7,094 (+4,218) | 6,453 (+5,651) |
+| W3 | grow_all | 1000 | 49,169 (+33,018) | 45,153 (+44,351) |
+| W3 | grow_all_old | 0 | 2,627 (+1,261) | 2,421 (+1,619) |
+| W3 | grow_all_old | 1 | 3,582 (+2,074) | 3,220 (+2,418) |
+| W3 | grow_all_old | 10 | 8,162 (+6,427) | 7,672 (+6,870) |
+| W3 | grow_all_old | 100 | 52,170 (+49,294) | 51,529 (+50,727) |
+| W3 | grow_all_old | 1000 | 493,259 (+477,108) | 489,243 (+488,441) |
 | W4 | lookup | 0 | 1,120 (+279) | 611 (+280) |
 | W4 | lookup | 1 | 1,988 (+912) | 1,244 (+913) |
 | W4 | lookup | 10 | 2,452 (+927) | 1,259 (+928) |
 | W4 | lookup | 100 | 5,663 (+927) | 1,259 (+928) |
 | W4 | lookup | 1000 | 39,638 (+927) | 1,259 (+928) |
-| W4 | insert_middle | 0 | 4,239 (+2,889) | 3,585 (+2,782) |
-| W4 | insert_middle | 1 | 5,238 (+3,653) | 4,326 (+3,523) |
-| W4 | insert_middle | 10 | 6,565 (+4,531) | 5,186 (+4,383) |
-| W4 | insert_middle | 100 | 11,681 (+6,436) | 7,046 (+6,243) |
-| W4 | insert_middle | 1000 | 64,103 (+24,883) | 25,043 (+24,240) |
-| W4 | grow_all_old | 0 | 2,666 (+1,316) | 2,491 (+1,688) |
-| W4 | grow_all_old | 1 | 3,764 (+2,179) | 3,453 (+2,650) |
-| W4 | grow_all_old | 10 | 8,599 (+6,565) | 8,160 (+7,357) |
-| W4 | grow_all_old | 100 | 55,487 (+50,242) | 54,897 (+54,094) |
-| W4 | grow_all_old | 1000 | 525,376 (+486,156) | 521,411 (+520,608) |
+| W4 | insert_middle | 0 | 4,236 (+2,890) | 3,582 (+2,783) |
+| W4 | insert_middle | 1 | 5,235 (+3,654) | 4,323 (+3,524) |
+| W4 | insert_middle | 10 | 6,562 (+4,532) | 5,183 (+4,384) |
+| W4 | insert_middle | 100 | 11,678 (+6,437) | 7,043 (+6,244) |
+| W4 | insert_middle | 1000 | 64,100 (+24,884) | 25,040 (+24,241) |
+| W4 | grow_all_old | 0 | 2,127 (+781) | 1,672 (+873) |
+| W4 | grow_all_old | 1 | 3,639 (+2,058) | 3,288 (+2,489) |
+| W4 | grow_all_old | 10 | 6,380 (+4,350) | 5,901 (+5,102) |
+| W4 | grow_all_old | 100 | 31,692 (+26,451) | 31,062 (+30,263) |
+| W4 | grow_all_old | 1000 | 287,210 (+247,994) | 283,205 (+282,406) |
 
 ## SBF v0, n=0
 
@@ -278,8 +220,8 @@ Cells are whole CU (signed operation delta from the matching load-only idle). "F
 | Library | lookup | insert_middle | remove | set_all | iterate_sum |
 |---|---|---|---|---|---|
 | Borsh | 351 (+11) | 662 (+338) | 424 (+100) | 421 (+97) | 348 (+8) |
-| Blubber lazy | 637 (+22) | 1,734 (+1,015) | 1,324 (+605) | 1,278 (+559) | 638 (+23) |
-| Blubber checked | 1,033 (+23) | 2,178 (+1,015) | 1,768 (+605) | 1,670 (+507) | 1,033 (+23) |
+| Blubber lazy | 637 (+22) | 1,734 (+1,015) | 1,324 (+605) | 1,228 (+509) | 638 (+23) |
+| Blubber checked | 1,033 (+23) | 2,178 (+1,015) | 1,768 (+605) | 1,672 (+509) | 1,033 (+23) |
 | Star Frame | 364 (+26) | 652 (+217) | 486 (+51) | 440 (+5) | 339 (+1) |
 | Sokoban | 279 (+10) | 360 (+89) | 279 (+8) | 338 (+67) | 337 (+68) |
 | Zeropod | 314 (+15) | 760 (+435) | 484 (+159) | 481 (+156) | 306 (+7) |
@@ -293,8 +235,8 @@ Cells are whole CU (signed operation delta from the matching load-only idle). "F
 | Library | read_all | set_equal | grow_one | grow_all | grow_all_old |
 |---|---|---|---|---|---|
 | Borsh | 325 (+3) | 390 (+86) | 388 (+84) | 389 (+85) | 390 (+86) |
-| Blubber lazy | 599 (+269) | 803 (+1) | 803 (+1) | 1,813 (+1,011) | 2,452 (+1,650) |
-| Blubber checked | 1,117 (+259) | 1,367 (+1) | 1,367 (+1) | 1,995 (+629) | 2,640 (+1,274) |
+| Blubber lazy | 599 (+269) | 803 (+1) | 803 (+1) | 1,625 (+823) | 2,421 (+1,619) |
+| Blubber checked | 1,117 (+259) | 1,367 (+1) | 1,367 (+1) | 1,951 (+585) | 2,627 (+1,261) |
 | Star Frame | 363 (+4) | 482 (+3) | 482 (+3) | 665 (+186) | 751 (+272) |
 | Zeropod | 303 (+4) | 499 (+193) | 497 (+191) | 498 (+192) | 499 (+193) |
 | Wincode | 394 (+10) | 584 (+138) | 582 (+136) | 583 (+137) | 584 (+138) |
@@ -305,8 +247,8 @@ Cells are whole CU (signed operation delta from the matching load-only idle). "F
 | Library | lookup | insert_middle | grow_all_old |
 |---|---|---|---|
 | Borsh | 345 (+11) | 744 (+421) | 413 (+90) |
-| Blubber lazy | 611 (+280) | 3,585 (+2,782) | 2,491 (+1,688) |
-| Blubber checked | 1,120 (+279) | 4,239 (+2,889) | 2,666 (+1,316) |
+| Blubber lazy | 611 (+280) | 3,582 (+2,783) | 1,672 (+873) |
+| Blubber checked | 1,120 (+279) | 4,236 (+2,890) | 2,127 (+781) |
 | Star Frame | 361 (+4) | 1,273 (+792) | 823 (+342) |
 | Zeropod | 307 (+6) | 907 (+571) | 532 (+196) |
 | Wincode | 384 (+10) | 892 (+505) | 525 (+138) |
@@ -335,8 +277,8 @@ Cells are whole CU (signed operation delta from the matching load-only idle). "F
 | Library | lookup | insert_middle | remove | set_all | iterate_sum |
 |---|---|---|---|---|---|
 | Borsh | 698 (+58) | 1,140 (+516) | 891 (+267) | 853 (+229) | 682 (+42) |
-| Blubber lazy | 974 (+319) | 2,031 (+1,312) | 1,856 (+1,137) | 1,392 (+673) | 710 (+55) |
-| Blubber checked | 1,406 (+319) | 2,516 (+1,312) | 2,341 (+1,137) | 1,825 (+621) | 1,146 (+59) |
+| Blubber lazy | 974 (+319) | 2,031 (+1,312) | 1,856 (+1,137) | 1,343 (+624) | 710 (+55) |
+| Blubber checked | 1,406 (+319) | 2,516 (+1,312) | 2,341 (+1,137) | 1,828 (+624) | 1,146 (+59) |
 | Star Frame | 537 (+199) | 784 (+349) | 740 (+305) | 448 (+13) | 362 (+24) |
 | Sokoban | 325 (+56) | 445 (+174) | 369 (+98) | 504 (+233) | 511 (+242) |
 | Zeropod | 426 (+127) | 1,301 (+586) | 1,085 (+370) | 983 (+268) | 321 (+22) |
@@ -350,8 +292,8 @@ Cells are whole CU (signed operation delta from the matching load-only idle). "F
 | Library | read_all | set_equal | grow_one | grow_all | grow_all_old |
 |---|---|---|---|---|---|
 | Borsh | 766 (+112) | 853 (+217) | 895 (+259) | 894 (+258) | 993 (+357) |
-| Blubber lazy | 941 (+611) | 2,366 (+1,564) | 2,693 (+1,891) | 2,155 (+1,353) | 3,259 (+2,457) |
-| Blubber checked | 1,606 (+606) | 3,053 (+1,545) | 3,398 (+1,890) | 2,493 (+985) | 3,603 (+2,095) |
+| Blubber lazy | 941 (+611) | 2,366 (+1,564) | 2,693 (+1,891) | 2,128 (+1,326) | 3,220 (+2,418) |
+| Blubber checked | 1,606 (+606) | 3,053 (+1,545) | 3,398 (+1,890) | 2,490 (+982) | 3,582 (+2,074) |
 | Star Frame | 664 (+305) | 847 (+368) | 1,114 (+635) | 1,039 (+560) | 1,490 (+1,011) |
 | Zeropod | 559 (+122) | 1,042 (+476) | 1,142 (+576) | 1,141 (+575) | 1,240 (+674) |
 | Wincode | 676 (+121) | 1,062 (+321) | 1,104 (+363) | 1,103 (+362) | 1,202 (+461) |
@@ -362,8 +304,8 @@ Cells are whole CU (signed operation delta from the matching load-only idle). "F
 | Library | lookup | insert_middle | grow_all_old |
 |---|---|---|---|
 | Borsh | 1,180 (+150) | 1,662 (+643) | 1,460 (+441) |
-| Blubber lazy | 1,244 (+913) | 4,326 (+3,523) | 3,453 (+2,650) |
-| Blubber checked | 1,988 (+912) | 5,238 (+3,653) | 3,764 (+2,179) |
+| Blubber lazy | 1,244 (+913) | 4,323 (+3,524) | 3,288 (+2,489) |
+| Blubber checked | 1,988 (+912) | 5,235 (+3,654) | 3,639 (+2,058) |
 | Star Frame | 678 (+321) | 1,451 (+970) | 1,689 (+1,208) |
 | Zeropod | 639 (+197) | 1,913 (+941) | 1,736 (+764) |
 | Wincode | 750 (+158) | 1,587 (+755) | 1,358 (+526) |
@@ -392,8 +334,8 @@ Cells are whole CU (signed operation delta from the matching load-only idle). "F
 | Library | lookup | insert_middle | remove | set_all | iterate_sum |
 |---|---|---|---|---|---|
 | Borsh | 2,473 (+158) | 3,825 (+1,526) | 3,571 (+1,272) | 3,617 (+1,318) | 2,618 (+303) |
-| Blubber lazy | 974 (+319) | 2,493 (+1,774) | 2,171 (+1,452) | 1,428 (+709) | 854 (+199) |
-| Blubber checked | 1,611 (+319) | 3,183 (+1,774) | 2,861 (+1,452) | 2,066 (+657) | 1,513 (+221) |
+| Blubber lazy | 974 (+319) | 2,493 (+1,774) | 2,171 (+1,452) | 1,379 (+660) | 854 (+199) |
+| Blubber checked | 1,611 (+319) | 3,183 (+1,774) | 2,861 (+1,452) | 2,069 (+660) | 1,513 (+221) |
 | Star Frame | 537 (+199) | 955 (+520) | 758 (+323) | 502 (+67) | 515 (+177) |
 | Sokoban | 354 (+85) | 549 (+278) | 731 (+460) | 1,281 (+1,010) | 1,351 (+1,082) |
 | Zeropod | 426 (+127) | 4,236 (+1,344) | 4,021 (+1,129) | 3,997 (+1,105) | 420 (+121) |
@@ -407,8 +349,8 @@ Cells are whole CU (signed operation delta from the matching load-only idle). "F
 | Library | read_all | set_equal | grow_one | grow_all | grow_all_old |
 |---|---|---|---|---|---|
 | Borsh | 4,276 (+1,075) | 4,147 (+964) | 4,189 (+1,006) | 4,458 (+1,275) | 5,457 (+2,274) |
-| Blubber lazy | 3,557 (+3,227) | 2,506 (+1,704) | 3,187 (+2,385) | 2,615 (+1,813) | 7,738 (+6,936) |
-| Blubber checked | 4,431 (+3,204) | 3,419 (+1,684) | 4,050 (+2,315) | 3,081 (+1,346) | 8,210 (+6,475) |
+| Blubber lazy | 3,557 (+3,227) | 2,506 (+1,704) | 3,187 (+2,385) | 2,583 (+1,781) | 7,672 (+6,870) |
+| Blubber checked | 4,431 (+3,204) | 3,419 (+1,684) | 4,050 (+2,315) | 3,073 (+1,338) | 8,162 (+6,427) |
 | Star Frame | 3,154 (+2,795) | 847 (+368) | 1,212 (+733) | 2,857 (+2,378) | 6,329 (+5,850) |
 | Zeropod | 2,938 (+1,157) | 5,447 (+2,621) | 5,547 (+2,721) | 5,816 (+2,990) | 6,815 (+3,989) |
 | Wincode | 2,773 (+1,084) | 4,608 (+1,491) | 4,650 (+1,533) | 4,919 (+1,802) | 5,918 (+2,801) |
@@ -419,8 +361,8 @@ Cells are whole CU (signed operation delta from the matching load-only idle). "F
 | Library | lookup | insert_middle | grow_all_old |
 |---|---|---|---|
 | Borsh | 5,896 (+250) | 7,738 (+2,103) | 8,731 (+3,096) |
-| Blubber lazy | 1,259 (+928) | 5,186 (+4,383) | 8,160 (+7,357) |
-| Blubber checked | 2,452 (+927) | 6,565 (+4,531) | 8,599 (+6,565) |
+| Blubber lazy | 1,259 (+928) | 5,183 (+4,384) | 5,901 (+5,102) |
+| Blubber checked | 2,452 (+927) | 6,562 (+4,532) | 6,380 (+4,350) |
 | Star Frame | 759 (+402) | 1,679 (+1,198) | 9,057 (+8,576) |
 | Zeropod | 2,120 (+307) | 8,571 (+3,781) | 9,589 (+4,799) |
 | Wincode | 3,795 (+278) | 8,078 (+2,458) | 9,044 (+3,424) |
@@ -449,8 +391,8 @@ Cells are whole CU (signed operation delta from the matching load-only idle). "F
 | Library | lookup | insert_middle | remove | set_all | iterate_sum |
 |---|---|---|---|---|---|
 | Borsh | 19,818 (+218) | 30,758 (+11,174) | 30,136 (+10,552) | 32,145 (+12,561) | 22,636 (+3,036) |
-| Blubber lazy | 974 (+319) | 2,868 (+2,149) | 2,171 (+1,452) | 1,788 (+1,069) | 2,294 (+1,639) |
-| Blubber checked | 3,501 (+319) | 5,448 (+2,149) | 4,751 (+1,452) | 4,316 (+1,017) | 5,023 (+1,841) |
+| Blubber lazy | 974 (+319) | 2,868 (+2,149) | 2,171 (+1,452) | 1,739 (+1,020) | 2,294 (+1,639) |
+| Blubber checked | 3,501 (+319) | 5,448 (+2,149) | 4,751 (+1,452) | 4,319 (+1,020) | 5,023 (+1,841) |
 | Star Frame | 537 (+199) | 1,210 (+775) | 758 (+323) | 1,042 (+607) | 2,045 (+1,707) |
 | Sokoban | 496 (+227) | 671 (+400) | 1,198 (+927) | 9,050 (+8,779) | 9,750 (+9,481) |
 | Zeropod | 426 (+127) | 33,710 (+8,583) | 33,115 (+7,988) | 35,054 (+9,927) | 1,410 (+1,111) |
@@ -464,8 +406,8 @@ Cells are whole CU (signed operation delta from the matching load-only idle). "F
 | Library | read_all | set_equal | grow_one | grow_all | grow_all_old |
 |---|---|---|---|---|---|
 | Borsh | 39,376 (+10,705) | 37,087 (+8,434) | 37,129 (+8,476) | 40,098 (+11,445) | 50,097 (+21,444) |
-| Blubber lazy | 29,477 (+29,147) | 2,506 (+1,704) | 3,637 (+2,835) | 6,485 (+5,683) | 51,865 (+51,063) |
-| Blubber checked | 31,312 (+28,944) | 4,560 (+1,684) | 6,046 (+3,170) | 7,102 (+4,226) | 52,488 (+49,612) |
+| Blubber lazy | 29,477 (+29,147) | 2,506 (+1,704) | 3,637 (+2,835) | 6,453 (+5,651) | 51,529 (+50,727) |
+| Blubber checked | 31,312 (+28,944) | 4,560 (+1,684) | 6,046 (+3,170) | 7,094 (+4,218) | 52,170 (+49,294) |
 | Star Frame | 28,174 (+27,815) | 847 (+368) | 1,518 (+1,039) | 21,037 (+20,558) | 54,839 (+54,360) |
 | Zeropod | 26,608 (+11,507) | 49,187 (+23,951) | 49,287 (+24,051) | 52,256 (+27,020) | 62,255 (+37,019) |
 | Wincode | 23,743 (+10,714) | 40,068 (+13,191) | 40,110 (+13,233) | 43,079 (+16,202) | 53,078 (+26,201) |
@@ -476,8 +418,8 @@ Cells are whole CU (signed operation delta from the matching load-only idle). "F
 | Library | lookup | insert_middle | grow_all_old |
 |---|---|---|---|
 | Borsh | 52,915 (+310) | 68,917 (+16,323) | 82,617 (+30,023) |
-| Blubber lazy | 1,259 (+928) | 7,046 (+6,243) | 54,897 (+54,094) |
-| Blubber checked | 5,663 (+927) | 11,681 (+6,436) | 55,487 (+50,242) |
+| Blubber lazy | 1,259 (+928) | 7,043 (+6,244) | 31,062 (+30,263) |
+| Blubber checked | 5,663 (+927) | 11,678 (+6,437) | 31,692 (+26,451) |
 | Star Frame | 789 (+432) | 2,354 (+1,873) | 106,465 (+105,984) |
 | Zeropod | 16,700 (+1,297) | 75,279 (+31,801) | 88,991 (+45,513) |
 | Wincode | 55,881 (+276) | 95,771 (+18,807) | 110,020 (+33,056) |
@@ -506,8 +448,8 @@ Cells are whole CU (signed operation delta from the matching load-only idle). "F
 | Library | lookup | insert_middle | remove | set_all | iterate_sum |
 |---|---|---|---|---|---|
 | Borsh | 188,944 (+458) | 292,449 (+103,979) | 291,444 (+102,974) | 313,381 (+124,911) | 218,822 (+30,336) |
-| Blubber lazy | 974 (+319) | 5,487 (+4,768) | 2,777 (+2,058) | 5,388 (+4,669) | 16,694 (+16,039) |
-| Blubber checked | 22,401 (+319) | 26,967 (+4,768) | 24,257 (+2,058) | 26,816 (+4,617) | 40,123 (+18,041) |
+| Blubber lazy | 974 (+319) | 5,487 (+4,768) | 2,777 (+2,058) | 5,339 (+4,620) | 16,694 (+16,039) |
+| Blubber checked | 22,401 (+319) | 26,967 (+4,768) | 24,257 (+2,058) | 26,819 (+4,620) | 40,123 (+18,041) |
 | Star Frame | 537 (+199) | 1,535 (+1,100) | 827 (+392) | 6,442 (+6,007) | 17,345 (+17,007) |
 | Sokoban | 583 (+314) | full | 1,525 (+1,254) | 85,669 (+85,398) | 92,669 (+92,400) |
 | Zeropod | 426 (+127) | 319,832 (+77,175) | 318,842 (+76,185) | 340,709 (+98,052) | 11,310 (+11,011) |
@@ -521,8 +463,8 @@ Cells are whole CU (signed operation delta from the matching load-only idle). "F
 | Library | read_all | set_equal | grow_one | grow_all | grow_all_old |
 |---|---|---|---|---|---|
 | Borsh | 390,946 (+107,005) | 367,057 (+83,134) | 367,099 (+83,176) | 397,094 (+113,171) | 497,093 (+213,170) |
-| Blubber lazy | 288,677 (+288,347) | 2,506 (+1,704) | 8,533 (+7,731) | 45,185 (+44,383) | 492,279 (+491,477) |
-| Blubber checked | 301,987 (+286,344) | 17,835 (+1,684) | 28,267 (+12,116) | 49,177 (+33,026) | 496,277 (+480,126) |
+| Blubber lazy | 288,677 (+288,347) | 2,506 (+1,704) | 8,533 (+7,731) | 45,153 (+44,351) | 489,243 (+488,441) |
+| Blubber checked | 301,987 (+286,344) | 17,835 (+1,684) | 28,267 (+12,116) | 49,169 (+33,018) | 493,259 (+477,108) |
 | Star Frame | 278,374 (+278,015) | 847 (+368) | 4,268 (+3,789) | 202,917 (+202,438) | 540,019 (+539,540) |
 | Zeropod | 263,308 (+115,007) | 486,587 (+237,251) | 486,687 (+237,351) | 516,682 (+267,346) | 616,681 (+367,345) |
 | Wincode | 233,443 (+107,014) | 394,668 (+130,191) | 394,710 (+130,233) | 424,705 (+160,228) | 524,704 (+260,227) |
@@ -533,8 +475,8 @@ Cells are whole CU (signed operation delta from the matching load-only idle). "F
 | Library | lookup | insert_middle | grow_all_old |
 |---|---|---|---|
 | Borsh | 516,918 (+550) | 670,748 (+154,391) | heap exhausted |
-| Blubber lazy | 1,259 (+928) | 25,043 (+24,240) | 521,411 (+520,608) |
-| Blubber checked | 39,638 (+927) | 64,103 (+24,883) | 525,376 (+486,156) |
+| Blubber lazy | 1,259 (+928) | 25,040 (+24,241) | 283,205 (+282,406) |
+| Blubber checked | 39,638 (+927) | 64,100 (+24,884) | 287,210 (+247,994) |
 | Star Frame | 843 (+486) | 8,003 (+7,522) | 1,287,238 (+1,286,757) |
 | Zeropod | 161,351 (+10,048) | 733,283 (+307,731) | 878,116 (+452,564) |
 | Wincode | 783,389 (+491) | 1,181,955 (+182,659) | 1,328,841 (+329,545) |
@@ -583,11 +525,11 @@ Cells are whole CU (signed operation delta from the matching load-only idle). "F
 | W2 | remove | 10 | 2,863 (+1,457) | 2,173 (+1,457) |
 | W2 | remove | 100 | 4,753 (+1,457) | 2,173 (+1,457) |
 | W2 | remove | 1000 | 24,259 (+2,063) | 2,779 (+2,063) |
-| W2 | set_all | 0 | 1,667 (+507) | 1,275 (+559) |
-| W2 | set_all | 1 | 1,822 (+621) | 1,389 (+673) |
-| W2 | set_all | 10 | 2,063 (+657) | 1,425 (+709) |
-| W2 | set_all | 100 | 4,313 (+1,017) | 1,785 (+1,069) |
-| W2 | set_all | 1000 | 26,813 (+4,617) | 5,385 (+4,669) |
+| W2 | set_all | 0 | 1,669 (+509) | 1,225 (+509) |
+| W2 | set_all | 1 | 1,825 (+624) | 1,340 (+624) |
+| W2 | set_all | 10 | 2,066 (+660) | 1,376 (+660) |
+| W2 | set_all | 100 | 4,316 (+1,020) | 1,736 (+1,020) |
+| W2 | set_all | 1000 | 26,816 (+4,620) | 5,336 (+4,620) |
 | W2 | iterate_sum | 0 | 1,030 (+23) | 635 (+23) |
 | W2 | iterate_sum | 1 | 1,143 (+59) | 707 (+55) |
 | W2 | iterate_sum | 10 | 1,510 (+221) | 851 (+199) |
@@ -608,31 +550,31 @@ Cells are whole CU (signed operation delta from the matching load-only idle). "F
 | W3 | grow_one | 10 | 4,036 (+2,312) | 3,178 (+2,379) |
 | W3 | grow_one | 100 | 6,032 (+3,167) | 3,628 (+2,829) |
 | W3 | grow_one | 1000 | 28,259 (+12,119) | 8,530 (+7,731) |
-| W3 | grow_all | 0 | 1,986 (+629) | 1,808 (+1,009) |
-| W3 | grow_all | 1 | 2,482 (+985) | 2,150 (+1,351) |
-| W3 | grow_all | 10 | 3,099 (+1,375) | 2,639 (+1,840) |
-| W3 | grow_all | 100 | 7,480 (+4,615) | 6,869 (+6,070) |
-| W3 | grow_all | 1000 | 53,155 (+37,015) | 49,169 (+48,370) |
-| W3 | grow_all_old | 0 | 2,631 (+1,274) | 2,448 (+1,649) |
-| W3 | grow_all_old | 1 | 3,592 (+2,095) | 3,255 (+2,456) |
-| W3 | grow_all_old | 10 | 8,199 (+6,475) | 7,734 (+6,935) |
-| W3 | grow_all_old | 100 | 52,477 (+49,612) | 51,861 (+51,062) |
-| W3 | grow_all_old | 1000 | 496,266 (+480,126) | 492,275 (+491,476) |
+| W3 | grow_all | 0 | 1,942 (+585) | 1,620 (+821) |
+| W3 | grow_all | 1 | 2,480 (+983) | 2,124 (+1,325) |
+| W3 | grow_all | 10 | 3,093 (+1,369) | 2,609 (+1,810) |
+| W3 | grow_all | 100 | 7,474 (+4,609) | 6,839 (+6,040) |
+| W3 | grow_all | 1000 | 53,149 (+37,009) | 49,139 (+48,340) |
+| W3 | grow_all_old | 0 | 2,618 (+1,261) | 2,416 (+1,617) |
+| W3 | grow_all_old | 1 | 3,571 (+2,074) | 3,215 (+2,416) |
+| W3 | grow_all_old | 10 | 8,151 (+6,427) | 7,667 (+6,868) |
+| W3 | grow_all_old | 100 | 52,159 (+49,294) | 51,524 (+50,725) |
+| W3 | grow_all_old | 1000 | 493,248 (+477,108) | 489,238 (+488,439) |
 | W4 | lookup | 0 | 1,110 (+279) | 608 (+280) |
 | W4 | lookup | 1 | 1,973 (+909) | 1,238 (+910) |
 | W4 | lookup | 10 | 2,439 (+926) | 1,255 (+927) |
 | W4 | lookup | 100 | 5,650 (+926) | 1,255 (+927) |
 | W4 | lookup | 1000 | 39,625 (+926) | 1,255 (+927) |
-| W4 | insert_middle | 0 | 4,212 (+2,872) | 3,580 (+2,780) |
-| W4 | insert_middle | 1 | 5,214 (+3,641) | 4,328 (+3,528) |
-| W4 | insert_middle | 10 | 6,536 (+4,514) | 5,185 (+4,385) |
-| W4 | insert_middle | 100 | 11,654 (+6,421) | 7,047 (+6,247) |
-| W4 | insert_middle | 1000 | 64,120 (+24,912) | 25,088 (+24,288) |
-| W4 | grow_all_old | 0 | 2,656 (+1,316) | 2,487 (+1,687) |
-| W4 | grow_all_old | 1 | 3,752 (+2,179) | 3,449 (+2,649) |
-| W4 | grow_all_old | 10 | 8,587 (+6,565) | 8,156 (+7,356) |
-| W4 | grow_all_old | 100 | 55,475 (+50,242) | 54,893 (+54,093) |
-| W4 | grow_all_old | 1000 | 525,364 (+486,156) | 521,407 (+520,607) |
+| W4 | insert_middle | 0 | 4,209 (+2,873) | 3,577 (+2,781) |
+| W4 | insert_middle | 1 | 5,211 (+3,642) | 4,325 (+3,529) |
+| W4 | insert_middle | 10 | 6,533 (+4,515) | 5,182 (+4,386) |
+| W4 | insert_middle | 100 | 11,651 (+6,422) | 7,044 (+6,248) |
+| W4 | insert_middle | 1000 | 64,117 (+24,913) | 25,085 (+24,289) |
+| W4 | grow_all_old | 0 | 2,117 (+781) | 1,669 (+873) |
+| W4 | grow_all_old | 1 | 3,627 (+2,058) | 3,281 (+2,485) |
+| W4 | grow_all_old | 10 | 6,344 (+4,326) | 5,870 (+5,074) |
+| W4 | grow_all_old | 100 | 31,476 (+26,247) | 30,851 (+30,055) |
+| W4 | grow_all_old | 1000 | 285,194 (+245,990) | 281,194 (+280,398) |
 
 ## SBF v3, n=0
 
@@ -658,8 +600,8 @@ Cells are whole CU (signed operation delta from the matching load-only idle). "F
 | Library | lookup | insert_middle | remove | set_all | iterate_sum |
 |---|---|---|---|---|---|
 | Borsh | 350 (+11) | 661 (+338) | 423 (+100) | 420 (+97) | 347 (+8) |
-| Blubber lazy | 634 (+22) | 1,724 (+1,008) | 1,324 (+608) | 1,275 (+559) | 635 (+23) |
-| Blubber checked | 1,030 (+23) | 2,168 (+1,008) | 1,768 (+608) | 1,667 (+507) | 1,030 (+23) |
+| Blubber lazy | 634 (+22) | 1,724 (+1,008) | 1,324 (+608) | 1,225 (+509) | 635 (+23) |
+| Blubber checked | 1,030 (+23) | 2,168 (+1,008) | 1,768 (+608) | 1,669 (+509) | 1,030 (+23) |
 | Star Frame | 364 (+26) | 652 (+217) | 486 (+51) | 440 (+5) | 339 (+1) |
 | Sokoban | 278 (+10) | 359 (+89) | 278 (+8) | 337 (+67) | 336 (+68) |
 | Zeropod | 313 (+15) | 759 (+435) | 483 (+159) | 480 (+156) | 305 (+7) |
@@ -673,8 +615,8 @@ Cells are whole CU (signed operation delta from the matching load-only idle). "F
 | Library | read_all | set_equal | grow_one | grow_all | grow_all_old |
 |---|---|---|---|---|---|
 | Borsh | 324 (+3) | 389 (+86) | 387 (+84) | 388 (+85) | 389 (+86) |
-| Blubber lazy | 596 (+269) | 800 (+1) | 800 (+1) | 1,808 (+1,009) | 2,448 (+1,649) |
-| Blubber checked | 1,108 (+259) | 1,358 (+1) | 1,358 (+1) | 1,986 (+629) | 2,631 (+1,274) |
+| Blubber lazy | 596 (+269) | 800 (+1) | 800 (+1) | 1,620 (+821) | 2,416 (+1,617) |
+| Blubber checked | 1,108 (+259) | 1,358 (+1) | 1,358 (+1) | 1,942 (+585) | 2,618 (+1,261) |
 | Star Frame | 363 (+4) | 482 (+3) | 482 (+3) | 665 (+186) | 751 (+272) |
 | Zeropod | 302 (+4) | 498 (+193) | 496 (+191) | 497 (+192) | 498 (+193) |
 | Wincode | 393 (+10) | 583 (+138) | 581 (+136) | 582 (+137) | 583 (+138) |
@@ -685,8 +627,8 @@ Cells are whole CU (signed operation delta from the matching load-only idle). "F
 | Library | lookup | insert_middle | grow_all_old |
 |---|---|---|---|
 | Borsh | 344 (+11) | 743 (+421) | 412 (+90) |
-| Blubber lazy | 608 (+280) | 3,580 (+2,780) | 2,487 (+1,687) |
-| Blubber checked | 1,110 (+279) | 4,212 (+2,872) | 2,656 (+1,316) |
+| Blubber lazy | 608 (+280) | 3,577 (+2,781) | 1,669 (+873) |
+| Blubber checked | 1,110 (+279) | 4,209 (+2,873) | 2,117 (+781) |
 | Star Frame | 361 (+4) | 1,273 (+792) | 823 (+342) |
 | Zeropod | 306 (+6) | 906 (+571) | 531 (+196) |
 | Wincode | 383 (+10) | 891 (+505) | 524 (+138) |
@@ -715,8 +657,8 @@ Cells are whole CU (signed operation delta from the matching load-only idle). "F
 | Library | lookup | insert_middle | remove | set_all | iterate_sum |
 |---|---|---|---|---|---|
 | Borsh | 697 (+58) | 1,139 (+516) | 890 (+267) | 852 (+229) | 681 (+42) |
-| Blubber lazy | 971 (+319) | 2,030 (+1,314) | 1,859 (+1,143) | 1,389 (+673) | 707 (+55) |
-| Blubber checked | 1,403 (+319) | 2,515 (+1,314) | 2,344 (+1,143) | 1,822 (+621) | 1,143 (+59) |
+| Blubber lazy | 971 (+319) | 2,030 (+1,314) | 1,859 (+1,143) | 1,340 (+624) | 707 (+55) |
+| Blubber checked | 1,403 (+319) | 2,515 (+1,314) | 2,344 (+1,143) | 1,825 (+624) | 1,143 (+59) |
 | Star Frame | 537 (+199) | 784 (+349) | 740 (+305) | 448 (+13) | 362 (+24) |
 | Sokoban | 324 (+56) | 444 (+174) | 368 (+98) | 503 (+233) | 510 (+242) |
 | Zeropod | 425 (+127) | 1,300 (+586) | 1,084 (+370) | 982 (+268) | 320 (+22) |
@@ -730,8 +672,8 @@ Cells are whole CU (signed operation delta from the matching load-only idle). "F
 | Library | read_all | set_equal | grow_one | grow_all | grow_all_old |
 |---|---|---|---|---|---|
 | Borsh | 765 (+112) | 852 (+217) | 894 (+259) | 893 (+258) | 992 (+357) |
-| Blubber lazy | 938 (+611) | 2,358 (+1,559) | 2,684 (+1,885) | 2,150 (+1,351) | 3,255 (+2,456) |
-| Blubber checked | 1,595 (+606) | 3,037 (+1,540) | 3,382 (+1,885) | 2,482 (+985) | 3,592 (+2,095) |
+| Blubber lazy | 938 (+611) | 2,358 (+1,559) | 2,684 (+1,885) | 2,124 (+1,325) | 3,215 (+2,416) |
+| Blubber checked | 1,595 (+606) | 3,037 (+1,540) | 3,382 (+1,885) | 2,480 (+983) | 3,571 (+2,074) |
 | Star Frame | 664 (+305) | 847 (+368) | 1,114 (+635) | 1,039 (+560) | 1,490 (+1,011) |
 | Zeropod | 558 (+122) | 1,041 (+476) | 1,141 (+576) | 1,140 (+575) | 1,239 (+674) |
 | Wincode | 675 (+121) | 1,061 (+321) | 1,103 (+363) | 1,102 (+362) | 1,201 (+461) |
@@ -742,8 +684,8 @@ Cells are whole CU (signed operation delta from the matching load-only idle). "F
 | Library | lookup | insert_middle | grow_all_old |
 |---|---|---|---|
 | Borsh | 1,179 (+150) | 1,661 (+643) | 1,459 (+441) |
-| Blubber lazy | 1,238 (+910) | 4,328 (+3,528) | 3,449 (+2,649) |
-| Blubber checked | 1,973 (+909) | 5,214 (+3,641) | 3,752 (+2,179) |
+| Blubber lazy | 1,238 (+910) | 4,325 (+3,529) | 3,281 (+2,485) |
+| Blubber checked | 1,973 (+909) | 5,211 (+3,642) | 3,627 (+2,058) |
 | Star Frame | 678 (+321) | 1,451 (+970) | 1,689 (+1,208) |
 | Zeropod | 638 (+197) | 1,912 (+941) | 1,735 (+764) |
 | Wincode | 749 (+158) | 1,586 (+755) | 1,357 (+526) |
@@ -772,8 +714,8 @@ Cells are whole CU (signed operation delta from the matching load-only idle). "F
 | Library | lookup | insert_middle | remove | set_all | iterate_sum |
 |---|---|---|---|---|---|
 | Borsh | 2,472 (+158) | 3,824 (+1,526) | 3,570 (+1,272) | 3,616 (+1,318) | 2,617 (+303) |
-| Blubber lazy | 971 (+319) | 2,489 (+1,773) | 2,173 (+1,457) | 1,425 (+709) | 851 (+199) |
-| Blubber checked | 1,608 (+319) | 3,179 (+1,773) | 2,863 (+1,457) | 2,063 (+657) | 1,510 (+221) |
+| Blubber lazy | 971 (+319) | 2,489 (+1,773) | 2,173 (+1,457) | 1,376 (+660) | 851 (+199) |
+| Blubber checked | 1,608 (+319) | 3,179 (+1,773) | 2,863 (+1,457) | 2,066 (+660) | 1,510 (+221) |
 | Star Frame | 537 (+199) | 955 (+520) | 758 (+323) | 502 (+67) | 515 (+177) |
 | Sokoban | 353 (+85) | 548 (+278) | 730 (+460) | 1,280 (+1,010) | 1,350 (+1,082) |
 | Zeropod | 425 (+127) | 4,235 (+1,344) | 4,020 (+1,129) | 3,996 (+1,105) | 419 (+121) |
@@ -787,8 +729,8 @@ Cells are whole CU (signed operation delta from the matching load-only idle). "F
 | Library | read_all | set_equal | grow_one | grow_all | grow_all_old |
 |---|---|---|---|---|---|
 | Borsh | 4,275 (+1,075) | 4,146 (+964) | 4,188 (+1,006) | 4,457 (+1,275) | 5,456 (+2,274) |
-| Blubber lazy | 3,554 (+3,227) | 2,500 (+1,701) | 3,178 (+2,379) | 2,639 (+1,840) | 7,734 (+6,935) |
-| Blubber checked | 4,420 (+3,204) | 3,405 (+1,681) | 4,036 (+2,312) | 3,099 (+1,375) | 8,199 (+6,475) |
+| Blubber lazy | 3,554 (+3,227) | 2,500 (+1,701) | 3,178 (+2,379) | 2,609 (+1,810) | 7,667 (+6,868) |
+| Blubber checked | 4,420 (+3,204) | 3,405 (+1,681) | 4,036 (+2,312) | 3,093 (+1,369) | 8,151 (+6,427) |
 | Star Frame | 3,154 (+2,795) | 847 (+368) | 1,212 (+733) | 2,857 (+2,378) | 6,329 (+5,850) |
 | Zeropod | 2,937 (+1,157) | 5,446 (+2,621) | 5,546 (+2,721) | 5,815 (+2,990) | 6,814 (+3,989) |
 | Wincode | 2,772 (+1,084) | 4,607 (+1,491) | 4,649 (+1,533) | 4,918 (+1,802) | 5,917 (+2,801) |
@@ -799,8 +741,8 @@ Cells are whole CU (signed operation delta from the matching load-only idle). "F
 | Library | lookup | insert_middle | grow_all_old |
 |---|---|---|---|
 | Borsh | 5,895 (+250) | 7,737 (+2,103) | 8,730 (+3,096) |
-| Blubber lazy | 1,255 (+927) | 5,185 (+4,385) | 8,156 (+7,356) |
-| Blubber checked | 2,439 (+926) | 6,536 (+4,514) | 8,587 (+6,565) |
+| Blubber lazy | 1,255 (+927) | 5,182 (+4,386) | 5,870 (+5,074) |
+| Blubber checked | 2,439 (+926) | 6,533 (+4,515) | 6,344 (+4,326) |
 | Star Frame | 759 (+402) | 1,679 (+1,198) | 9,057 (+8,576) |
 | Zeropod | 2,119 (+307) | 8,570 (+3,781) | 9,588 (+4,799) |
 | Wincode | 3,794 (+278) | 8,077 (+2,458) | 9,043 (+3,424) |
@@ -829,8 +771,8 @@ Cells are whole CU (signed operation delta from the matching load-only idle). "F
 | Library | lookup | insert_middle | remove | set_all | iterate_sum |
 |---|---|---|---|---|---|
 | Borsh | 19,814 (+218) | 30,754 (+11,174) | 30,132 (+10,552) | 32,141 (+12,561) | 22,632 (+3,036) |
-| Blubber lazy | 971 (+319) | 2,866 (+2,150) | 2,173 (+1,457) | 1,785 (+1,069) | 2,291 (+1,639) |
-| Blubber checked | 3,498 (+319) | 5,446 (+2,150) | 4,753 (+1,457) | 4,313 (+1,017) | 5,020 (+1,841) |
+| Blubber lazy | 971 (+319) | 2,866 (+2,150) | 2,173 (+1,457) | 1,736 (+1,020) | 2,291 (+1,639) |
+| Blubber checked | 3,498 (+319) | 5,446 (+2,150) | 4,753 (+1,457) | 4,316 (+1,020) | 5,020 (+1,841) |
 | Star Frame | 537 (+199) | 1,210 (+775) | 758 (+323) | 1,042 (+607) | 2,045 (+1,707) |
 | Sokoban | 495 (+227) | 670 (+400) | 1,197 (+927) | 9,049 (+8,779) | 9,749 (+9,481) |
 | Zeropod | 425 (+127) | 33,706 (+8,583) | 33,111 (+7,988) | 35,050 (+9,927) | 1,409 (+1,111) |
@@ -844,8 +786,8 @@ Cells are whole CU (signed operation delta from the matching load-only idle). "F
 | Library | read_all | set_equal | grow_one | grow_all | grow_all_old |
 |---|---|---|---|---|---|
 | Borsh | 39,375 (+10,705) | 37,086 (+8,434) | 37,128 (+8,476) | 40,097 (+11,445) | 50,096 (+21,444) |
-| Blubber lazy | 29,474 (+29,147) | 2,500 (+1,701) | 3,628 (+2,829) | 6,869 (+6,070) | 51,861 (+51,062) |
-| Blubber checked | 31,301 (+28,944) | 4,546 (+1,681) | 6,032 (+3,167) | 7,480 (+4,615) | 52,477 (+49,612) |
+| Blubber lazy | 29,474 (+29,147) | 2,500 (+1,701) | 3,628 (+2,829) | 6,839 (+6,040) | 51,524 (+50,725) |
+| Blubber checked | 31,301 (+28,944) | 4,546 (+1,681) | 6,032 (+3,167) | 7,474 (+4,609) | 52,159 (+49,294) |
 | Star Frame | 28,174 (+27,815) | 847 (+368) | 1,518 (+1,039) | 21,037 (+20,558) | 54,839 (+54,360) |
 | Zeropod | 26,607 (+11,507) | 49,186 (+23,951) | 49,286 (+24,051) | 52,255 (+27,020) | 62,254 (+37,019) |
 | Wincode | 23,742 (+10,714) | 40,067 (+13,191) | 40,109 (+13,233) | 43,078 (+16,202) | 53,077 (+26,201) |
@@ -856,8 +798,8 @@ Cells are whole CU (signed operation delta from the matching load-only idle). "F
 | Library | lookup | insert_middle | grow_all_old |
 |---|---|---|---|
 | Borsh | 52,911 (+310) | 68,913 (+16,323) | 82,613 (+30,023) |
-| Blubber lazy | 1,255 (+927) | 7,047 (+6,247) | 54,893 (+54,093) |
-| Blubber checked | 5,650 (+926) | 11,654 (+6,421) | 55,475 (+50,242) |
+| Blubber lazy | 1,255 (+927) | 7,044 (+6,248) | 30,851 (+30,055) |
+| Blubber checked | 5,650 (+926) | 11,651 (+6,422) | 31,476 (+26,247) |
 | Star Frame | 789 (+432) | 2,354 (+1,873) | 106,465 (+105,984) |
 | Zeropod | 16,699 (+1,297) | 75,275 (+31,801) | 88,987 (+45,513) |
 | Wincode | 55,880 (+276) | 95,770 (+18,807) | 110,019 (+33,056) |
@@ -886,8 +828,8 @@ Cells are whole CU (signed operation delta from the matching load-only idle). "F
 | Library | lookup | insert_middle | remove | set_all | iterate_sum |
 |---|---|---|---|---|---|
 | Borsh | 188,940 (+458) | 292,445 (+103,979) | 291,440 (+102,974) | 313,377 (+124,911) | 218,818 (+30,336) |
-| Blubber lazy | 971 (+319) | 5,521 (+4,805) | 2,779 (+2,063) | 5,385 (+4,669) | 16,691 (+16,039) |
-| Blubber checked | 22,398 (+319) | 27,001 (+4,805) | 24,259 (+2,063) | 26,813 (+4,617) | 40,120 (+18,041) |
+| Blubber lazy | 971 (+319) | 5,521 (+4,805) | 2,779 (+2,063) | 5,336 (+4,620) | 16,691 (+16,039) |
+| Blubber checked | 22,398 (+319) | 27,001 (+4,805) | 24,259 (+2,063) | 26,816 (+4,620) | 40,120 (+18,041) |
 | Star Frame | 537 (+199) | 1,535 (+1,100) | 827 (+392) | 6,442 (+6,007) | 17,345 (+17,007) |
 | Sokoban | 582 (+314) | full | 1,524 (+1,254) | 85,668 (+85,398) | 92,668 (+92,400) |
 | Zeropod | 425 (+127) | 319,828 (+77,175) | 318,838 (+76,185) | 340,705 (+98,052) | 11,309 (+11,011) |
@@ -901,8 +843,8 @@ Cells are whole CU (signed operation delta from the matching load-only idle). "F
 | Library | read_all | set_equal | grow_one | grow_all | grow_all_old |
 |---|---|---|---|---|---|
 | Borsh | 390,945 (+107,005) | 367,056 (+83,134) | 367,098 (+83,176) | 397,093 (+113,171) | 497,092 (+213,170) |
-| Blubber lazy | 288,674 (+288,347) | 2,500 (+1,701) | 8,530 (+7,731) | 49,169 (+48,370) | 492,275 (+491,476) |
-| Blubber checked | 301,976 (+286,344) | 17,821 (+1,681) | 28,259 (+12,119) | 53,155 (+37,015) | 496,266 (+480,126) |
+| Blubber lazy | 288,674 (+288,347) | 2,500 (+1,701) | 8,530 (+7,731) | 49,139 (+48,340) | 489,238 (+488,439) |
+| Blubber checked | 301,976 (+286,344) | 17,821 (+1,681) | 28,259 (+12,119) | 53,149 (+37,009) | 493,248 (+477,108) |
 | Star Frame | 278,374 (+278,015) | 847 (+368) | 4,268 (+3,789) | 202,917 (+202,438) | 540,019 (+539,540) |
 | Zeropod | 263,307 (+115,007) | 486,586 (+237,251) | 486,686 (+237,351) | 516,681 (+267,346) | 616,680 (+367,345) |
 | Wincode | 233,442 (+107,014) | 394,667 (+130,191) | 394,709 (+130,233) | 424,704 (+160,228) | 524,703 (+260,227) |
@@ -913,8 +855,8 @@ Cells are whole CU (signed operation delta from the matching load-only idle). "F
 | Library | lookup | insert_middle | grow_all_old |
 |---|---|---|---|
 | Borsh | 516,914 (+550) | 670,744 (+154,391) | heap exhausted |
-| Blubber lazy | 1,255 (+927) | 25,088 (+24,288) | 521,407 (+520,607) |
-| Blubber checked | 39,625 (+926) | 64,120 (+24,912) | 525,364 (+486,156) |
+| Blubber lazy | 1,255 (+927) | 25,085 (+24,289) | 281,194 (+280,398) |
+| Blubber checked | 39,625 (+926) | 64,117 (+24,913) | 285,194 (+245,990) |
 | Star Frame | 843 (+486) | 8,003 (+7,522) | 1,287,238 (+1,286,757) |
 | Zeropod | 161,350 (+10,048) | 733,279 (+307,731) | 878,112 (+452,564) |
 | Wincode | 783,388 (+491) | 1,181,954 (+182,659) | 1,328,840 (+329,545) |
@@ -1011,20 +953,20 @@ These replay the original published mixed fixture, including its original inputs
 
 | Arch | Published case | Published CU | Observed CU | Difference |
 |---|---|---|---|---|
-| v0 | list_fixed_n1000_ref_iter_plain | 10,780 | 10,780 | 0.000% |
-| v0 | list_fixed_n1000_callback_equal_set_plain | 8,202 | 8,202 | 0.000% |
-| v0 | map_fixed_n1000_ref_iter_plain | 91,117 | 91,117 | 0.000% |
-| v0 | map_fixed_n1000_callback_equal_set_plain | 66,029 | 66,029 | 0.000% |
-| v0 | list_indexed_n1000_fill_plain | 48,997 | 48,997 | 0.000% |
-| v0 | map_indexed_n1000_fill_plain | 74,128 | 74,128 | 0.000% |
-| v0 | map_indexed_n1000_map_grow_from_old_values_plain | 485,720 | 485,720 | 0.000% |
-| v3 | list_fixed_n1000_ref_iter_plain | 10,779 | 10,779 | 0.000% |
-| v3 | list_fixed_n1000_callback_equal_set_plain | 8,198 | 8,198 | 0.000% |
-| v3 | map_fixed_n1000_ref_iter_plain | 91,116 | 91,116 | 0.000% |
-| v3 | map_fixed_n1000_callback_equal_set_plain | 66,025 | 66,025 | 0.000% |
-| v3 | list_indexed_n1000_fill_plain | 52,971 | 52,971 | 0.000% |
-| v3 | map_indexed_n1000_fill_plain | 74,110 | 74,110 | 0.000% |
-| v3 | map_indexed_n1000_map_grow_from_old_values_plain | 485,703 | 485,703 | 0.000% |
+| v0 | list_fixed_n1000_ref_iter_plain | 10,799 | 10,798 | 0.009% |
+| v0 | list_fixed_n1000_callback_equal_set_plain | 8,122 | 8,121 | 0.012% |
+| v0 | map_fixed_n1000_ref_iter_plain | 91,136 | 91,135 | 0.001% |
+| v0 | map_fixed_n1000_callback_equal_set_plain | 65,949 | 65,948 | 0.002% |
+| v0 | list_indexed_n1000_fill_plain | 49,018 | 49,008 | 0.020% |
+| v0 | map_indexed_n1000_fill_plain | 74,147 | 74,149 | 0.003% |
+| v0 | map_indexed_n1000_map_grow_from_old_values_plain | 485,745 | 482,747 | 0.617% |
+| v3 | list_fixed_n1000_ref_iter_plain | 10,797 | 10,794 | 0.028% |
+| v3 | list_fixed_n1000_callback_equal_set_plain | 8,119 | 8,116 | 0.037% |
+| v3 | map_fixed_n1000_ref_iter_plain | 91,134 | 91,131 | 0.003% |
+| v3 | map_fixed_n1000_callback_equal_set_plain | 65,946 | 65,943 | 0.005% |
+| v3 | list_indexed_n1000_fill_plain | 52,993 | 52,983 | 0.019% |
+| v3 | map_indexed_n1000_fill_plain | 74,130 | 74,133 | 0.004% |
+| v3 | map_indexed_n1000_map_grow_from_old_values_plain | 485,729 | 482,728 | 0.618% |
 
 ## Failed observations
 

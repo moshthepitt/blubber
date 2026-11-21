@@ -7,6 +7,9 @@ use blubber_core::Layout;
 
 use crate::edit::{Preparation, PreparationError};
 
+#[cfg(feature = "alloc")]
+use alloc::{string::String, vec::Vec};
+
 trait MeasureFault {
     fn report_measure(self, lazy: bool, poisoned: &mut bool) -> crate::Error;
 }
@@ -43,8 +46,14 @@ pub(crate) fn is_fixed_map(layout: Layout) -> bool {
 // directories/key domains. Lazy fixed maps admit geometry without source keys.
 // Match the typed fixed/indexed shape here so the plan needs no repeated
 // descriptor dispatch, and a mismatched lazy view cannot reuse key evidence.
+// An empty fill can reuse the plan built by source admission.
 #[inline(always)]
-pub(crate) fn source(view: View<'_>, admitted: bool, map: bool, fixed_map: bool) -> Result<u32> {
+pub(crate) fn source(
+    view: View<'_>,
+    admitted: bool,
+    map: bool,
+    fixed_map: bool,
+) -> Result<(u32, Option<RewritePlan>)> {
     if admitted {
         if view.layout().tag() != if map { 8 } else { 7 } {
             return Err(ErrorKind::InvalidSchema.into());
@@ -53,12 +62,12 @@ pub(crate) fn source(view: View<'_>, admitted: bool, map: bool, fixed_map: bool)
             if !fixed_map {
                 return Err(ErrorKind::InvalidSchema.into());
             }
-            return Ok(view.map_header()?.count);
+            return Ok((view.map_header()?.count, None));
         }
         if fixed_map {
             return Err(ErrorKind::InvalidSchema.into());
         }
-        return view.word(0);
+        return Ok((view.word(0)?, None));
     }
     let (count, total, actual_fixed_map) = if map {
         let h = view.map_header()?;
@@ -66,7 +75,9 @@ pub(crate) fn source(view: View<'_>, admitted: bool, map: bool, fixed_map: bool)
             h.count,
             match h.width {
                 Some(width) => crate::schema::mul(h.count, width)?,
-                None => view.bytes().len() as u32 - h.payload,
+                // This pass admits the source. Indexed maps can plan zero
+                // output bytes here because replacements are measured later.
+                None => 0,
             },
             h.width.is_some(),
         )
@@ -81,16 +92,22 @@ pub(crate) fn source(view: View<'_>, admitted: bool, map: bool, fixed_map: bool)
             false,
         )
     };
-    view.relative(RewritePlan::check(
-        view.bytes(),
-        &view.layout(),
-        count,
-        total,
-    ))?;
+    // A certified empty map has an exact four-byte extent and no stored keys
+    // or ends to scan before building the write-free plan.
+    let source_plan = if !map || count != 0 || !matches!(view.layout(), Layout::Flat { .. }) {
+        Some(view.relative(RewritePlan::check(
+            view.bytes(),
+            &view.layout(),
+            count,
+            total,
+        ))?)
+    } else {
+        None
+    };
     if actual_fixed_map != fixed_map {
         return Err(ErrorKind::InvalidSchema.into());
     }
-    Ok(count)
+    Ok((count, source_plan))
 }
 
 #[inline(always)]
@@ -161,12 +178,15 @@ pub(crate) fn prepare_fill_policy<T: crate::Schema>(
         }
         return Ok((plan, (count, len)));
     }
-    let count = source(view, admitted, map, fixed_map)?;
-    let len = if count == 0 {
-        0
-    } else {
-        T::measure(value).map_err(PreparationError::input)?
-    };
+    let (count, source_plan) = source(view, admitted, map, fixed_map)?;
+    if count == 0 {
+        let collection = match source_plan {
+            Some(admitted) => admitted,
+            None => plan(view, 0, 0, fixed_map)?,
+        };
+        return Ok((collection.typed(T::FIXED_SIZE, key_width, map)?, (0, 0)));
+    }
+    let len = T::measure(value).map_err(PreparationError::input)?;
     let total = crate::schema::mul(count, len)?;
     Ok((
         plan(view, count, total, fixed_map)?.typed(T::FIXED_SIZE, key_width, map)?,
@@ -227,7 +247,7 @@ fn prepare_values<T: crate::Schema>(
     values: &[T::Init<'_>],
 ) -> Preparation<(RewritePlan, ())> {
     let fixed_map = map && T::FIXED_SIZE.is_some();
-    let count = source(view, admitted, map, fixed_map)?;
+    let (count, _) = source(view, admitted, map, fixed_map)?;
     if values.len() != count as usize {
         return Err(ErrorKind::InvalidBoundary.into());
     }
@@ -240,6 +260,173 @@ fn prepare_values<T: crate::Schema>(
         plan(view, count, total, fixed_map)?.typed(T::FIXED_SIZE, key_width, map)?,
         (),
     ))
+}
+
+#[cfg(feature = "alloc")]
+pub(crate) struct StagedStrings {
+    text: String,
+    ends: Vec<usize>,
+    uniform: Option<u32>,
+}
+
+#[cfg(feature = "alloc")]
+#[cfg_attr(target_os = "solana", inline(never))]
+pub(crate) fn stage_strings<K: crate::MapKey>(
+    view: View<'_>,
+    admitted: bool,
+    output_capacity: usize,
+    mut transform: impl FnMut(&str, &mut [u8]) -> Result<usize>,
+) -> Preparation<(RewritePlan, StagedStrings)> {
+    use crate::{Error, Map, Str};
+
+    let (count, _) = source(view, admitted, true, false)?;
+    let mut bytes = Vec::new();
+    let mut ends = Vec::new();
+    if count == 0 {
+        let plan = plan(view, 0, 0, false)?.typed(None, K::SIZE, true)?;
+        return Ok((
+            plan,
+            StagedStrings {
+                text: String::new(),
+                ends,
+                uniform: None,
+            },
+        ));
+    }
+    let map = view
+        .read::<Map<K, Str>>()
+        .map_err(PreparationError::source)?;
+    blubber_core::checked_u32(output_capacity)?;
+    bytes
+        .try_reserve_exact(output_capacity)
+        .map_err(|_| ErrorKind::Allocation)?;
+    bytes.resize(output_capacity, 0);
+    let mut output = bytes.as_mut_slice();
+    let mut old_strings = map.try_iter_batched();
+    let (_, first) = old_strings
+        .next()
+        .ok_or_else(|| {
+            PreparationError::source(Error::new(ErrorKind::InvalidBoundary, view.base()))
+        })?
+        .map_err(PreparationError::source)?;
+    let width = transform(first, output).map_err(PreparationError::input)?;
+    output = output.get_mut(width..).ok_or(ErrorKind::Capacity)?;
+    for (index, item) in old_strings.enumerate() {
+        let (_, old) = item.map_err(PreparationError::source)?;
+        let prior = output_capacity - output.len();
+        let written = transform(old, output).map_err(PreparationError::input)?;
+        output = output.get_mut(written..).ok_or(ErrorKind::Capacity)?;
+        // The first differing length is enough to reconstruct the earlier ends.
+        if written != width && ends.is_empty() {
+            ends.try_reserve_exact((count - 1) as usize)
+                .map_err(|_| ErrorKind::Allocation)?;
+            for previous in 1..=index {
+                ends.push(previous * width);
+            }
+        }
+        if !ends.is_empty() || written != width {
+            ends.push(prior);
+        }
+    }
+    let used = output_capacity - output.len();
+    bytes.truncate(used);
+    let text = String::from_utf8(bytes).map_err(|error| {
+        PreparationError::input(Error::new(
+            ErrorKind::InvalidUtf8,
+            error.utf8_error().valid_up_to() as u32,
+        ))
+    })?;
+    let uniform = ends.is_empty() && count > 1;
+    let check_end = |end| {
+        if text.get(..end).is_some() {
+            Ok(())
+        } else {
+            Err(PreparationError::input(Error::new(
+                ErrorKind::InvalidUtf8,
+                end as u32,
+            )))
+        }
+    };
+    if uniform && width != 0 {
+        for end in (width..used).step_by(width) {
+            check_end(end)?;
+        }
+    } else {
+        for &end in &ends {
+            check_end(end)?;
+        }
+    }
+    let plan = plan(view, count, used as u32, false)?.typed(None, K::SIZE, true)?;
+    let uniform = uniform.then_some(width as u32);
+    Ok((
+        plan,
+        StagedStrings {
+            text,
+            ends,
+            uniform,
+        },
+    ))
+}
+
+#[cfg(feature = "alloc")]
+impl StagedStrings {
+    pub(crate) fn encode(self, stream: &mut RewriteStream<'_>, key: u32) -> Result<()> {
+        if let Some(width) = self.uniform {
+            return stream.fill_uniform(
+                width,
+                key,
+                &UniformStrings {
+                    remaining: core::cell::Cell::new(self.text.as_bytes()),
+                    width,
+                    key,
+                },
+            );
+        }
+        let mut remaining = self.text.as_bytes();
+        // Staging already admitted every boundary. Each byte slice matches its exact loan.
+        let mut start = 0;
+        for end in self.ends {
+            let len = end - start;
+            let (value, rest) = remaining
+                .split_at_checked(len)
+                .ok_or(ErrorKind::InvalidPlan)?;
+            stream.prepare_slot(len as u32)?;
+            stream.destination().copy_from_slice(value);
+            stream.advance(len)?;
+            remaining = rest;
+            start = end;
+        }
+        stream.prepare_slot(remaining.len() as u32)?;
+        stream.destination().copy_from_slice(remaining);
+        stream.advance(remaining.len())
+    }
+}
+
+#[cfg(feature = "alloc")]
+struct UniformStrings<'a> {
+    remaining: core::cell::Cell<&'a [u8]>,
+    width: u32,
+    key: u32,
+}
+
+#[cfg(feature = "alloc")]
+impl blubber_core::fill::ValueEncoder for UniformStrings<'_> {
+    #[inline(always)]
+    fn geometry(&self) -> (u32, u32) {
+        (self.width, self.key)
+    }
+
+    #[inline(always)]
+    fn encode(&self, slot: &mut [u8]) -> Result<usize> {
+        let (value, rest) = self
+            .remaining
+            .get()
+            .split_at_checked(slot.len())
+            .ok_or(ErrorKind::InvalidPlan)?;
+        slot.copy_from_slice(value);
+        self.remaining.set(rest);
+        Ok(slot.len())
+    }
 }
 
 /// Checks count, every supplied canonical map key and every value once.
@@ -261,7 +448,7 @@ pub(crate) fn prepare_map_policy<K: crate::MapKey, V: crate::Schema>(
     entries: &[(K, V::Init<'_>)],
 ) -> Preparation<(RewritePlan, ())> {
     let fixed_map = V::FIXED_SIZE.is_some();
-    let count = source(view, admitted, true, fixed_map)?;
+    let (count, _) = source(view, admitted, true, fixed_map)?;
     if entries.len() != count as usize {
         return Err(ErrorKind::InvalidBoundary.into());
     }
@@ -678,7 +865,10 @@ mod tests {
                         .and_then(|_| { panic!("measurement reached mismatched value geometry") }),
                     Err::<(), _>(ErrorKind::InvalidSchema.into()),
                 );
-                assert_eq!(source(view, admitted, true, fixed), Ok(1));
+                assert_eq!(
+                    source(view, admitted, true, fixed).map(|(count, _)| count),
+                    Ok(1)
+                );
             }
         }
     }

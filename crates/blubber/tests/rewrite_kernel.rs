@@ -26,6 +26,196 @@ struct CheckedTailMap {
     values: blubber::Map<u8, blubber::Str>,
 }
 
+#[cfg(all(feature = "derive", feature = "alloc"))]
+mod old_strings {
+    use super::*;
+    use blubber::Error;
+
+    #[blubber::schema(account)]
+    struct OldStrings {
+        marker: u16,
+        values: blubber::Map<u8, blubber::Str>,
+    }
+
+    fn initialized(bytes: &mut [u8], values: &[(u8, &str)]) -> usize {
+        let used = OldStrings::initialize(
+            &mut SliceStore::new(bytes),
+            OldStringsInit { marker: 9, values },
+        )
+        .unwrap()
+        .commit()
+        .unwrap()
+        .used_len as usize;
+        bytes[used..].fill(0xa5);
+        used
+    }
+
+    fn write_staged(output: &mut [u8], value: &[u8]) -> blubber::Result<usize> {
+        output
+            .get_mut(..value.len())
+            .ok_or(ErrorKind::Capacity)?
+            .copy_from_slice(value);
+        Ok(value.len())
+    }
+
+    // docs:start map-transform
+    #[test]
+    fn doc_map_transform_and_short_output() -> blubber::Result<()> {
+        let mut bytes = [0; 64];
+        initialized(&mut bytes, &[(1, "aa"), (3, "bb")]);
+        let before = bytes;
+        let mut store = SliceStore::new(&mut bytes);
+        let mut root = OldStrings::load_checked_mut(&mut store)?;
+        let upper = |old: &str, output: &mut [u8]| {
+            let output = output.get_mut(..old.len()).ok_or(ErrorKind::Capacity)?;
+            output.copy_from_slice(old.as_bytes());
+            output.make_ascii_uppercase();
+            Ok(output.len())
+        };
+        let short = root.values_mut().rewrite_values_with(3, upper);
+        assert_eq!(short, Err(ErrorKind::Capacity.into()));
+        root.commit()?;
+        assert_eq!(bytes, before);
+
+        let mut store = SliceStore::new(&mut bytes);
+        let mut root = OldStrings::load_checked_mut(&mut store)?;
+        root.values_mut().rewrite_values_with(4, upper)?;
+        root.commit()?;
+        let root = OldStrings::load(&bytes)?;
+        assert_eq!(
+            root.values().iter().collect::<Vec<_>>(),
+            [(1, "AA"), (3, "BB")]
+        );
+        Ok(())
+    }
+    // docs:end map-transform
+
+    #[test]
+    fn rewrite_batches_variable_utf8_and_keeps_keys_and_prefix() {
+        let mut bytes = [0; 64];
+        initialized(&mut bytes, &[(1, "a"), (2, "b"), (3, "ñ"), (7, "")]);
+        let mut store = SliceStore::new(&mut bytes);
+        let mut root = OldStrings::load_checked_mut(&mut store).unwrap();
+        let mut visited = Vec::new();
+        root.values_mut()
+            .rewrite_values_with(8, |value, output| {
+                visited.push(value.to_owned());
+                let replacement = match value {
+                    "a" => "é",
+                    "b" => "ø",
+                    "ñ" => "ñé",
+                    _ => "",
+                };
+                write_staged(output, replacement.as_bytes())
+            })
+            .unwrap();
+        assert_eq!(visited, ["a", "b", "ñ", ""]);
+        root.commit().unwrap();
+        let root = OldStrings::load(&bytes).unwrap();
+        assert_eq!(root.marker(), 9);
+        assert_eq!(
+            root.values().iter().collect::<Vec<_>>(),
+            [(1, "é"), (2, "ø"), (3, "ñé"), (7, "")]
+        );
+    }
+
+    #[test]
+    fn staged_replacement_errors_keep_bytes_and_allow_commit() {
+        let mut bytes = [0; 64];
+        let used = initialized(&mut bytes, &[(1, "a"), (2, "b")]);
+        let before = bytes;
+        let mut store = SliceStore::new(&mut bytes);
+        let mut root = OldStrings::load_checked_mut(&mut store).unwrap();
+        // The aggregate is valid UTF-8 but the boundary between values is not.
+        let split = root.values_mut().rewrite_values_with(2, |old, output| {
+            write_staged(output, &[if old == "a" { 0xc3 } else { 0xa9 }])
+        });
+        assert_eq!(split, Err(Error::new(ErrorKind::InvalidUtf8, 1)));
+        let invalid = root
+            .values_mut()
+            .rewrite_values_with(2, |_, output| write_staged(output, &[0xff]));
+        assert_eq!(invalid, Err(Error::new(ErrorKind::InvalidUtf8, 0)));
+        let exceeded = root.values_mut().rewrite_values_with(1, |_, _| Ok(2));
+        assert_eq!(exceeded, Err(ErrorKind::Capacity.into()));
+        let callback_error = Error::new(ErrorKind::InvalidUtf8, 19);
+        let error = root.values_mut().rewrite_values_with(12, |old, output| {
+            if old == "b" {
+                Err(callback_error)
+            } else {
+                write_staged(output, b"longer")
+            }
+        });
+        assert_eq!(error, Err(callback_error));
+        assert_eq!(root.commit().unwrap().used_len as usize, used);
+        assert_eq!(bytes, before);
+    }
+
+    #[test]
+    fn uniform_empty_replacements_keep_every_key() {
+        let mut bytes = [0; 64];
+        initialized(&mut bytes, &[(1, "a"), (3, "b")]);
+        let mut store = SliceStore::new(&mut bytes);
+        let mut root = OldStrings::load_checked_mut(&mut store).unwrap();
+        root.values_mut()
+            .rewrite_values_with(0, |_, _| Ok(0))
+            .unwrap();
+        root.commit().unwrap();
+        let root = OldStrings::load(&bytes).unwrap();
+        assert_eq!(root.values().iter().collect::<Vec<_>>(), [(1, ""), (3, "")]);
+    }
+
+    #[test]
+    fn empty_rewrite_never_calls_the_transform() {
+        let mut bytes = [0; 64];
+        let used = initialized(&mut bytes, &[]);
+        let before = bytes;
+        let mut store = SliceStore::new(&mut bytes);
+        let mut root = OldStrings::load_checked_mut(&mut store).unwrap();
+        root.values_mut()
+            .rewrite_values_with(usize::MAX, |_, _| panic!("empty transform"))
+            .unwrap();
+        assert_eq!(root.commit().unwrap().used_len as usize, used);
+        assert_eq!(bytes, before);
+    }
+
+    #[cfg(not(feature = "verify-on-load"))]
+    #[test]
+    fn old_string_fault_sets_poison_during_staging() {
+        let mut bytes = [0; 64];
+        let used = initialized(&mut bytes, &[(1, "a"), (2, "b")]);
+        bytes[used - 1] = 0xff;
+        let before = bytes;
+        let mut store = SliceStore::new(&mut bytes);
+        let mut root = OldStrings::load_trusted_mut(&mut store).unwrap();
+        let result = root
+            .values_mut()
+            .rewrite_values_with(6, |_, output| write_staged(output, b"new"));
+        assert_eq!(
+            result,
+            Err(Error::new(ErrorKind::InvalidUtf8, used as u32 - 1))
+        );
+        assert_eq!(root.commit().unwrap_err(), ErrorKind::Poisoned.into());
+        assert_eq!(bytes, before);
+    }
+
+    #[cfg(not(feature = "verify-on-load"))]
+    #[test]
+    fn empty_map_still_admits_its_exact_extent() {
+        let mut bytes = [0; 64];
+        initialized(&mut bytes, &[(1, "a")]);
+        bytes[14..18].fill(0);
+        let before = bytes;
+        let mut store = SliceStore::new(&mut bytes);
+        let mut root = OldStrings::load_trusted_mut(&mut store).unwrap();
+        let result = root
+            .values_mut()
+            .rewrite_values_with(0, |_, _| panic!("transform before admission"));
+        assert_eq!(result, Err(Error::new(ErrorKind::InvalidBoundary, 18)));
+        assert_eq!(root.commit().unwrap_err(), ErrorKind::Poisoned.into());
+        assert_eq!(bytes, before);
+    }
+}
+
 static TEXTS: Layout = Layout::List {
     element: &Layout::Str,
 };

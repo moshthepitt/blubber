@@ -1,0 +1,18 @@
+[package]
+license = "MIT"
+name = "blubber-quickstart"
+description = "On-chain queue example for Blubber"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+publish = false
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+blubber = { workspace = true, features = ["derive", "pinocchio"] }
+pinocchio-system.workspace = true
+
+[lints]
+workspace = true

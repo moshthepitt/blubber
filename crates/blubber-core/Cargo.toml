@@ -11,6 +11,9 @@ include = ["/Cargo.toml", "/README.md", "/LICENSE", "/src/**/*.rs"]
 keywords = ["solana", "serialization", "verification"]
 categories = ["no-std", "encoding"]
 
+[package.metadata.docs.rs]
+features = ["program-error"]
+
 [features]
 default = []
 max-depth-16 = []

@@ -1,17 +1,17 @@
 Q7 v3: PASS 12 budgets / 60 samples; FAIL 0; sizes=(0, 1, 10, 100, 1000)
 Tools: SBF v1.53 / Rust 1.89.0-dev; Mollusk 0.16.2 / Agave 4.3.0;
-source-sha256=8d9f752a0e8e232752b9c7929f02a0f0176405383ec160f794bca34a0b1f0da3
-raw-sha256=9c2c1d116bcf517422f75669011faae7a534d88b7a60735e1502613d3289beb3
-elf-sha256=fadb91eaea27af24d41d9719690449371e0bf428ebc1f13a4840b34ea8f268ca
-{"enforced": true, "limit": [200, 2500], "max_intercept": 1885.5, "row": "list_indexed_cursor_get_plain", "slope_100_1000": 192.75, "slope_10_100": 190.67777777777778, "totals": [1589, 1960, 3813, 20974, 194449]}
-{"enforced": true, "limit": [200, 2500], "max_intercept": 1965.5, "row": "list_indexed_cursor_set_plain", "slope_100_1000": 119.75, "slope_10_100": 117.67777777777778, "totals": [1656, 1991, 3163, 13754, 121529]}
-{"enforced": true, "limit": [200, 2500], "max_intercept": 1914.5, "row": "list_indexed_callback_get_plain", "slope_100_1000": 194.75, "slope_10_100": 192.67777777777778, "totals": [1600, 1991, 3862, 21203, 196478]}
-{"enforced": true, "limit": [200, 2500], "max_intercept": 1962.5, "row": "list_indexed_callback_equal_set_plain", "slope_100_1000": 97.75, "slope_10_100": 95.67777777777778, "totals": [1593, 1966, 2940, 11551, 99526]}
-{"enforced": true, "limit": [300, 2800], "max_intercept": 2582.5, "row": "map_indexed_cursor_get_plain", "slope_100_1000": 285.75, "slope_10_100": 283.6777777777778, "totals": [1693, 2579, 5440, 30971, 288146]}
-{"enforced": true, "limit": [205, 2800], "max_intercept": 2534.5, "row": "map_indexed_cursor_set_plain", "slope_100_1000": 192.75, "slope_10_100": 190.67777777777778, "totals": [1694, 2414, 4462, 21623, 195098]}
-{"enforced": true, "limit": [275, 2600], "max_intercept": 2538.5, "row": "map_indexed_callback_get_plain", "slope_100_1000": 265.75, "slope_10_100": 263.6777777777778, "totals": [1593, 2514, 5196, 28927, 268102]}
-{"enforced": true, "limit": [195, 2700], "max_intercept": 2483.5, "row": "map_indexed_callback_equal_set_plain", "slope_100_1000": 179.75, "slope_10_100": 177.67777777777778, "totals": [1592, 2350, 4281, 20272, 182047]}
-{"enforced": true, "limit": [305, 2700], "max_intercept": 2575.5, "row": "map_indexed_cursor_get_common31_adjacent", "slope_100_1000": 294.75, "slope_10_100": 292.6777777777778, "totals": [1695, 2581, 5523, 31864, 297139]}
-{"enforced": true, "limit": [210, 2800], "max_intercept": 2527.5, "row": "map_indexed_cursor_set_common31_adjacent", "slope_100_1000": 201.75, "slope_10_100": 199.67777777777778, "totals": [1696, 2416, 4545, 22516, 204091]}
-{"enforced": true, "limit": [280, 2600], "max_intercept": 2531.5, "row": "map_indexed_callback_get_common31_adjacent", "slope_100_1000": 274.75, "slope_10_100": 272.6777777777778, "totals": [1595, 2516, 5279, 29820, 277095]}
-{"enforced": true, "limit": [195, 2800], "max_intercept": 2476.5, "row": "map_indexed_callback_equal_set_common31_adjacent", "slope_100_1000": 188.75, "slope_10_100": 186.67777777777778, "totals": [1594, 2352, 4364, 21165, 191040]}
+source-sha256=74ff527799aaf29b4b5b1890b106324f68a6103fa6bc1eae6a1a1373ab902b7b
+raw-sha256=62f3ce4554dd9e18ffed5573d56c78024deabdcd4c9fc29e9434c25ed923d407
+elf-sha256=cc4dd00c567b841fd67aafa8613835f0243800da3961bb3c6931dd309c213d5f
+{"enforced": true, "limit": [200, 2500], "max_intercept": 1896.5, "row": "list_indexed_cursor_get_plain", "slope_100_1000": 192.75, "slope_10_100": 190.67777777777778, "totals": [1600, 1971, 3824, 20985, 194460]}
+{"enforced": true, "limit": [200, 2500], "max_intercept": 1976.5, "row": "list_indexed_cursor_set_plain", "slope_100_1000": 119.75, "slope_10_100": 117.67777777777778, "totals": [1667, 2002, 3174, 13765, 121540]}
+{"enforced": true, "limit": [200, 2500], "max_intercept": 1925.5, "row": "list_indexed_callback_get_plain", "slope_100_1000": 194.75, "slope_10_100": 192.67777777777778, "totals": [1611, 2002, 3873, 21214, 196489]}
+{"enforced": true, "limit": [200, 2500], "max_intercept": 1973.5, "row": "list_indexed_callback_equal_set_plain", "slope_100_1000": 97.75, "slope_10_100": 95.67777777777778, "totals": [1604, 1977, 2951, 11562, 99537]}
+{"enforced": true, "limit": [300, 2800], "max_intercept": 2593.5, "row": "map_indexed_cursor_get_plain", "slope_100_1000": 285.75, "slope_10_100": 283.6777777777778, "totals": [1704, 2590, 5451, 30982, 288157]}
+{"enforced": true, "limit": [205, 2800], "max_intercept": 2545.5, "row": "map_indexed_cursor_set_plain", "slope_100_1000": 192.75, "slope_10_100": 190.67777777777778, "totals": [1705, 2425, 4473, 21634, 195109]}
+{"enforced": true, "limit": [275, 2600], "max_intercept": 2549.5, "row": "map_indexed_callback_get_plain", "slope_100_1000": 265.75, "slope_10_100": 263.6777777777778, "totals": [1604, 2525, 5207, 28938, 268113]}
+{"enforced": true, "limit": [195, 2700], "max_intercept": 2494.5, "row": "map_indexed_callback_equal_set_plain", "slope_100_1000": 179.75, "slope_10_100": 177.67777777777778, "totals": [1603, 2361, 4292, 20283, 182058]}
+{"enforced": true, "limit": [305, 2700], "max_intercept": 2586.5, "row": "map_indexed_cursor_get_common31_adjacent", "slope_100_1000": 294.75, "slope_10_100": 292.6777777777778, "totals": [1706, 2592, 5534, 31875, 297150]}
+{"enforced": true, "limit": [210, 2800], "max_intercept": 2538.5, "row": "map_indexed_cursor_set_common31_adjacent", "slope_100_1000": 201.75, "slope_10_100": 199.67777777777778, "totals": [1707, 2427, 4556, 22527, 204102]}
+{"enforced": true, "limit": [280, 2600], "max_intercept": 2542.5, "row": "map_indexed_callback_get_common31_adjacent", "slope_100_1000": 274.75, "slope_10_100": 272.6777777777778, "totals": [1606, 2527, 5290, 29831, 277106]}
+{"enforced": true, "limit": [195, 2800], "max_intercept": 2487.5, "row": "map_indexed_callback_equal_set_common31_adjacent", "slope_100_1000": 188.75, "slope_10_100": 186.67777777777778, "totals": [1605, 2363, 4375, 21176, 191051]}

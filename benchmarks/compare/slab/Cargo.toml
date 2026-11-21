@@ -1,0 +1,21 @@
+[package]
+license = "MIT"
+name = "compare-slab"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[lib]
+crate-type = ["cdylib"]
+
+[features]
+heap = []
+
+[dependencies]
+anchor_slab = { package = "anchor-lang", git = "https://github.com/otter-sec/anchor", rev = "7d68eb325f297013a5e0903ddd698fe26218f5a3" }
+bytemuck = { version = "1.25.2", features = ["derive"] }
+compare-program = { path = "../program", features = ["no-entrypoint"] }
+pinocchio = { version = "0.11.2", default-features = false, features = ["alloc", "copy", "cpi"] }
+
+[lints.rust]
+unexpected_cfgs = { level = "warn", check-cfg = ['cfg(target_os, values("solana"))'] }

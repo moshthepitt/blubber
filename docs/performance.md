@@ -1,101 +1,46 @@
-# Choosing an access pattern
+# Performance guide
 
-Measure your whole handler with the schema, load policy and runtime settings
-you want to deploy. Container microbenchmarks include different authentication, checksum
-and commit work, so their totals need not match another caller. Whole CU is
-the instruction total; a signed delta subtracts a matched idle and is not an
-isolated instruction total. [CU scope](../benchmarks/CU.md) describes the fixtures.
+## Measure the whole handler
 
-Use ordinary point reads for a small subset. For full fixed-value map passes,
-`try_values` avoids decoding keys. Batched string iteration scans all payload
-bytes during setup; partial reads can cost more than ordinary iteration.
-[Reader examples](guide.md#reading-lists-maps-and-strings) show both policies and error behaviour.
+In the comparison fixture on SBF v0, looking up the middle key in a 1,000-entry fixed-value map takes 974<!-- num:cmp.v0.n1000.map_lookup.lazy --> CU with a lazy load and 22,401<!-- num:cmp.v0.n1000.map_lookup.checked --> CU with a checked load. That middle key hits Blubber's first binary-search probe. In the separate scaling fixture, a front hit takes 2,000<!-- num:scaling.v0.n1000.map_lookup.front_hit --> CU, a middle miss takes 1,783<!-- num:scaling.v0.n1000.map_lookup.middle_miss --> CU, an end hit takes 1,921<!-- num:scaling.v0.n1000.map_lookup.end_hit --> CU, and a front hit where keys share a common prefix takes 4,603<!-- num:scaling.v0.n1000.map_lookup.common_prefix_front_hit --> CU.
 
-Use `fill` to give every list item the same value. In the retained lazy
-`List<u64>` fixture at n=1000, `fill` costs 4,843 CU on v0 and 4,840 on v3.
-`try_for_each_mut` with a constant setter costs 7,924 and 7,921 CU.
-[Comparison receipt](../benchmarks/compare/results/receipt.json) · [Measured rows](../benchmarks/compare/results/all.csv).
+Whole CU is the total cost of the instruction, including setup, account loading and any commit. Idle is a control run that sets up and finishes without the operation. Delta is whole CU minus idle. An idle baseline can already include a checked scan or an account resize, depending on the dataset.
 
-Use a cursor or `try_for_each_mut` when each edit needs its own logic. Growing
-every indexed value this way can repeat suffix movement and directory patching,
-with quadratic total work. Use `fill_values` for a constant map replacement or
-a whole-container rewrite when you can stage the replacements independently.
+In my view, a benchmark row only holds for its own caller and setup, so measure the whole instruction in your handler rather than copying a delta from a table. Match your target SBF binary architecture (v0 or v3), collection size, key position and prefix, load policy, growth budget and allocator. For choosing between a lazy load and a checked load, see [`docs/trust-model.md#choose-a-load`](trust-model.md#choose-a-load).
 
-For a single equal-size string replacement, use a scoped `with_mut` edit. In
-the 2026-11-12 point-edit receipt, the middle replacement in a lazy
-1000-item string list cost 1,537 CU on v0 and 1,533 CU on v3. The callers
-using `get_mut` cost 2,491 and 2,486 CU. Both callers used `Max` headroom.
-[Scoped edit contract](guide.md#scoped-child-edits).
+## Read one item or many
 
-Use byte values if your program only needs bytes. `[u8; N]` stores fixed-width
-bytes, and `List<u8>` stores counted bytes. Both skip UTF-8 validation. Ordinary
-`Str` reads call `core::str::from_utf8` to return `&str`. A checked load also
-validates the strings during its scan.
-[Byte and string encodings](../SPEC.md#conventions-and-scalar-encodings).
+Fallible reads return a Rust error when they detect invalid account bytes. `try_get` reports absence when a lookup finds no item, while `try_iter` yields a `Result` per item.
 
-Old-dependent rewrites require caller storage. The ordinary string-map recipe
-copies each old value twice and appends `!`, records ends in `Vec<usize>`, then
-borrows staged slices for `rewrite_values`. At n=1000 the retained String/ends
-recipe uses 41,008 heap bytes; a fixed-width-slice variant uses 33,008 bytes.
-Both exceed the default 32 KiB heap and need an explicit `RequestHeapFrame`.
-These are fixture observations, not a general allocator bound. Rewrite consumes
-the whole map, so inputs cannot be submitted in arbitrary chunks.
+Call `try_get` when your handler needs only a few items, because scanning the whole collection pays for entries you never use. Several single-item lookups, inserts and removals still cost more CU in Blubber than in the fastest other library in the comparison; see [`benchmarks/compare/GAPS.md#gaps-within-the-same-load-policy`](../benchmarks/compare/GAPS.md#gaps-within-the-same-load-policy).
 
-When you know the growth budget, use `Headroom::UpTo(n)` with the peak extra
-encoded bytes beyond opening spare. Include directory and parent growth.
-`UpTo(0)` performs no speculative opening resize. Positive `UpTo(n)` requests
-at most n extra physical bytes and may grant less. In the retained prepaid raw
-lease fixture at n=1000, an eight-byte growth costs 848 CU on v0 and 837 CU on
-v3 with `UpTo(32)`. With `Max` it costs 863 and 852 CU.
-[v0 scaling receipt](../benchmarks/CU-v0.md) · [v3 scaling receipt](../benchmarks/CU-v3.md).
+When you need every item in a map whose values implement `Fixed` and do not care about the keys, call `try_values`. It reads the values without decoding the keys.
 
-`Max` probes through the invocation window. SDK-local capacity does not certify
-transaction growth resources or ancestor CPI limits. `OnDemand` requires a
-working allocator and retains a handle slot per growth attempt, including
-failed attempts. Bound reopens/growth and all other allocations together.
+For a `List<Str>` or `Map<K, Str>`, `try_iter_batched` scans the string payload during setup and checks item ends as it yields values. Use `try_iter_batched` when you walk the whole collection. Stick to `try_get` or `try_iter` when you only inspect a small subset or stop early.
 
-Eight ordinary map groups remain tracked against their original traversal
-bounds in both caller layouts. They retain byte/read/idle checks; tracking is
-not a claim that they meet those bounds. Fixed maps have plain/common31
-`mut_iter`, `mut_try_iter` and `cursor_set` groups (six); indexed maps have
-plain/common31 `cursor_set` groups (two). The fixed bound is 120 CU/item and
-`120*n+2500`; indexed cursor bounds are 205 and `205*n+2800` for plain keys,
-210 and `210*n+2800` for common31 keys. The
-[ordinary measurements](../benchmarks/TRAVERSAL.md#ordinary-caller-costs) show
-both architectures and layouts, including all sampled totals and slopes.
+## Replace many values
 
-The [comparison](../benchmarks/COMPARE.md) records account bytes, heap, load
-policies and failed rows alongside CU. A large measurement meter allows slow
-rows to finish; it is not a production transaction budget.
+Growing strings one item at a time in an indexed list or map can move the following bytes and patch the offset directory on every step. Across N growths, byte movement can be quadratic. Bulk fill and rewrite methods avoid that repeated shifting.
 
-## Comparison by size
+Fill repeats one replacement across every slot. On a 1,000-item `List<u64>` on SBF v0, replacing every element with a constant takes 4,843<!-- num:cmp.v0.n1000.list_set.fill.lazy --> whole CU with `fill`, versus 7,924<!-- num:cmp.v0.n1000.list_set.callback.lazy --> whole CU with `try_for_each_mut`. Use `fill` on a list or `fill_values` on a map when every item gets the same value.
 
-These retained whole-instruction observations use the same methods and data as
-the README table. Each cell is checked / lazy; both architectures and all
-sampled sizes are shown. The full comparison records matching idles and load
-contracts.
+Rewrite supplies all replacements in one pass. When each new string is built from the previous string in that slot, staging temporary values on the heap before `rewrite_from` or `rewrite_values` can blow the default 32<!-- num:runtime.default.heap_kib --> KiB SDK bump heap. In the 1,000-entry checked map caller on SBF v0, staging `String` data plus end offsets uses 41,008<!-- num:traversal.v0.n1000.map_rewrite.string_ends.heap_bytes --> bytes of heap, and staging fixed-width slices uses 33,008<!-- num:traversal.v0.n1000.map_rewrite.fixed_width.heap_bytes --> bytes. Both exceed the default heap and need a larger heap to run; see [`benchmarks/TRAVERSAL.md#ordinary-caller-costs`](../benchmarks/TRAVERSAL.md#ordinary-caller-costs).
 
-The headline lookup is a first-probe hit for Blubber. The separate scaling
-fixture measures fixed positions. For a lazy `Map<Pubkey, u64>` with 1000
-plain keys, a front hit costs 2,009 CU on v0 and 2,005 CU on v3. An end hit
-costs 1,930 and 1,926 CU, and a middle miss costs 1,792 and 1,788 CU.
-[v0 scaling receipt](../benchmarks/CU-v0.md) · [v3 scaling receipt](../benchmarks/CU-v3.md).
+With `alloc`, call `rewrite_values_with` on a `MapMut<K, Str>` to build each replacement from the previous string within an explicit `output_capacity` byte bound. In the checked traversal caller on SBF v0 at 1,000 items ([`benchmarks/TRAVERSAL.md#ordinary-caller-costs`](../benchmarks/TRAVERSAL.md#ordinary-caller-costs)), `rewrite_values_with` takes 255,155<!-- num:traversal.v0.n1000.map_rewrite.with.whole --> CU and 17,008<!-- num:traversal.v0.n1000.map_rewrite.with.heap_bytes --> bytes of heap, compared with 288,129<!-- num:traversal.v0.n1000.map_rewrite.batched.whole --> CU and 33,008<!-- num:traversal.v0.n1000.map_rewrite.batched.heap_bytes --> bytes for manual batching (32,974<!-- num:traversal.v0.n1000.map_rewrite.transform_saving --> CU less). For working code, see [`docs/recipes.md#replace-a-collection`](recipes.md#replace-a-collection). The contract is in [`SPEC.md#walks-fill-and-rewrite`](../SPEC.md#walks-fill-and-rewrite).
 
-<!-- compare-size:start -->
+## Budget growth and memory
 
-Whole CU by size, checked / lazy.
+Headroom is the extra physical space an edit session asks for. Prefer `Headroom::UpTo(bytes)` when you know the peak extra bytes your edit needs. `Headroom::Max` probes the local growth budget, and `Headroom::OnDemand` resizes during edits and allocates on growth attempts. On Solana, the runtime caps an account at 10<!-- num:runtime.account.max_mib --> MiB and caps its growth at 10,240<!-- num:runtime.invocation.growth_bytes --> bytes per invocation. There is also a separate shared transaction growth budget.
 
-| Arch | n | List sum | Map lookup | List constant fill | Map old-dependent growth |
-|---|---|---|---|---|---|
-| v0 | 0 | 849 / 561 | 1,033 / 637 | 1,995 / 1,813 | 2,666 / 2,491 |
-| v0 | 1 | 864 / 576 | 1,406 / 974 | 2,493 / 2,155 | 3,764 / 3,453 |
-| v0 | 10 | 954 / 666 | 1,611 / 974 | 3,081 / 2,615 | 8,599 / 8,160 |
-| v0 | 100 | 1,854 / 1,566 | 3,501 / 974 | 7,102 / 6,485 | 55,487 / 54,897 |
-| v0 | 1000 | 10,854 / 10,566 | 22,401 / 974 | 49,177 / 45,185 | 525,376 / 521,411 |
-| v3 | 0 | 846 / 558 | 1,030 / 634 | 1,986 / 1,808 | 2,656 / 2,487 |
-| v3 | 1 | 861 / 573 | 1,403 / 971 | 2,482 / 2,150 | 3,752 / 3,449 |
-| v3 | 10 | 951 / 663 | 1,608 / 971 | 3,099 / 2,639 | 8,587 / 8,156 |
-| v3 | 100 | 1,851 / 1,563 | 3,498 / 971 | 7,480 / 6,869 | 55,475 / 54,893 |
-| v3 | 1000 | 10,851 / 10,563 | 22,398 / 971 | 53,155 / 49,169 | 525,364 / 521,407 |
+The ordinary demo program runs without a heap allocator. If your handler uses `OnDemand`, owned helpers or manual staging, budget that heap alongside whatever else your instruction allocates.
 
-<!-- compare-size:end -->
+An SBF call frame is limited to 4,096<!-- num:runtime.sbf.stack_frame_bytes --> bytes of stack space. Run `bash scripts/sbf-stack.sh MANIFEST PACKAGE ARCH OUTPUT_DIR LOG` to force a final-crate rebuild and reject stack-frame warnings that `cargo` otherwise lets pass.
+
+## Find the numbers
+
+Each benchmark page answers a different question:
+
+- [`benchmarks/CU.md`](../benchmarks/CU.md) and [`#read-a-row`](../benchmarks/CU.md#read-a-row) explain the scaling fixtures, memory profiles (including direct mapping) and CSV columns.
+- [`benchmarks/TRAVERSAL.md#ordinary-caller-costs`](../benchmarks/TRAVERSAL.md#ordinary-caller-costs) records caller and staging heap high-water marks.
+- [`benchmarks/COMPARE.md#method`](../benchmarks/COMPARE.md#method) covers the cross-library harness, its 256<!-- num:cmp.environment.heap_kib --> KiB configured heap and the benchmark receipt that records the compiler and ELF hashes.
+- [`benchmarks/compare/GAPS.md#gaps-within-the-same-load-policy`](../benchmarks/compare/GAPS.md#gaps-within-the-same-load-policy) lists large whole-instruction CU gaps under comparable load policies.

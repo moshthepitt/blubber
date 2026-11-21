@@ -7,12 +7,12 @@ Verus
   Platform: linux_x86_64
   Toolchain: 1.99.1-x86_64-unknown-linux-gnu (overridden by environment variable RUSTUP_TOOLCHAIN)
 
-Kani: 23 passed; 0 failed; 5677 properties (1 unreachable); default checks enabled
+Kani: 23 passed; 0 failed; 5719 properties (1 unreachable); default checks enabled
 Symbolic inputs: two full-domain values per type; bool additionally checks all tag bytes; jobs=1; per-harness timeout=600s
-source-tree-sha256 (156 paths; sorted path-NUL-content-hash): abb04ca65257167d4ede3b7a5efc38d95887900e4c05e6bf90a3ec9cbccf8821
-kani-raw-sha256: c45fe9bc789e4efc9889334b54ca722369878f31efbaa49af86373a98632183a
+source-tree-sha256 (154 paths; sorted path-NUL-content-hash): 01c74f721bbc957b919ed7a6fc6077de129421b5079be214e1c0d1cdb6b18c37
+kani-raw-sha256: bff9657b509a15134a72704d1597b81484884a87cea751766bcb7e33c6216024
 Verus: 1 verified; 0 errors; theorem raw_key_identity; arbitrary positive u32 width
-verus-raw-sha256: be561ba80ec4e3bfc163104e23e35d9ab4aa745010fd1977e2c2ac9477c7d464
+verus-raw-sha256: f50f0a6ac852aae64321a5712af1911abe86f52194f15dc7ed26fbf63b610f96
 Coverage: 6 expected covers satisfied; all 23 per-harness counts matched
 cover-inventory-sha256 (sorted name:count lines): 47b40e5ed4bba271a133981fafb4dfad9d14d4e02cd58249275b86cb5ec152a3
 map_key_address_projection: PASS; width=32; unwind=34

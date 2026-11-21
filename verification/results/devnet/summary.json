@@ -1,5 +1,5 @@
 {
-  "balance_lamports": 34559867040,
+  "balance_lamports": 34349377120,
   "completed_tiers": [
     "base"
   ],
@@ -18,46 +18,46 @@
     "min": 150,
     "sum": 192600
   },
-  "deployment_fees_lamports": 77225000,
+  "deployment_fees_lamports": 77860000,
   "elfs": {
     "borrow-alloc-v0": {
-      "sha256": "65193f205d55c3697b76f9faf1ec1e98c86b5b97e7df18d34016e8e9b68207e9",
-      "size": 3697312
+      "sha256": "d3f429cefa2a0c18285d2658d1236ebfdde47d3a92469e05080b1eaed57a4fa8",
+      "size": 3747200
     },
     "borrow-alloc-v3": {
-      "sha256": "f601cd026189a2094b7eaf5f02e243d000da4b287c69db4a59d812b8a1980dd6",
-      "size": 3559024
+      "sha256": "4a75ab583dec89ec8a00f4e179e82fae8d4e2895c1bf34f499de46f275d6a6b9",
+      "size": 3582104
     },
     "borrow-no-alloc-v0": {
-      "sha256": "7ed90fac3fe63c292c623f8d06629e1fbda9956319fcf1ff683ed81e58f70476",
-      "size": 3691080
+      "sha256": "aa2dc9a1c2689e4d8bb9389b77f705b558fb2892540e0393c5fb3308b2cb100a",
+      "size": 3703944
     },
     "borrow-no-alloc-v3": {
-      "sha256": "0f0cd3df0db16bea3f37a10e019fee78ecb89e76baf83cd0340a0671870bebbe",
-      "size": 3526336
+      "sha256": "e62952b2190b49f570bce01a2ad6ae280379979a773245b8070fc8cdb892ec83",
+      "size": 3540704
     },
     "input-owner": {
-      "sha256": "0865cc2342cf2117114e0e90e06af434f340a11d56847838d563bd62137d31ab",
-      "size": 2672
+      "sha256": "3eb5d0701f54da2e2bdbdb08b53b39b910ec2a99e47552f69f2e0d11f8c86666",
+      "size": 2712
     },
     "policy-off-v0": {
-      "sha256": "63c0b3fcf300960e626dc327eafe1e4c1fddbc3912641349b6bb0b5a617404d7",
-      "size": 217752
+      "sha256": "ba7eebbd080453a3ece485371b97c5ad5fe86a9107b4a3276c71267e8f99b073",
+      "size": 229080
     },
     "policy-off-v3": {
-      "sha256": "d3fc4bc599fdb1491ab520636deca2801600c2caaf60a3f492c5438ecf2c394c",
-      "size": 208880
+      "sha256": "062604f40587fba0a30ea42344b13fac7fdf5e87ab65f4137fa2a52a67fe7251",
+      "size": 220296
     },
     "policy-on-v0": {
-      "sha256": "1b0839ccc16cc845785d8bebe86181059fc1253ac2ec78af89b7fc48c56b696e",
-      "size": 220400
+      "sha256": "4e093aa24c574f680c19234f9e96da20833d99a9f3c7b31e7af0946bb0d2f23c",
+      "size": 232512
     },
     "policy-on-v3": {
-      "sha256": "6f57fe3fae1582ae3121f6d4cf9c18d11834dfa3798ddcbbb964f36aa15f27bc",
-      "size": 211704
+      "sha256": "c27175b890fcd5326440e0b5a4b89f8453ec4558c2237ad2abdd921e9a3ae0d5",
+      "size": 223784
     }
   },
-  "estimated_total_fees_lamports": 196525000,
+  "estimated_total_fees_lamports": 197160000,
   "fee_note": "Maintenance fee quotes await final payer-and-rent reconciliation; case fees use full receipts.",
   "fees_complete": false,
   "fixture_cu_delta": {
@@ -1400,16 +1400,16 @@
   "plans": {
     "base": {
       "case_count": 1284,
-      "fee_estimate_lamports": 243185000,
-      "net_cost_estimate_lamports": 256514920,
-      "peak_lamports": 19012595280,
+      "fee_estimate_lamports": 244100000,
+      "net_cost_estimate_lamports": 257429920,
+      "peak_lamports": 19266626320,
       "signature_fee_lamports": 5000
     },
     "large": {
       "case_count": 24,
-      "fee_estimate_lamports": 91485000,
-      "net_cost_estimate_lamports": 94817480,
-      "peak_lamports": 72075832960,
+      "fee_estimate_lamports": 92110000,
+      "net_cost_estimate_lamports": 95442480,
+      "peak_lamports": 72329574000,
       "signature_fee_lamports": 5000
     }
   },
@@ -1420,12 +1420,12 @@
     },
     "cluster": "https://api.devnet.solana.com",
     "epoch": {
-      "absoluteSlot": 523550826,
-      "blockHeight": 510663950,
-      "epoch": 1211,
-      "slotIndex": 398826,
+      "absoluteSlot": 524394777,
+      "blockHeight": 511501004,
+      "epoch": 1213,
+      "slotIndex": 378777,
       "slotsInEpoch": 432000,
-      "transactionCount": 19940079338
+      "transactionCount": 19959865102
     },
     "features": {
       "account_data_direct_mapping": {
@@ -1448,129 +1448,129 @@
   },
   "programs": {
     "base-borrow-alloc-v0": {
-      "elf_sha256": "65193f205d55c3697b76f9faf1ec1e98c86b5b97e7df18d34016e8e9b68207e9",
-      "id": "9L1fVx8MVG2q6yVU7DPUTbW9mCMEGkChp9N88yEF2pb7",
+      "elf_sha256": "d3f429cefa2a0c18285d2658d1236ebfdde47d3a92469e05080b1eaed57a4fa8",
+      "id": "4Fhv1XDLqvYeNp7bt9rG1AevZigqnFxmkYchBwtFyzby",
       "loader": "BPFLoaderUpgradeab1e11111111111111111111111",
       "retained_shell_lamports": 833120,
       "state": "closed"
     },
     "base-borrow-alloc-v3": {
-      "elf_sha256": "f601cd026189a2094b7eaf5f02e243d000da4b287c69db4a59d812b8a1980dd6",
-      "id": "6gpLtzDUdyZmPdC5ynirhb2kr2pa27C8NZ1dwyEsi2Hv",
+      "elf_sha256": "4a75ab583dec89ec8a00f4e179e82fae8d4e2895c1bf34f499de46f275d6a6b9",
+      "id": "78EtfbbeWt9zkMzRkSnAWfN4JTGweoDdUZGoQPWEqV2G",
       "loader": "BPFLoaderUpgradeab1e11111111111111111111111",
       "retained_shell_lamports": 833120,
       "state": "closed"
     },
     "base-borrow-no-alloc-v0": {
-      "elf_sha256": "7ed90fac3fe63c292c623f8d06629e1fbda9956319fcf1ff683ed81e58f70476",
-      "id": "DWwCRxXvTkkT48cuXKN4dbp6rdS4J1TQkCxZYgbNhkgD",
+      "elf_sha256": "aa2dc9a1c2689e4d8bb9389b77f705b558fb2892540e0393c5fb3308b2cb100a",
+      "id": "Aup8ZtM87w2JhTRSuZe1KTYAUryboacJY6XqX24MbhXK",
       "loader": "BPFLoaderUpgradeab1e11111111111111111111111",
       "retained_shell_lamports": 833120,
       "state": "closed"
     },
     "base-borrow-no-alloc-v3": {
-      "elf_sha256": "0f0cd3df0db16bea3f37a10e019fee78ecb89e76baf83cd0340a0671870bebbe",
-      "id": "7kC6UkqqrvuLM66CCc3qcweALPf53beSKbCGzgGfzFmo",
+      "elf_sha256": "e62952b2190b49f570bce01a2ad6ae280379979a773245b8070fc8cdb892ec83",
+      "id": "CnZhWQq87bvhTmcyfoNFLx27Zz2QoWn8p2zNX8iWvvoM",
       "loader": "BPFLoaderUpgradeab1e11111111111111111111111",
       "retained_shell_lamports": 833120,
       "state": "closed"
     },
     "base-policy-off-v0": {
-      "elf_sha256": "63c0b3fcf300960e626dc327eafe1e4c1fddbc3912641349b6bb0b5a617404d7",
-      "id": "BKcui5XBxK9JG1y3YBVXXQXfKTWEZYHCStf5L9eDazDx",
+      "elf_sha256": "ba7eebbd080453a3ece485371b97c5ad5fe86a9107b4a3276c71267e8f99b073",
+      "id": "8Wf5uVnB7YwVKQxQUQPgZ81RSddV5JzXXinwpoKHYC42",
       "loader": "BPFLoaderUpgradeab1e11111111111111111111111",
       "retained_shell_lamports": 833120,
       "state": "closed"
     },
     "base-policy-off-v3": {
-      "elf_sha256": "d3fc4bc599fdb1491ab520636deca2801600c2caaf60a3f492c5438ecf2c394c",
-      "id": "oVfGhphkxSv5bomU7WWbbsUQ6ZxcjCDcQhxxKLqr3R7",
+      "elf_sha256": "062604f40587fba0a30ea42344b13fac7fdf5e87ab65f4137fa2a52a67fe7251",
+      "id": "7UGycuTF9zo2G7KM2spYEAE741bu9z2nqXLCnYuZ3sw5",
       "loader": "BPFLoaderUpgradeab1e11111111111111111111111",
       "retained_shell_lamports": 833120,
       "state": "closed"
     },
     "base-policy-on-v0": {
-      "elf_sha256": "1b0839ccc16cc845785d8bebe86181059fc1253ac2ec78af89b7fc48c56b696e",
-      "id": "GuB9ojLhWCNE3sNBrt6BonWejGL6GKV8Qf1Mj31j78u9",
+      "elf_sha256": "4e093aa24c574f680c19234f9e96da20833d99a9f3c7b31e7af0946bb0d2f23c",
+      "id": "BNgn6kdCA1CCsTEsrQudz4waMhuLaQeSsw1YiAzQEF1f",
       "loader": "BPFLoaderUpgradeab1e11111111111111111111111",
       "retained_shell_lamports": 833120,
       "state": "closed"
     },
     "base-policy-on-v3": {
-      "elf_sha256": "6f57fe3fae1582ae3121f6d4cf9c18d11834dfa3798ddcbbb964f36aa15f27bc",
-      "id": "EuJk4FuymwJpsJEtxAtaFy5x5t5NtSd7HnnEvjTQFee7",
+      "elf_sha256": "c27175b890fcd5326440e0b5a4b89f8453ec4558c2237ad2abdd921e9a3ae0d5",
+      "id": "AsJ7fz7tsTgijdBCDp81YpumVFxD5GfVECu1nBixVsGq",
       "loader": "BPFLoaderUpgradeab1e11111111111111111111111",
       "retained_shell_lamports": 833120,
       "state": "closed"
     },
     "large-borrow-alloc-v0": {
-      "id": "HQn4v7ttATyMEzMYoGXnAodX7LHuZyZ6SknFQbA8MV3j",
+      "id": "Cp52as9zeGgAjCNCEmFzpp5VoCrrKEhsS9rnTH6h6ad",
       "state": "reserved"
     },
     "large-borrow-alloc-v3": {
-      "id": "8ZZ7j2vuhiYA1upyC4cBy3tBkA5zfY6zzcqHiLhoaw9e",
+      "id": "GrtWGkLrrXxp5MJcCMohhuXwcbLS1oHP3dPibvx45Thj",
       "state": "reserved"
     },
     "large-borrow-no-alloc-v0": {
-      "id": "37ES1zLtL2kguXXyMgmmSTXJDBaUfhwiJy29r88nXpMu",
+      "id": "CA54oATyiMvEKSoVqos2mzcX3S57oMMDc8wcX24ChwZY",
       "state": "reserved"
     },
     "large-borrow-no-alloc-v3": {
-      "id": "7PAXC55UsBU2cX5dhRNm8ad7JxPDtQThrQPdQ3vxznpz",
+      "id": "68A8SmVquUXbsfyjT6QwCgZXNEJCGHkw2i6oozcVpHAn",
       "state": "reserved"
     },
     "owner-borrow-alloc-v0-op13-s128-plain-w1-owner1-exec0-a0": {
-      "elf_sha256": "0865cc2342cf2117114e0e90e06af434f340a11d56847838d563bd62137d31ab",
-      "id": "2mKs5ixzJEuyWvLCTtcouhUmhhTnF9fk6S52wdhM5vMS",
+      "elf_sha256": "3eb5d0701f54da2e2bdbdb08b53b39b910ec2a99e47552f69f2e0d11f8c86666",
+      "id": "E7sh75zBpEYw8Jpun1FWajdXs2geQmK1hnZ4uAfBGd5M",
       "loader": "BPFLoaderUpgradeab1e11111111111111111111111",
       "retained_shell_lamports": 833120,
       "state": "closed"
     },
     "owner-borrow-alloc-v0-op14-s128-plain-w1-owner1-exec0-a0": {
-      "elf_sha256": "0865cc2342cf2117114e0e90e06af434f340a11d56847838d563bd62137d31ab",
-      "id": "BEeQtWckBnBdzfCDPRaSPksh12mgcbWC2UkmMHvXbmzB",
+      "elf_sha256": "3eb5d0701f54da2e2bdbdb08b53b39b910ec2a99e47552f69f2e0d11f8c86666",
+      "id": "FCGCNC9Dy1xmg1UPQnubdemDqHmbp4Laq8en9SNdPB3L",
       "loader": "BPFLoaderUpgradeab1e11111111111111111111111",
       "retained_shell_lamports": 833120,
       "state": "closed"
     },
     "owner-borrow-alloc-v3-op13-s128-plain-w1-owner1-exec0-a0": {
-      "elf_sha256": "0865cc2342cf2117114e0e90e06af434f340a11d56847838d563bd62137d31ab",
-      "id": "4xYQP6AkQLfrPmmAssfR6wDvtssLc1iiP5Qy4ZnTxWF5",
+      "elf_sha256": "3eb5d0701f54da2e2bdbdb08b53b39b910ec2a99e47552f69f2e0d11f8c86666",
+      "id": "5ZcAmUKN9zTmUE5nP58SGNeQ9N9qM31aLbTcDdyw6jPh",
       "loader": "BPFLoaderUpgradeab1e11111111111111111111111",
       "retained_shell_lamports": 833120,
       "state": "closed"
     },
     "owner-borrow-alloc-v3-op14-s128-plain-w1-owner1-exec0-a0": {
-      "elf_sha256": "0865cc2342cf2117114e0e90e06af434f340a11d56847838d563bd62137d31ab",
-      "id": "F1WeTqX1BU25H82N7xG4xLfLVypthifp43qtuKpY2eZq",
+      "elf_sha256": "3eb5d0701f54da2e2bdbdb08b53b39b910ec2a99e47552f69f2e0d11f8c86666",
+      "id": "CSEReiga9kNnM3bFhBNFMJ3KSdTVofv1C24effyJ7RT3",
       "loader": "BPFLoaderUpgradeab1e11111111111111111111111",
       "retained_shell_lamports": 833120,
       "state": "closed"
     },
     "owner-borrow-no-alloc-v0-op13-s128-plain-w1-owner1-exec0-a0": {
-      "elf_sha256": "0865cc2342cf2117114e0e90e06af434f340a11d56847838d563bd62137d31ab",
-      "id": "5bzCXsv3PT7SYgUHaC62CV7JA9GyTsreWA6Wh4HSCsJt",
+      "elf_sha256": "3eb5d0701f54da2e2bdbdb08b53b39b910ec2a99e47552f69f2e0d11f8c86666",
+      "id": "BUx8HTZVeKPe6dZcw6GFCqMXYuN6HfnCm93wyha2QbDN",
       "loader": "BPFLoaderUpgradeab1e11111111111111111111111",
       "retained_shell_lamports": 833120,
       "state": "closed"
     },
     "owner-borrow-no-alloc-v0-op14-s128-plain-w1-owner1-exec0-a0": {
-      "elf_sha256": "0865cc2342cf2117114e0e90e06af434f340a11d56847838d563bd62137d31ab",
-      "id": "Eq3Jd735waAGvidst2hw3YkksdRnXVD54EmB9JiaStXw",
+      "elf_sha256": "3eb5d0701f54da2e2bdbdb08b53b39b910ec2a99e47552f69f2e0d11f8c86666",
+      "id": "6kL8U7BvAUzAe2GXEmKjhynFS1DtfDaH8GXJXHCdaQU3",
       "loader": "BPFLoaderUpgradeab1e11111111111111111111111",
       "retained_shell_lamports": 833120,
       "state": "closed"
     },
     "owner-borrow-no-alloc-v3-op13-s128-plain-w1-owner1-exec0-a0": {
-      "elf_sha256": "0865cc2342cf2117114e0e90e06af434f340a11d56847838d563bd62137d31ab",
-      "id": "B1NBferUAec51gX3SBXaKGenFUpKSxd1cYs17k4SzoY4",
+      "elf_sha256": "3eb5d0701f54da2e2bdbdb08b53b39b910ec2a99e47552f69f2e0d11f8c86666",
+      "id": "Hgg8eWKp78VeWa5FjSzHfUj7DbnzmxJEZMZwUpngUAwR",
       "loader": "BPFLoaderUpgradeab1e11111111111111111111111",
       "retained_shell_lamports": 833120,
       "state": "closed"
     },
     "owner-borrow-no-alloc-v3-op14-s128-plain-w1-owner1-exec0-a0": {
-      "elf_sha256": "0865cc2342cf2117114e0e90e06af434f340a11d56847838d563bd62137d31ab",
-      "id": "Cfr87sfpU4p25keVveT8X3mX2THW6vN786miA4Weuerd",
+      "elf_sha256": "3eb5d0701f54da2e2bdbdb08b53b39b910ec2a99e47552f69f2e0d11f8c86666",
+      "id": "5RKiTT5Wkr2LAtHsBHYLdobZ5retKemDv4HkgYFgrupi",
       "loader": "BPFLoaderUpgradeab1e11111111111111111111111",
       "retained_shell_lamports": 833120,
       "state": "closed"
@@ -1582,12 +1582,12 @@
     "exemption_threshold": 1.0,
     "lamports_per_byte_year": 5080,
     "sha256": "e6833309a1b7d9ce57849bd64d1d5834144a14cbc659346a9fda424a3e7ae219",
-    "slot": 523543587
+    "slot": 524394777
   },
-  "run_id": "1794984215901280652",
+  "run_id": "1795187856822554702",
   "source": {
-    "head": "4354ff2aae29ec6d1489e21474d8d309aee80146",
-    "sha256": "dd1bba211857fcc0269668e86491997b7ca135291a62a0a09e4fa24b7e7cac71"
+    "head": "3215f8e3a60f7d18193ee321e64bb7339a79cf99",
+    "sha256": "83ad1a5837b09309b68e7cb74abdb41f2983541a1b4265ee11172c5e6c75dd1b"
   },
   "status": "ok",
   "total_fees_lamports": null,

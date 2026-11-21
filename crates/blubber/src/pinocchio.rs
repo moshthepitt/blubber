@@ -13,7 +13,8 @@
 //!
 //! ```
 //! use blubber::{schema, List, Str};
-//! use blubber::pinocchio::{AccountView, Address, EditOptions, Funding, Headroom};
+//! use blubber::pinocchio::{EditOptions, Funding, Headroom};
+//! use blubber::pinocchio_sdk::{AccountView, Address};
 //! #[schema(account)]
 //! struct Messages { items: List<Str>, note: Str }
 //! fn append_checked(account: &mut AccountView, owner: &Address) -> blubber::Result<()> {
@@ -34,29 +35,27 @@
 //! }
 //! ```
 //!
-//! Rent supports the runtime's exact integer formulas for thresholds 1.0 and
-//! 2.0, including 128 bytes of account overhead. Other threshold bits return
-//! [`ProgramError::UnsupportedSysvar`] before any funding or refund. Rates above
-//! the runtime's threshold-specific cap return [`ProgramError::InvalidArgument`].
+//! Rent uses the SDK's checked SIMD-0194 quote, including 128 bytes of account
+//! overhead. An out-of-range length or rate returns
+//! [`ProgramError::InvalidArgument`].
 
 use crate::storage::Backend as Resize;
 use crate::Resize as _;
+use ::pinocchio::{
+    account::{Ref, RefMut, MAX_PERMITTED_DATA_INCREASE},
+    address::address_eq,
+    sysvars::{rent::Rent, Sysvar},
+};
 use ::pinocchio::{error::ProgramError, Resize as SdkResize};
-pub use ::pinocchio::{AccountView, Address};
+use ::pinocchio::{AccountView, Address};
 use core::{cell::Cell, marker::PhantomData};
-use solana_account_view::{Ref, RefMut};
 
 #[cfg(feature = "alloc")]
 use alloc::boxed::Box;
 
 use crate::{storage::private, CommitInfo, ErrorKind, ReadStorage, Result};
 
-const MAX_INCREASE: usize = 10_240;
-use support::{check_funding, check_payer, check_refund, MAX_STORAGE};
-
 pub(crate) mod creation;
-pub(crate) mod rent;
-pub use creation::{allocate_account, allocate_pda, create_account, create_pda};
 
 /// Funding policy for completing an account session.
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
@@ -231,8 +230,6 @@ pub struct Store<'a> {
     opening_lamports: u64,
     growth_limit: usize,
     growth_limited: bool,
-    #[cfg(feature = "account-runtime")]
-    exact_allocation: bool,
     poisoned: bool,
     rent_check: RentCheck<'a>,
     refund: Option<&'a mut AccountView>,
@@ -240,11 +237,11 @@ pub struct Store<'a> {
 }
 
 // Direct loans carry this check too: discovered headroom is not prepaid rent.
-// Cache only immutable sysvar parameters; read current balances on every growth.
+// Reuse the session's rent sysvar and check live balances on every growth.
 pub(crate) struct RentCheck<'a> {
     account: AccountView,
     funding: Funding<'a>,
-    rate: Cell<u64>,
+    rent: Cell<Option<Rent>>,
     retained: Cell<usize>,
 }
 
@@ -254,26 +251,39 @@ impl RentCheck<'_> {
         if required == 0 {
             return Ok(());
         }
+        match self.check_growth(required) {
+            Ok(()) => Ok(()),
+            Err(ProgramError::AccountNotRentExempt) => Err(ErrorKind::RentShortfall.into()),
+            Err(error) => Err(error.into()),
+        }
+    }
+
+    #[inline(always)]
+    fn check_growth(&self, required: usize) -> core::result::Result<(), ProgramError> {
         let minimum = self.minimum(required.max(self.retained.get()))?;
-        let available = match self.funding {
-            Funding::Prepaid => self.account.lamports(),
-            Funding::TopUp { payer, .. } => {
-                self.account.lamports().saturating_add(payer.lamports())
+        let balance = self.account.lamports();
+        if balance >= minimum {
+            return Ok(());
+        }
+        if let Funding::TopUp { payer, .. } = self.funding {
+            if payer.lamports() >= minimum - balance {
+                return Ok(());
+            }
+        }
+        Err(ProgramError::AccountNotRentExempt)
+    }
+
+    #[inline(always)]
+    fn minimum(&self, len: usize) -> core::result::Result<u64, ProgramError> {
+        let rent = match self.rent.get() {
+            Some(rent) => rent,
+            None => {
+                let rent = Rent::get()?;
+                self.rent.set(Some(rent));
+                rent
             }
         };
-        if available < minimum {
-            return Err(ErrorKind::RentShortfall.into());
-        }
-        Ok(())
-    }
-    fn minimum(&self, len: usize) -> Result<u64> {
-        let mut rate = self.rate.get();
-        // Supported coefficients are bounded far below this sentinel.
-        if rate == u64::MAX {
-            rate = rent::rate_from_bytes(rent::parameters()?)?;
-            self.rate.set(rate);
-        }
-        rent::minimum_with_rate(rate, len)
+        rent.try_minimum_balance(len)
     }
 }
 
@@ -366,83 +376,16 @@ impl<'a> Store<'a> {
             opening_lamports,
             growth_limit,
             growth_limited,
-            #[cfg(feature = "account-runtime")]
-            exact_allocation: false,
             poisoned: false,
             rent_check: RentCheck {
                 account: handle,
                 funding,
-                rate: Cell::new(u64::MAX),
+                rent: Cell::new(None),
                 retained: Cell::new(0),
             },
             refund: None,
             owner: *owner,
         })
-    }
-
-    // The owning adapter supplies this account's held SDK guard. Modes with no opening
-    // resize can transfer that guard directly, keeping bytes borrowed throughout.
-    #[cfg(feature = "account-runtime")]
-    #[inline(always)]
-    /// Checked runtime lease handoff or allocation retention.
-    #[doc(hidden)]
-    pub fn __with_guard(
-        account: &'a mut AccountView,
-        owner: &Address,
-        funding: Funding<'a>,
-        headroom: Headroom,
-        guard: RefMut<'a, [u8]>,
-    ) -> Result<Self> {
-        authenticate(account, owner)?;
-        if !account.is_writable() {
-            return Err(ErrorKind::NotWritable.into());
-        }
-        check_funding(account, funding)?;
-        if !matches!(headroom, Headroom::UpTo(0) | Headroom::OnDemand) {
-            return Err(ErrorKind::InvalidSchema.into());
-        }
-        let current = account.data_len();
-        if guard.len() != current || guard.as_ptr() != account.data_ptr() {
-            return Err(ErrorKind::UsedLength.into());
-        }
-        Ok(Self {
-            guard: Some(guard),
-            caller: PhantomData,
-            headroom,
-            storage_len: current,
-            opening_len: current,
-            opening_lamports: account.lamports(),
-            growth_limit: current,
-            growth_limited: headroom == Headroom::OnDemand || current == MAX_STORAGE,
-            #[cfg(feature = "account-runtime")]
-            exact_allocation: false,
-            poisoned: false,
-            rent_check: RentCheck {
-                account: *account,
-                funding,
-                rate: Cell::new(u64::MAX),
-                retained: Cell::new(0),
-            },
-            refund: None,
-            owner: *owner,
-        })
-    }
-
-    // Adapter reservation changes no bytes or geometry and needs no typed
-    // root to be resolved again. Explicit shrink_to_fit clears it normally.
-    #[cfg(feature = "account-runtime")]
-    /// Checked runtime lease handoff or allocation retention.
-    #[doc(hidden)]
-    pub fn __retain_opening(&mut self) {
-        self.rent_check.retained.set(self.opening_len);
-    }
-
-    #[cfg(feature = "account-runtime")]
-    /// Checked runtime lease handoff or allocation retention.
-    #[doc(hidden)]
-    pub fn __retain_exact(&mut self) {
-        self.__retain_opening();
-        self.exact_allocation = true;
     }
 
     /// Sends excess final rent lamports to a program-authorized recipient.
@@ -457,14 +400,42 @@ impl<'a> Store<'a> {
         Ok(self)
     }
 
-    #[inline(never)]
+    #[inline(always)]
     fn settle(&mut self) -> Result<(u64, u64)> {
-        // No data guard survives here, including on failure. Recheck copied
-        // account handles before any CPI or direct lamport mutation.
+        if matches!(self.rent_check.funding, Funding::Prepaid) && self.refund.is_none() {
+            self.settle_prepaid()?;
+            Ok((0, 0))
+        } else {
+            self.settle_with_parties()
+        }
+    }
+
+    #[inline(always)]
+    fn settle_prepaid(&self) -> Result<()> {
         authenticate(&self.rent_check.account, &self.owner)?;
-        check_funding(&self.rent_check.account, self.rent_check.funding)?;
+        if self.rent_check.account.lamports() < self.rent_check.minimum(self.storage_len)? {
+            return Err(ErrorKind::RentShortfall.into());
+        }
+        Ok(())
+    }
+
+    #[inline(never)]
+    fn settle_with_parties(&mut self) -> Result<(u64, u64)> {
+        // Admission checked the addresses, which stay fixed during the lease.
+        // Recheck live account state and borrows before moving lamports.
+        authenticate(&self.rent_check.account, &self.owner)?;
+        if let Funding::TopUp {
+            payer,
+            system_program,
+        } = self.rent_check.funding
+        {
+            if !system_program.executable() {
+                return Err(ErrorKind::InvalidPayer.into());
+            }
+            check_payer_access(payer)?;
+        }
         if let Some(recipient) = self.refund.as_deref() {
-            check_refund(&self.rent_check.account, self.rent_check.funding, recipient)?;
+            check_refund_access(recipient)?;
         }
         let minimum = self.rent_check.minimum(self.storage_len)?;
         settle_minimum(
@@ -675,12 +646,15 @@ impl Resize for Store<'_> {
 
     #[inline(always)]
     fn commit(&mut self, used_len: u32) -> Result<CommitInfo> {
-        let preflight = self.check_open().and_then(|()| self.check_used(used_len));
         // Every first attempt closes, including invalid or poisoned completion.
-        drop(self.guard.take());
-        let used = preflight?;
+        let guard = self.guard.take().ok_or(ErrorKind::Closed)?;
+        drop(guard);
+        if self.poisoned {
+            return Err(ErrorKind::Poisoned.into());
+        }
+        let used = self.check_used(used_len)?;
         let final_len = used.max(self.rent_check.retained.get());
-        let (storage_len, shrink_error) = trim(self.storage_len, final_len, |len| {
+        let (storage_len, shrink_result) = trim(self.storage_len, final_len, |len| {
             let result = self.rent_check.account.resize(len);
             (self.rent_check.account.data_len(), result)
         });
@@ -702,7 +676,7 @@ impl Resize for Store<'_> {
             storage_len: self.storage_len as u32,
             topped_up,
             refunded,
-            shrink_error,
+            shrink_error: shrink_result.err().map(Into::into),
         })
     }
 
@@ -723,10 +697,6 @@ impl Resize for Store<'_> {
     fn shrink_to_fit(&mut self, used_len: u32) -> Result<bool> {
         self.check_open()?;
         self.check_used(used_len)?;
-        #[cfg(feature = "account-runtime")]
-        if self.exact_allocation {
-            return Ok(false);
-        }
         self.rent_check.retained.set(0);
         Ok(true)
     }
@@ -734,10 +704,6 @@ impl Resize for Store<'_> {
 
 impl Drop for Store<'_> {
     fn drop(&mut self) {
-        #[cfg(feature = "account-runtime")]
-        if self.exact_allocation {
-            return;
-        }
         let used = self.guard.as_deref().and_then(|bytes| {
             let word: [u8; 4] = bytes.get(8..12)?.try_into().ok()?;
             let used = u32::from_le_bytes(word) as usize;
@@ -771,44 +737,35 @@ fn settle_minimum(
     refund: Option<&mut AccountView>,
     minimum: u64,
 ) -> Result<(u64, u64)> {
-    let deficit = minimum.saturating_sub(account.lamports());
-    if deficit != 0 {
+    let balance = account.lamports();
+    if balance < minimum {
+        let deficit = minimum - balance;
         let Some(payer) = payer else {
             return Err(ErrorKind::RentShortfall.into());
         };
-        payer
-            .lamports()
-            .checked_sub(deficit)
-            .ok_or(ErrorKind::RentShortfall)?;
-        account
-            .lamports()
-            .checked_add(deficit)
-            .ok_or(ErrorKind::ArithmeticOverflow)?;
+        if payer.lamports() < deficit {
+            return Err(ErrorKind::RentShortfall.into());
+        }
         pinocchio_system::instructions::Transfer {
             from: payer,
             to: account,
             lamports: deficit,
         }
         .invoke()?;
+        return Ok((deficit, 0));
     }
-    let mut refunded = 0;
-    if let Some(recipient) = refund {
-        let balance = account.lamports();
-        refunded = balance
-            .checked_sub(minimum)
-            .ok_or(ErrorKind::RentShortfall)?;
+    if let Some(recipient) = refund.filter(|_| balance > minimum) {
+        let refunded = balance - minimum;
         let (state_balance, recipient_balance) =
             refund_balances(balance, recipient.lamports(), refunded)?;
-        // Both balances and recipient conditions are checked before either
-        // write. A refund never invokes System with data-bearing state.
-        if refunded != 0 {
-            account.set_lamports(state_balance);
-            recipient.set_lamports(recipient_balance);
-        }
+        account.set_lamports(state_balance);
+        recipient.set_lamports(recipient_balance);
+        return Ok((0, refunded));
     }
-    Ok((deficit, refunded))
+    Ok((0, 0))
 }
 
+#[inline(always)]
 fn refund_balances(state: u64, recipient: u64, amount: u64) -> Result<(u64, u64)> {
     let state = state
         .checked_sub(amount)
@@ -836,12 +793,11 @@ fn trim(
     current: usize,
     target: usize,
     resize: impl FnOnce(usize) -> (usize, core::result::Result<(), ProgramError>),
-) -> (usize, Option<crate::Error>) {
+) -> (usize, core::result::Result<(), ProgramError>) {
     if target == current {
-        return (current, None);
+        return (current, Ok(()));
     }
-    let (physical, result) = resize(target);
-    (physical, result.err().map(Into::into))
+    resize(target)
 }
 
 fn probe_target(current: usize, headroom: Headroom) -> Result<(usize, usize)> {
@@ -849,7 +805,7 @@ fn probe_target(current: usize, headroom: Headroom) -> Result<(usize, usize)> {
         return Err(ErrorKind::Capacity.into());
     }
     let cap = current
-        .checked_add(MAX_INCREASE)
+        .checked_add(MAX_PERMITTED_DATA_INCREASE)
         .ok_or(ErrorKind::ArithmeticOverflow)?
         .min(MAX_STORAGE);
     let target = match headroom {
@@ -929,7 +885,7 @@ fn re_lease<G>(
     resized.map_err(ReLeaseError::Resize)
 }
 
-// Pinocchio 0.11.2/account-view 2.0.0: InvalidRealloc is returned before any
+// Pinocchio 0.12.0/account-view 3.0.0: InvalidRealloc is returned before any
 // mutation and accepted lengths form an interval. Other errors propagate. Keep
 // the SBF canary across upgrades; runtime memory faults are not returned errors.
 // Keep the accepted lower bound and rejected upper bound; every success grows.
@@ -961,95 +917,70 @@ fn discover(
 #[cfg(test)]
 mod tests;
 
-// Free support items are exported only through __private with account-runtime.
-pub(crate) mod support {
-    use super::*;
+const MAX_STORAGE: usize = 10_485_760;
 
-    /// Checked runtime adapter support.
-    #[doc(hidden)]
-    pub const MAX_STORAGE: usize = 10_485_760;
+/// Quotes rent for a prospective account length under SIMD-0194.
+#[inline(always)]
+fn minimum_balance(len: usize) -> Result<u64> {
+    Ok(Rent::get()?.try_minimum_balance(len)?)
+}
 
-    #[inline(always)]
-    /// Checked runtime adapter support.
-    #[doc(hidden)]
-    pub fn check_funding(state: &AccountView, funding: Funding<'_>) -> Result<()> {
-        if let Funding::TopUp {
-            payer,
-            system_program,
-        } = funding
+#[inline(always)]
+fn check_funding(state: &AccountView, funding: Funding<'_>) -> Result<()> {
+    if let Funding::TopUp {
+        payer,
+        system_program,
+    } = funding
+    {
+        if address_eq(state.address(), payer.address())
+            || address_eq(state.address(), system_program.address())
+            || address_eq(payer.address(), system_program.address())
         {
-            if state.address() == payer.address()
-                || state.address() == system_program.address()
-                || payer.address() == system_program.address()
-            {
-                return Err(ErrorKind::DuplicateAccount.into());
-            }
-            if system_program.address() != &pinocchio_system::ID || !system_program.executable() {
-                return Err(ErrorKind::InvalidPayer.into());
-            }
-            check_payer(state, payer)?;
-        }
-        Ok(())
-    }
-
-    /// Checked runtime adapter support.
-    #[doc(hidden)]
-    pub fn check_payer(state: &AccountView, payer: &AccountView) -> Result<()> {
-        if state.address() == payer.address() || payer.address() == &pinocchio_system::ID {
             return Err(ErrorKind::DuplicateAccount.into());
         }
-        if !payer.is_signer()
-            || !payer.is_writable()
-            || !payer.owned_by(&pinocchio_system::ID)
-            || !payer.is_data_empty()
-            || payer.executable()
+        if !address_eq(system_program.address(), &pinocchio_system::ID)
+            || !system_program.executable()
         {
             return Err(ErrorKind::InvalidPayer.into());
         }
-        payer
-            .check_borrow_mut()
-            .map_err(|_| ErrorKind::BorrowConflict)?;
-        Ok(())
+        check_payer_access(payer)?;
     }
+    Ok(())
+}
 
-    /// Checked runtime adapter support.
-    #[doc(hidden)]
-    pub fn check_refund(
-        state: &AccountView,
-        funding: Funding<'_>,
-        recipient: &AccountView,
-    ) -> Result<()> {
-        if state.address() == recipient.address()
-            || matches!(funding, Funding::TopUp { payer, .. } if payer.address() == recipient.address())
-        {
-            return Err(ErrorKind::DuplicateAccount.into());
-        }
-        if !recipient.is_writable() {
-            return Err(ErrorKind::NotWritable.into());
-        }
-        if recipient.executable() {
-            return Err(ErrorKind::Unauthorized.into());
-        }
-        recipient
-            .check_borrow_mut()
-            .map_err(|_| ErrorKind::BorrowConflict)?;
-        Ok(())
+fn check_payer_access(payer: &AccountView) -> Result<()> {
+    if !payer.is_signer()
+        || !payer.is_writable()
+        || !payer.owned_by(&pinocchio_system::ID)
+        || !payer.is_data_empty()
+        || payer.executable()
+    {
+        return Err(ErrorKind::InvalidPayer.into());
     }
+    payer
+        .check_borrow_mut()
+        .map_err(|_| ErrorKind::BorrowConflict)?;
+    Ok(())
+}
 
-    // Allocation hooks can supply a payer without a System Program view. The SDK
-    // Transfer uses the canonical program id. The caller authenticates state,
-    // validates payer/refund views and releases all data guards before settlement.
-    // Store keeps its stricter funding/recipient checks in settle above.
-    #[cfg(feature = "account-runtime")]
-    #[inline(always)]
-    /// Checked runtime adapter support.
-    #[doc(hidden)]
-    pub fn settle_account(
-        account: &mut AccountView,
-        payer: Option<&AccountView>,
-        refund: Option<&mut AccountView>,
-        storage_len: usize,
-    ) -> Result<(u64, u64)> {
-        settle_minimum(account, payer, refund, rent::minimum_balance(storage_len)?)
+fn check_refund(state: &AccountView, funding: Funding<'_>, recipient: &AccountView) -> Result<()> {
+    if address_eq(state.address(), recipient.address())
+        || matches!(funding, Funding::TopUp { payer, .. } if address_eq(payer.address(), recipient.address()))
+    {
+        return Err(ErrorKind::DuplicateAccount.into());
     }
+    check_refund_access(recipient)
+}
+
+fn check_refund_access(recipient: &AccountView) -> Result<()> {
+    if !recipient.is_writable() {
+        return Err(ErrorKind::NotWritable.into());
+    }
+    if recipient.executable() {
+        return Err(ErrorKind::Unauthorized.into());
+    }
+    recipient
+        .check_borrow_mut()
+        .map_err(|_| ErrorKind::BorrowConflict)?;
+    Ok(())
 }

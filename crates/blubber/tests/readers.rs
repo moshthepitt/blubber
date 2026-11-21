@@ -4,7 +4,7 @@
 
 mod support;
 
-use blubber::{Fixed, List, Map, MapKey, Pubkey, Schema, Str, View};
+use blubber::{Address, Fixed, List, Map, MapKey, Schema, Str, View};
 use core::iter::FusedIterator;
 use support::{account, encoded, read, Pair, Record, DISCRIMINATOR};
 
@@ -177,10 +177,10 @@ fn nested_maps_lists_and_options_read_without_owned_intermediates() {
 
 #[test]
 fn raw_and_pubkey_map_keys_are_copied() {
-    let a = Pubkey::from_bytes([1; 32]);
-    let b = Pubkey::from_bytes([2; 32]);
-    let bytes = encoded::<Map<Pubkey, bool>>(&&[(a, false), (b, true)][..]);
-    let map = read::<Map<Pubkey, bool>>(&bytes).unwrap();
+    let a = Address::new_from_array([1; 32]);
+    let b = Address::new_from_array([2; 32]);
+    let bytes = encoded::<Map<Address, bool>>(&&[(a, false), (b, true)][..]);
+    let map = read::<Map<Address, bool>>(&bytes).unwrap();
     assert_eq!(map.iter().collect::<Vec<_>>(), [(a, false), (b, true)]);
     assert_eq!(map.get(&b), Some(true));
     let bytes = encoded::<Map<[u8; 3], Str>>(&&[([0, 1, 2], "a"), ([255, 0, 0], "b")][..]);
@@ -216,7 +216,7 @@ fn all_fixed_reader_families_and_removed_values_decode_by_value() {
     scalar(true);
     scalar(false);
     scalar([9; 37]);
-    scalar(Pubkey::from_bytes([42; 32]));
+    scalar(Address::new_from_array([42; 32]));
     let bytes = encoded::<Str>(&"discarded");
     assert_eq!(
         Str::read_removed(View::new(&bytes, Str::LAYOUT, 0).unwrap()),
@@ -957,11 +957,11 @@ fn streamed_maps_retain_full_keys_borrows_and_slot_hints() {
                 for (i, byte) in key.iter_mut().enumerate() {
                     *byte = k.wrapping_mul(17).wrapping_add(i as u8);
                 }
-                (Pubkey::from_bytes(key), v)
+                (Address::new_from_array(key), v)
             })
             .collect();
-        let bytes = encoded::<Map<Pubkey, Str>>(&entries.as_slice());
-        let map = read::<Map<Pubkey, Str>>(&bytes).unwrap();
+        let bytes = encoded::<Map<Address, Str>>(&entries.as_slice());
+        let map = read::<Map<Address, Str>>(&bytes).unwrap();
         let (checksum, borrowed) = {
             let mut iter = map.try_iter();
             let mut checksum = 0u64;
@@ -1536,24 +1536,24 @@ fn strict32_checked_reader_preserves_prefix_faults_and_values() {
         first[position + 1..].fill(0xff);
         second[position + 1..].fill(0);
         let entries = [
-            (Pubkey::from_bytes(first), false),
-            (Pubkey::from_bytes(second), true),
+            (Address::new_from_array(first), false),
+            (Address::new_from_array(second), true),
         ];
-        let mut bytes = encoded::<Map<Pubkey, bool>>(&entries.as_slice());
-        let checked = View::new(&bytes, <Map<Pubkey, bool>>::LAYOUT, 31).unwrap();
+        let mut bytes = encoded::<Map<Address, bool>>(&entries.as_slice());
+        let checked = View::new(&bytes, <Map<Address, bool>>::LAYOUT, 31).unwrap();
         checked.validate().unwrap();
         assert_eq!(
-            checked.read::<Map<Pubkey, bool>>().unwrap().iter().count(),
+            checked.read::<Map<Address, bool>>().unwrap().iter().count(),
             2
         );
         bytes[37..69].copy_from_slice(&first);
-        let checked = View::new(&bytes, <Map<Pubkey, bool>>::LAYOUT, 31).unwrap();
+        let checked = View::new(&bytes, <Map<Address, bool>>::LAYOUT, 31).unwrap();
         assert_eq!(
             checked.validate(),
             Err(Error::new(ErrorKind::DuplicateKey, 68))
         );
         bytes[4..36].copy_from_slice(&second);
-        let checked = View::new(&bytes, <Map<Pubkey, bool>>::LAYOUT, 31).unwrap();
+        let checked = View::new(&bytes, <Map<Address, bool>>::LAYOUT, 31).unwrap();
         assert_eq!(
             checked.validate(),
             Err(Error::new(ErrorKind::UnsortedKeys, 68))

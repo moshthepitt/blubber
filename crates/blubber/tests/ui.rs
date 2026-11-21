@@ -38,9 +38,10 @@ fn public_api_compile_contracts() {
     count += metadata.check_ui(&directory, inventory, "metadata");
     let tree = metadata.dependency_tree();
     assert!(
-        !tree.lines().skip(1).any(|line| ["pinocchio", "solana-"]
-            .iter()
-            .any(|sdk| line.starts_with(sdk))),
+        !tree.lines().skip(1).any(|line| {
+            line.starts_with("pinocchio")
+                || (line.starts_with("solana-") && !line.starts_with("solana-address v2."))
+        }),
         "{tree}"
     );
     let scoped = Consumer::new(root, "scoped-ui", format!(

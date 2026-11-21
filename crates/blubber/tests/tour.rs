@@ -8,10 +8,10 @@ mod exercise;
 #[path = "support/tour/state.rs"]
 mod state;
 
-use blubber::{Pubkey, Result, SliceStore};
+use blubber::{Address, Result, SliceStore};
 use state::{Limits, MyAccount};
 
-fn assert_finished(account: state::MyAccountRef<'_>, actor: Pubkey) {
+fn assert_finished(account: state::MyAccountRef<'_>, actor: Address) {
     account.validate().unwrap();
     assert_eq!(account.authority(), actor);
     assert_eq!(account.counter(), 1);
@@ -32,7 +32,7 @@ fn assert_finished(account: state::MyAccountRef<'_>, actor: Pubkey) {
 
 #[test]
 fn tour_runs_on_a_fixed_slice_and_reopens_after_commit() -> Result<()> {
-    let actor = Pubkey::from_bytes([1; 32]);
+    let actor = Address::new_from_array([1; 32]);
     let mut room = [0; 4096];
     let mut store = SliceStore::new(&mut room);
     let mut account = MyAccount::initialize(&mut store, state::seed(actor))?;
@@ -54,7 +54,7 @@ fn tour_runs_on_a_fixed_slice_and_reopens_after_commit() -> Result<()> {
 #[cfg(feature = "alloc")]
 #[test]
 fn tour_runs_on_a_vec_that_grows_from_exact_seed_capacity() -> Result<()> {
-    let actor = Pubkey::from_bytes([2; 32]);
+    let actor = Address::new_from_array([2; 32]);
     let mut bytes = Vec::new();
     let mut store = blubber::VecStore::new(&mut bytes);
     let mut account = MyAccount::initialize(&mut store, state::seed(actor))?;
@@ -70,13 +70,13 @@ fn tour_runs_on_a_vec_that_grows_from_exact_seed_capacity() -> Result<()> {
 #[test]
 fn unauthorized_exercise_preserves_the_complete_storage() -> Result<()> {
     let mut room = [0; 4096];
-    let actor = Pubkey::from_bytes([1; 32]);
+    let actor = Address::new_from_array([1; 32]);
     MyAccount::initialize(&mut SliceStore::new(&mut room), state::seed(actor))?;
     let before = room;
     let mut store = SliceStore::new(&mut room);
     let mut account = MyAccount::load_mut(&mut store)?;
     assert_eq!(
-        exercise::exercise(&mut account, Pubkey::from_bytes([2; 32])),
+        exercise::exercise(&mut account, Address::new_from_array([2; 32])),
         Err(blubber::ErrorKind::Unauthorized.into())
     );
     account.validate()?;
@@ -89,7 +89,8 @@ fn unauthorized_exercise_preserves_the_complete_storage() -> Result<()> {
 fn owned_tour_inputs_do_not_borrow_the_inserted_mirror() -> Result<()> {
     let mut room = [0; 4096];
     let mut store = SliceStore::new(&mut room);
-    let mut account = MyAccount::initialize(&mut store, state::seed(Pubkey::from_bytes([1; 32])))?;
+    let mut account =
+        MyAccount::initialize(&mut store, state::seed(Address::new_from_array([1; 32])))?;
     let mut owned = state::RecordOwned {
         name: "x".into(),
         tags: vec![1, 2],

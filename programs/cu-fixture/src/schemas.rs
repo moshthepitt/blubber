@@ -1,5 +1,5 @@
 //! Account declarations shared by the SBF fixture and host acceptance checks.
-use blubber::{List, Map, Pubkey, Str};
+use blubber::{Address, List, Map, Str};
 
 /// Fixed scalar fixture.
 #[blubber::schema(account)]
@@ -23,7 +23,7 @@ pub struct Numbers {
 #[blubber::schema(account)]
 pub struct PublicKeyMap {
     /// Sorted fixed-value entries.
-    pub value: Map<Pubkey, u64>,
+    pub value: Map<Address, u64>,
 }
 /// SDK Address map fixture.
 #[blubber::schema(account)]
@@ -62,8 +62,8 @@ mod scaling {
         pub enabled: bool,
         /// Stored [u8; 17] value.
         pub raw: [u8; 17],
-        /// Stored Pubkey value.
-        pub key: Pubkey,
+        /// Stored Address value.
+        pub key: Address,
         /// Stored pinocchio::Address value.
         pub address: pinocchio::Address,
     }
@@ -85,7 +85,7 @@ mod scaling {
     #[blubber::schema(account)]
     pub struct KeyWords {
         /// Raw public keys and indexed UTF-8 values.
-        pub value: Map<Pubkey, Str>,
+        pub value: Map<Address, Str>,
     }
     /// Address-keyed indexed-value map scaling fixture.
     #[blubber::schema(account)]

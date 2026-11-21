@@ -216,29 +216,28 @@ impl<'a, T: Schema> ListRef<'a, T> {
 impl<'a> ListRef<'a, Str> {
     /// Borrows the complete packed string payload after checking aggregate UTF-8.
     ///
-    /// Checks the actual string-list schema, count/header extent and aggregate
-    /// text. It does **not** certify individual item ends: an end inside a
-    /// multibyte character can succeed here while [`Self::validate`] and item
-    /// reads reject it. Use iteration when item positions or errors matter.
+    /// Checks the string-list schema, header extent and aggregate text. An item
+    /// end inside a multibyte character can pass the aggregate check. Use
+    /// [`Self::try_iter`] for individual items and [`Self::validate`] to check
+    /// the complete list.
     ///
     /// Work is O(payload bytes), with constant header work and no allocation.
-    /// An empty list returns `""` and still pays the header/setup cost. Errors
+    /// An empty list still checks its header and returns `""`. Errors
     /// use the same account-relative offsets as other checked readers; an
     /// invalid aggregate reports its first invalid UTF-8 byte.
     ///
-    /// | Setup row | UTF-8 bytes visited | Returned text |
-    /// | --- | --- | --- |
-    /// | n=0, empty list | Zero; schema/header checks still run | `""` |
-    /// | n=1 | The complete sole string | That string, or a UTF-8 error |
-    ///
     /// ```
     /// # #![forbid(unsafe_code)]
-    /// use blubber::{List, Schema, Str, View};
-    /// // Two strings, "a" and "é", with one stored cumulative end.
-    /// let bytes = [2, 0, 0, 0, 1, 0, 0, 0, b'a', 0xc3, 0xa9];
+    /// use blubber::{Error, ErrorKind, List, Schema, Str, View};
+    /// // Two items with an end inside the UTF-8 encoding of "é".
+    /// let bytes = [2, 0, 0, 0, 2, 0, 0, 0, b'a', 0xc3, 0xa9];
     /// let list = View::new(&bytes, *List::<Str>::LAYOUT, 12)?
     ///     .read::<List<Str>>()?;
     /// assert_eq!(list.try_concat_str()?, "aé");
+    /// assert!(matches!(list.try_iter().next(), Some(Err(Error::Fault {
+    ///     kind: ErrorKind::InvalidUtf8, ..
+    /// }))));
+    /// assert!(list.validate().is_err());
     /// # Ok::<(), blubber::Error>(())
     /// ```
     #[inline(always)]
@@ -269,7 +268,6 @@ impl<'a> ListRef<'a, Str> {
     /// [`Self::try_iter`] for lazy reads. Invalid aggregate text or a boundary
     /// inside a character uses ordinary per-item conversion, preserving accepted
     /// prefixes and the first error's exact offset. Errors are yielded once.
-    #[inline(always)]
     ///
     /// ```
     /// use blubber::{List, Schema, Str, View};
@@ -280,6 +278,7 @@ impl<'a> ListRef<'a, Str> {
     /// assert_eq!(list.try_iter_batched().take(1).collect::<blubber::Result<Vec<_>>>()?, ["a"]);
     /// # Ok::<(), blubber::Error>(())
     /// ```
+    #[inline(always)]
     pub fn try_iter_batched(self) -> TryBatchedListIter<'a> {
         let inner = self.try_iter();
         let text = match &inner.state {
@@ -540,19 +539,22 @@ impl<'a, K: MapKey, V: Fixed + Schema> MapRef<'a, K, V> {
     /// A value fault consumes its slot; later slots remain readable. Exhaustion
     /// is fused, and cloning retains the same immutable bytes and position.
     ///
-    /// Key bytes are never decoded. This does not certify key domains, ordering
-    /// or uniqueness; call [`Self::validate`] for a complete map certificate.
-    /// [`Self::try_iter`] retains key decoding and stops after its first error.
+    /// Iteration uses no allocation. Call [`Self::validate`] to check key
+    /// domains, ordering and uniqueness. [`Self::try_iter`] decodes each key
+    /// before its value and stops after its first error.
     ///
     /// ```
-    /// use blubber::{Map, Schema, View};
+    /// use blubber::{Error, ErrorKind, Map, Schema, View};
     /// let bytes = [3, 0, 0, 0, 1, 1, 2, 2, 3, 0];
     /// let map = View::new(&bytes, *<Map<u8, bool> as Schema>::LAYOUT, 20)?
     ///     .read::<Map<u8, bool>>()?;
     /// let mut values = map.try_values();
     /// assert_eq!(values.next().transpose()?, Some(true));
-    /// assert!(values.next().is_some_and(|item| item.is_err()));
+    /// assert!(matches!(values.next(), Some(Err(Error::Fault {
+    ///     kind: ErrorKind::InvalidBool, offset: 27, ..
+    /// }))));
     /// assert_eq!(values.next().transpose()?, Some(false));
+    /// assert!(values.next().is_none());
     /// let mut entries = map.try_iter();
     /// assert!(entries.next().is_some_and(|item| item.is_ok()));
     /// assert!(entries.next().is_some_and(|item| item.is_err()));
@@ -637,16 +639,11 @@ impl<K: MapKey, V: Fixed> FusedIterator for TryMapValues<'_, K, V> {}
 impl<'a, K: MapKey> MapRef<'a, K, Str> {
     /// Iterates copied keys and strings after one packed-payload UTF-8 scan.
     ///
-    /// Setup costs O(payload bytes). [`Self::try_iter`] remains lazy. Each key
-    /// and selected end, including the terminal end, is checked in ordinary
-    /// iteration order. Invalid text or character boundaries use per-item
-    /// conversion, preserving accepted prefixes and first-error offsets.
-    /// This does not certify key ordering or uniqueness; use [`Self::validate`].
-    #[inline(always)]
-    ///
-    /// Setup scans the whole string payload even for `take(1)`. Prefer
-    /// [`Self::try_iter`] for partial traversal; both stop after the same first
-    /// item error. See the list's batched example for the setup comparison.
+    /// Setup costs O(payload bytes), even for `take(1)`. Use [`Self::try_iter`]
+    /// to read only part of the map. Both iterators check keys and item ends in
+    /// the same order and stop at the same first error. Invalid aggregate text
+    /// or an end inside a character triggers per-item UTF-8 conversion.
+    /// Call [`Self::validate`] to check ordering and uniqueness.
     ///
     /// ```
     /// use blubber::{Map, Schema, Str, View};
@@ -659,6 +656,7 @@ impl<'a, K: MapKey> MapRef<'a, K, Str> {
     /// assert_eq!(map.try_iter_batched().take(1).collect::<blubber::Result<Vec<_>>>()?, [(1, "a")]);
     /// # Ok::<(), blubber::Error>(())
     /// ```
+    #[inline(always)]
     pub fn try_iter_batched(self) -> TryBatchedMapIter<'a, K> {
         let inner = self.try_iter();
         let text = match &inner.state {

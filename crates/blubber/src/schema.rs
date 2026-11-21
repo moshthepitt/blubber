@@ -4,7 +4,7 @@ use core::marker::PhantomData;
 
 use blubber_core::{checked_u32, Layout, Leaf, MAX_DEPTH};
 
-use crate::{Error, ErrorKind, Fixed, MapKey, Pubkey, Result, View};
+use crate::{Address, Error, ErrorKind, Fixed, MapKey, Result, View};
 
 #[cfg(test)]
 #[path = "schema_work.rs"]
@@ -331,9 +331,7 @@ fixed_schema!(i32, Leaf::Signed(4));
 fixed_schema!(i64, Leaf::Signed(8));
 fixed_schema!(i128, Leaf::Signed(16));
 fixed_schema!(bool, Leaf::Bool);
-fixed_schema!(Pubkey, Leaf::Raw(32));
-#[cfg(feature = "pinocchio")]
-fixed_schema!(::pinocchio::Address, Leaf::Raw(32));
+fixed_schema!(Address, Leaf::Raw(32));
 
 impl<const N: usize> Schema for [u8; N] {
     const __ENCODER_AUDITED: bool = true;

@@ -63,7 +63,9 @@ fn main() {
             let ops: &[u8] = match layout {
                 0 => &[0, 6, 7, 20, 26, 27, 30, 31, 32, 33, 34, 70],
                 2 => &[0, 6, 7, 20, 26, 27, 30, 31, 32, 33, 34],
-                3 => &[0, 6, 7, 20, 26, 27, 30, 31, 33, 34, 63, 64, 66, 71, 72, 73],
+                3 => &[
+                    0, 6, 7, 20, 26, 27, 30, 31, 33, 34, 63, 64, 66, 71, 72, 73, 74, 75,
+                ],
                 _ => &[0, 6, 7, 20, 26, 27, 30, 31, 33, 34, 63, 64],
             };
             for n in [0, 1, 10, 100, 1000] {
@@ -75,7 +77,7 @@ fn main() {
                         n,
                         op: match op {
                             70 => 31,
-                            71..=73 => 71,
+                            71..=75 => 71,
                             _ => op,
                         },
                         common,
@@ -90,6 +92,14 @@ fn main() {
                             "map_grow_from_old_values",
                             "map_grow_from_old_values_fixed_width",
                         )
+                    } else if op == 74 {
+                        case.name().replace(
+                            "map_grow_from_old_values",
+                            "map_grow_from_old_values_batched",
+                        )
+                    } else if op == 75 {
+                        case.name()
+                            .replace("map_grow_from_old_values", "map_grow_from_old_values_with")
                     } else {
                         case.name()
                     };
@@ -97,7 +107,7 @@ fn main() {
                         continue;
                     }
                     let (schema, mut value, disc) = case.model_case().model();
-                    if matches!(op, 71..=73) {
+                    if matches!(op, 71..=75) {
                         use blubber_model::Value;
                         let Value::Struct(fields) = &mut value else {
                             panic!("recipe root");

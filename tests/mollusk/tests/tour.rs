@@ -11,14 +11,17 @@ use mollusk_svm::{
 use solana_account::Account;
 use solana_instruction::{error::InstructionError, AccountMeta, Instruction};
 use solana_pubkey::Pubkey;
+use solana_sdk_ids::system_program::ID as SYSTEM;
+
+#[path = "support/invalid_rent.rs"]
+mod invalid_rent;
 
 const OWNER: Pubkey = Pubkey::new_from_array([7; 32]);
 const STATE: Pubkey = Pubkey::new_from_array([8; 32]);
 const PAYER: Pubkey = Pubkey::new_from_array([9; 32]);
-const SYSTEM: Pubkey = Pubkey::new_from_array([0; 32]);
 const DISCRIMINATOR: [u8; 8] = [47, 253, 130, 2, 67, 165, 139, 141];
 const BALANCE: u64 = 100_000_000_000;
-const WINDOW: usize = 10_240;
+use pinocchio::account::MAX_PERMITTED_DATA_INCREASE as WINDOW;
 
 // Define the wire schema and values without importing production descriptors,
 // seed inputs, codecs or the exercise's implementation.
@@ -336,7 +339,6 @@ fn failed_final_funding_rolls_back_the_entire_exercise() {
 }
 
 #[test]
-#[allow(deprecated)]
 fn shrinking_tour_uses_live_rent_and_rolls_back_on_settlement_failure() {
     assert!(bytes(true).len() < bytes(false).len());
     for profile in 0..3 {
@@ -344,11 +346,11 @@ fn shrinking_tour_uses_live_rent_and_rolls_back_on_settlement_failure() {
         case.accounts[0].1.lamports = 1;
         case.accounts[1].1.lamports = 0;
         // A shrink cannot rely on the opening balance to establish exemption.
-        // Unsupported live rent fails commit, rolling back the complete tour.
-        case.mollusk.sysvars.rent.exemption_threshold = 1.5f64.to_le_bytes();
+        // An out-of-range rent quote fails commit and rolls back the tour.
+        case.accounts.push(invalid_rent::sysvar(&case.mollusk));
         case.run(
             &case.instruction(2),
-            Some(pinocchio::error::ProgramError::UnsupportedSysvar.into()),
+            Some(pinocchio::error::ProgramError::InvalidArgument.into()),
             0,
         );
     }

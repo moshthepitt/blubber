@@ -50,10 +50,15 @@ fn error_codes_faults() {
         error.custom_code() == Error::from(KINDS[b]).custom_code(),
         a == b
     );
-    assert_eq!(
-        ProgramError::from(error),
-        ProgramError::Custom(0xB101 + a as u32)
-    );
+    let expected = match (offset, a + 1) {
+        (Error::NO_OFFSET, 18) => ProgramError::InvalidAccountOwner,
+        (Error::NO_OFFSET, 20) => ProgramError::AccountBorrowFailed,
+        (Error::NO_OFFSET, 21) => ProgramError::InvalidRealloc,
+        (Error::NO_OFFSET, 22) => ProgramError::AccountNotRentExempt,
+        (Error::NO_OFFSET, 26) => ProgramError::AccountAlreadyInitialized,
+        _ => ProgramError::Custom(0xB101 + a as u32),
+    };
+    assert_eq!(ProgramError::from(error), expected);
     assert_eq!(
         Error::from(KINDS[a]),
         Error::new(KINDS[a], Error::NO_OFFSET)

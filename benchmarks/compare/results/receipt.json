@@ -1,15 +1,15 @@
 {
   "artifacts": {
-    "target/release-prep-checks/calibration-v0/blubber_cu_fixture.so": "debca2695adf0d09d0b8425ca6db2ef4a7ef096a6760f478dda5f4b00741d5e6",
-    "target/release-prep-checks/calibration-v3/blubber_cu_fixture.so": "1a01cfe5185ed57914bd8d50a74e329305d27294da06546b71548d01ca8c6fbc",
-    "target/release-prep-checks/heap-v0/compare_program.so": "58c9f7a7542468e74e81b8fdbaf5e6ce6cca9b180d3a98842ee5c9a5a03bcd54",
-    "target/release-prep-checks/heap-v0/compare_star.so": "bbb89ca26071655cbfb6dd66bbb4b8c73f8f80088742f4dbda7a9498278b1cee",
-    "target/release-prep-checks/heap-v3/compare_program.so": "a473eb144287a42409d1b949bd4770f5382fa9fe596d2551c296cc4798066ccf",
-    "target/release-prep-checks/heap-v3/compare_star.so": "0b8849a0258a6d0a2572406e831ea8aad28c80686b3bbfe74f809dcbba345835",
-    "target/release-prep-checks/v0/compare_program.so": "0179fd9e3323718a32f9e773bfb2f11752e4e7e3ace800441e88d067bd2b1479",
-    "target/release-prep-checks/v0/compare_star.so": "f41009fc51c0aa943131ef8baa69067f635ea3b88ed6d11ba0d330333377932b",
-    "target/release-prep-checks/v3/compare_program.so": "f990f5655ffa8fd042ef057543f807667243610f6d89a65ddb105af42fe7deeb",
-    "target/release-prep-checks/v3/compare_star.so": "51d12172e27f2e824f6de19d4cadb1dfc6cb927e9fea24e4dfd9b0a253238f50"
+    "target/docs-assembly-compare/calibration-v0/blubber_cu_fixture.so": "ecb8fb4d84c61c8995d242353b6acb7539b9accc4b3a4e198ed5e05d027aa20f",
+    "target/docs-assembly-compare/calibration-v3/blubber_cu_fixture.so": "fece17b94107bc7cafa37816307949b3daa83cdf42e0abee0b5b5305d143a054",
+    "target/docs-assembly-compare/heap-v0/compare_program.so": "b20aa61ae38513d430a183e7ad72a582498bd63dde12d41f7c826421dd2f2ca0",
+    "target/docs-assembly-compare/heap-v0/compare_star.so": "39c8e20260ec4c4015a2b8515d1e95fc7157d82a87b5be01617923fa5fcca7f8",
+    "target/docs-assembly-compare/heap-v3/compare_program.so": "a03eab4050b34954202eb25fae9f7216ce666c69187bf79443a9e03e66cf20de",
+    "target/docs-assembly-compare/heap-v3/compare_star.so": "774f5c182e9b87d571cf5897dfce3cb067ac5bd0894457ba84ea5f5d17396ce3",
+    "target/docs-assembly-compare/v0/compare_program.so": "3304fc42eb311f84c5a41d7414a0501ab76d02f0b429cda6fc3577285458cecc",
+    "target/docs-assembly-compare/v0/compare_star.so": "1229eaa75c5d2ab2639b2930740e48e79410f1656556a1330a3b4d1b3355f399",
+    "target/docs-assembly-compare/v3/compare_program.so": "7c09687b31dc1265230f031c46ba89a095d28395895ca7c6cefef0cd8e4c75ff",
+    "target/docs-assembly-compare/v3/compare_star.so": "df9cd0454bc6886d9cd5af7bbdf260b1d1422b664b9a61c388988b67330efeb1"
   },
   "competitors": {
     "anchor_slab": {
@@ -60,16 +60,16 @@
     "blubber": {
       "capabilities": {
         "formal": "Verus kernel; bounded Kani typed checks (repository gates)",
-        "pinocchio_anchor_v2": "native Pinocchio / Anchor v2 lazy and checked managed lifecycle (git pin; T5/T5b receipts)",
-        "realloc": "default Max lease (+10240), commit trims",
+        "pinocchio_anchor_v2": "native Pinocchio / Anchor v2 lazy and checked managed lifecycle (pinned SDK)",
+        "realloc": "default UpTo(0) lease; comparison mutable families use explicit Max with matching idles, commit trims",
         "storage": "unsized borrowed",
-        "validation": "raw reads: whole root including key order; authenticated mutable Store loads: lazy touched checks (D21 default)"
+        "validation": "raw reads: whole root including key order; authenticated mutable Store loads: lazy touched checks"
       },
-      "commit": "cecc6280885b62abd225c566b1f57a836f169d51",
-      "commit_date": "2026-11-14",
-      "license": null,
+      "commit": "e906f7deca37a000d5fcd12de4a1937af20c01b7",
+      "commit_date": "2026-11-19",
+      "license": "MIT",
       "package": "blubber",
-      "source_sha256": "959f69b7f87aaf97f22a69a2ef277855e01aeecb5af4ae050050009ae8471779",
+      "source_sha256": "7554ec473dae4e5f43d7d641f4b389b1555b763e8838b0cb28417f2e9ca67aa0",
       "unsafe_syntax": {
         "count": 0,
         "files": {}
@@ -80,16 +80,16 @@
     "blubber_checked": {
       "capabilities": {
         "formal": "Verus kernel; bounded Kani typed checks (repository gates)",
-        "pinocchio_anchor_v2": "native Pinocchio / Anchor v2 lazy and checked managed lifecycle (git pin; T5/T5b receipts)",
-        "realloc": "default Max lease (+10240), commit trims",
+        "pinocchio_anchor_v2": "native Pinocchio / Anchor v2 lazy and checked managed lifecycle (pinned SDK)",
+        "realloc": "default UpTo(0) lease; comparison mutable families use explicit Max with matching idles, commit trims",
         "storage": "unsized borrowed",
-        "validation": "explicit checked reads and mutable ingress: complete root, strict keys and UTF-8"
+        "validation": "explicit checked reads and mutable loads: complete root, strict keys and UTF-8"
       },
-      "commit": "cecc6280885b62abd225c566b1f57a836f169d51",
-      "commit_date": "2026-11-14",
-      "license": null,
+      "commit": "e906f7deca37a000d5fcd12de4a1937af20c01b7",
+      "commit_date": "2026-11-19",
+      "license": "MIT",
       "package": "blubber",
-      "source_sha256": "959f69b7f87aaf97f22a69a2ef277855e01aeecb5af4ae050050009ae8471779",
+      "source_sha256": "7554ec473dae4e5f43d7d641f4b389b1555b763e8838b0cb28417f2e9ca67aa0",
       "unsafe_syntax": {
         "count": 0,
         "files": {}
@@ -100,16 +100,16 @@
     "blubber_trusted": {
       "capabilities": {
         "formal": "Verus kernel; bounded Kani typed checks (repository gates)",
-        "pinocchio_anchor_v2": "native Pinocchio / Anchor v2 lazy and checked managed lifecycle (git pin; T5/T5b receipts)",
-        "realloc": "default Max lease (+10240), commit trims",
+        "pinocchio_anchor_v2": "native Pinocchio / Anchor v2 lazy and checked managed lifecycle (pinned SDK)",
+        "realloc": "default UpTo(0) lease; comparison mutable families use explicit Max with matching idles, commit trims",
         "storage": "unsized borrowed",
         "validation": "O(1) envelope/discriminator; caller guarantees valid program-written bytes; touched paths checked lazily"
       },
-      "commit": "cecc6280885b62abd225c566b1f57a836f169d51",
-      "commit_date": "2026-11-14",
-      "license": null,
+      "commit": "e906f7deca37a000d5fcd12de4a1937af20c01b7",
+      "commit_date": "2026-11-19",
+      "license": "MIT",
       "package": "blubber",
-      "source_sha256": "959f69b7f87aaf97f22a69a2ef277855e01aeecb5af4ae050050009ae8471779",
+      "source_sha256": "7554ec473dae4e5f43d7d641f4b389b1555b763e8838b0cb28417f2e9ca67aa0",
       "unsafe_syntax": {
         "count": 0,
         "files": {}
@@ -282,7 +282,7 @@
         "pinocchio_anchor_v2": "raw bytes / raw bytes",
         "realloc": "same exact slot growth/free-list policy as native view",
         "storage": "growable arena; 56-byte slots, 32-byte caller header",
-        "validation": "upstream reachable-graph bounds/alignment, cycles, parents, colors, black height, ordering and cached max; equal keys allowed; free list remains caller trust"
+        "validation": "upstream reachable-graph bounds/alignment, cycles, parents, colours, black height, ordering and cached max; equal keys allowed; free list remains caller trust"
       },
       "commit": "5f4272ec067459dc6ed761331319678edcd25f51",
       "commit_date": "2026-10-22",
@@ -347,7 +347,7 @@
         "pinocchio_anchor_v2": "raw bytes / raw bytes",
         "realloc": "none; full capacity reserved",
         "storage": "fixed 1000",
-        "validation": "POD size/alignment; no tree-link, color, or key-order validation"
+        "validation": "POD size/alignment; no tree-link, colour, or key-order validation"
       },
       "commit": "f8ecce2c50c12e6b8731b59ecdb3a1f43769a094",
       "commit_date": "2024-08-23",
@@ -521,32 +521,31 @@
   },
   "compute_unit_limit": 40000000,
   "handwritten_unsafe_syntax": 0,
-  "harness_sha256": "c535f85ea62a7678c3b920284a2e3e846282d36705f57110f39470974fcccbad",
+  "harness_sha256": "14e26443e35d066f2d80e8d133de43d0ff098ea2ab3163a45aa42bfcc28457ce",
   "heap_limit": 262144,
-  "lock_sha256": "5a737067cb436fb3f10fed7ce36b90385fc17a2aa12991a5ee4a74a0f539333e",
+  "lock_sha256": "60fad3eadcfd6f3a3fb9c001963186a930b9d0c254fc11956a5d3ca5ef4c7e8c",
   "platform_tools": "v1.53",
   "profile": {
     "codegen-units": 1,
     "lto": "fat",
     "overflow-checks": true
   },
-  "recorded_utc": "2026-11-14T14:04:33.780805+00:00",
+  "recorded_utc": "2026-11-19T15:00:17.330164+00:00",
   "reports": {
-    "README.md": "28f3dc43dc433e62a01545badedf2ea7dce94cbf58f867380b07527b39f869e7",
-    "benchmarks/COMPARE.md": "0306ced80d1424b4bd5fb8a81e2c8c1ff9d9af8cf3a09246152b3b48bf77066b",
-    "benchmarks/compare/ERGONOMICS.md": "4cc3322aca9b55a89d16cb5ace5bcec0cc28938f06a100b1ff594b3ea6697df1",
-    "benchmarks/compare/GAPS.md": "caab59569662872797dd1a7951f272ce951624ad91bd7f6d7e86b8796af68f1f",
+    "README.md": "3ecb91cd9b9c8fa517d3598e1e63178fd91510ddf2d8ec4da21509f6fde3d573",
+    "benchmarks/COMPARE.md": "1dc8686ac9b3aac1f767ba76119aac136835d317220a53ab039dc7be4c6ff4d0",
+    "benchmarks/compare/GAPS.md": "2f14a69d01710630a81a052cf4f74dfa70851d3a4c7335e1f81e59ff4e89734d",
     "crates/blubber-anchor/README.md": "6e6d6516f6c92a5a4ba71f50808d5bf17cca5ab1010fa3b54e67b2aa5f3921ee"
   },
   "result_files": {
-    "benchmarks/compare/results/all.csv": "17e32edcb6d29ede6d7638e191dc5401bc72c4faa209321c2f63776e4e568457",
-    "benchmarks/compare/results/all.json": "7e690160131fd16afb54b83f72ccade76ccf32d9ebb3b30537f56c9dfdb0349b",
-    "benchmarks/compare/results/calibration-v0.json": "1c273ca127035e882734f9c428ec88d371154de0c47e3662fb54d1cd15e9d8a8",
-    "benchmarks/compare/results/calibration-v3.json": "3c9985677101904b31be6d100a9f058ed144e5fc801bc9586ac879a854dc1c17",
-    "benchmarks/compare/results/heap-v0.json": "51fd89f2e29d9788a1e498bbc6b74db45826540b9bd93a987adaf6d739ad4f64",
-    "benchmarks/compare/results/heap-v3.json": "bb9ee47e52e76263e6ba387bb975fd69bf464e036d63f0d70c678a0e72673505",
-    "benchmarks/compare/results/v0.json": "b4d3e2e305228940f3ea3d81b6894297f393660bd43b06f6d2bdaa97a35bf53a",
-    "benchmarks/compare/results/v3.json": "194f21feb25c17dca85e8a21476a71707d3443b243f3ecbab6d37ad0300aeba6"
+    "benchmarks/compare/results/all.csv": "61ad537d489f1a83c6d3e61c7294c0db55b8cc0366e730727161f14d69a4d5e3",
+    "benchmarks/compare/results/all.json": "8dbb99395baf273ec00c31831591d7c2404efe8038e25c02938b4aac40ec7152",
+    "benchmarks/compare/results/calibration-v0.json": "b8575a2cbe96e773d12023d9e4497eefb20a217886d9a426eea396dc6fa4f8d5",
+    "benchmarks/compare/results/calibration-v3.json": "c79d0871d02f9231d4c43a9616c9a6686db8f6316723c91560d83d36e8e2d9f8",
+    "benchmarks/compare/results/heap-v0.json": "05e4467cd5ada3cf9a35938399308ea1a3039b02158c12e78e737a403dec7b79",
+    "benchmarks/compare/results/heap-v3.json": "e46eaa28b199cb0767d2163ecf267711bb9bd963426baba866c0bd80db58b343",
+    "benchmarks/compare/results/v0.json": "6538b8004aade317e0fc09608e43074205e26d1950120f714b0466e8f48bb7f7",
+    "benchmarks/compare/results/v3.json": "145fe71c55851ddbf1f852fdd644e5c6edb3a443b8133c4cb17df49f544006c0"
   },
   "rows": 1740,
   "sbf_features": {
@@ -555,7 +554,7 @@
     "compare-star": "native entrypoint; shared helpers no-entrypoint",
     "diagnostic": "heap"
   },
-  "source_sha256": "25cdb6b94093b5397b636118332042d33b0adbc113548a1a6efe43dabe5b3de4",
+  "source_sha256": "a14ad61dc7b0789602e90aa2fe132962272bd478f85e261e371ab12a621af5a8",
   "tools": {
     "cargo-build-sbf": {
       "path": "sbf-builder/cargo-build-sbf",

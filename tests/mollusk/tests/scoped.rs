@@ -10,6 +10,7 @@ use mollusk_svm::{
 use solana_account::Account;
 use solana_instruction::{AccountMeta, Instruction};
 use solana_pubkey::Pubkey;
+use solana_sdk_ids::system_program::ID as SYSTEM;
 
 #[path = "support/rent.rs"]
 mod rent_check;
@@ -17,7 +18,6 @@ mod rent_check;
 const OWNER: Pubkey = Pubkey::new_from_array([7; 32]);
 const STATE: Pubkey = Pubkey::new_from_array([8; 32]);
 const PAYER: Pubkey = Pubkey::new_from_array([9; 32]);
-const SYSTEM: Pubkey = Pubkey::new_from_array([0; 32]);
 
 fn runtime(profile: u8) -> Mollusk {
     let mut mollusk = Mollusk::default();
@@ -93,43 +93,40 @@ fn accounts(state: Pubkey, balance: u64) -> Vec<(Pubkey, Account)> {
 }
 
 #[test]
-#[allow(deprecated)]
 fn generated_creation_paths_commit_and_release_at_runtime_rent() {
     for profile in 0..3 {
-        for threshold in [1f64, 2f64] {
-            for action in [0, 2, 3, 4] {
-                let mut mollusk = runtime(profile);
-                mollusk.sysvars.rent.lamports_per_byte = 3480;
-                mollusk.sysvars.rent.exemption_threshold = threshold.to_le_bytes();
-                let (pda, _) = Pubkey::find_program_address(&[b"scoped"], &OWNER);
-                let state = if action == 2 || action == 4 {
-                    pda
-                } else {
-                    STATE
-                };
-                for balance in if action >= 3 {
-                    &[1, 10_000_000][..]
-                } else {
-                    &[0][..]
-                } {
-                    let original = accounts(state, *balance);
-                    let cpis = if action < 3 {
-                        1
-                    } else if *balance == 1 {
-                        3
-                    } else {
-                        2
-                    };
-                    let result = run(&mollusk, action, &original, cpis, None);
-                    let account = result.get_account(&state).unwrap();
-                    assert_eq!(account.owner, OWNER);
-                    let minimum = mollusk.sysvars.rent.minimum_balance(account.data.len());
-                    assert_eq!(account.lamports, (*balance).max(minimum));
-                    assert_eq!(
-                        result.get_account(&PAYER).unwrap().lamports,
-                        original[1].1.lamports - minimum.saturating_sub(*balance)
-                    );
+        for action in [0, 2, 3, 4] {
+            let mollusk = runtime(profile);
+            let (pda, _) = Pubkey::find_program_address(&[b"scoped"], &OWNER);
+            let state = if action == 2 || action == 4 {
+                pda
+            } else {
+                STATE
+            };
+            for balance in if action >= 3 {
+                &[1, 10_000_000][..]
+            } else {
+                &[0][..]
+            } {
+                let original = accounts(state, *balance);
+                let result = run(&mollusk, action, &original, 1, None);
+                let inner = &result.inner_instructions[0].instruction;
+                let opcode: u32 = if action < 3 { 0 } else { 13 };
+                assert_eq!(&inner.data[..4], &opcode.to_le_bytes());
+                let keys = result.message.as_ref().unwrap().account_keys();
+                assert_eq!(keys[inner.program_id_index as usize], SYSTEM);
+                let account = result.get_account(&state).unwrap();
+                assert_eq!(account.owner, OWNER);
+                let minimum = mollusk.sysvars.rent.minimum_balance(account.data.len());
+                if action >= 3 {
+                    assert_eq!(keys[inner.accounts[0] as usize], state);
+                    assert_eq!(inner.accounts.len(), 1 + usize::from(*balance < minimum));
                 }
+                assert_eq!(account.lamports, (*balance).max(minimum));
+                assert_eq!(
+                    result.get_account(&PAYER).unwrap().lamports,
+                    original[1].1.lamports - minimum.saturating_sub(*balance)
+                );
             }
         }
     }

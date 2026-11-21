@@ -349,15 +349,15 @@ fn walk_key_admission_handles_full_width_coordinates_without_panics() {
 
 #[blubber::schema(account)]
 struct WidePatch {
-    values: Map<blubber::Pubkey, Str>,
+    values: Map<blubber::Address, Str>,
 }
 
 #[test]
 fn wide_keys_use_the_same_checked_transport_and_late_fault_frame() {
-    let keys: [blubber::Pubkey; 8] = core::array::from_fn(|i| {
+    let keys: [blubber::Address; 8] = core::array::from_fn(|i| {
         let mut bytes = [0; 32];
         bytes[0] = 2 * (i as u8 + 1);
-        blubber::Pubkey::from_bytes(bytes)
+        blubber::Address::new_from_array(bytes)
     });
     let entries = keys
         .iter()

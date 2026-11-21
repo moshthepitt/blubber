@@ -2,7 +2,7 @@
 #![cfg_attr(target_os = "solana", no_std)]
 #![forbid(unsafe_code)]
 
-use blubber::{pinocchio::ReadStore, List, Map, Pubkey, Str};
+use blubber::{pinocchio::ReadStore, List, Map, Str};
 use pinocchio::{error::ProgramError, AccountView, Address, ProgramResult};
 
 /// Bounded corrupt histories, compiled only for the dedicated T7 fixture.
@@ -19,13 +19,13 @@ pub struct Numbers {
 #[blubber::schema(account)]
 pub struct PublicKeyMap {
     /// Sorted raw keys and copied values.
-    pub value: Map<Pubkey, u64>,
+    pub value: Map<Address, u64>,
 }
 /// Indexed-map workload from the comparison fixture.
 #[blubber::schema(account)]
 pub struct KeyWords {
     /// Sorted raw keys and indexed eight-byte strings.
-    pub value: Map<Pubkey, Str>,
+    pub value: Map<Address, Str>,
 }
 
 #[cfg(all(target_os = "solana", not(feature = "corrupt")))]
@@ -38,10 +38,10 @@ pinocchio::no_allocator!();
 pinocchio::nostd_panic_handler!();
 
 // Keep the comparison's full-byte key and UTF-8 checksum work.
-fn middle_key(n: usize) -> Pubkey {
+fn middle_key(n: usize) -> Address {
     let mut key = [42; 32];
     key[..4].copy_from_slice(&(2 * (n / 2 + 1) as u32).to_be_bytes());
-    Pubkey::from_bytes(key)
+    Address::new_from_array(key)
 }
 
 /// Runs first and repeated typed loads under one genuine shared guard.
@@ -62,7 +62,7 @@ pub fn run(id: &Address, accounts: &mut [AccountView], ix: &[u8]) -> ProgramResu
         return Err(ProgramError::NotEnoughAccountKeys);
     };
     let n = u16::from_le_bytes([lo, hi]) as usize;
-    if n > 1000 || account.owner() != id || !account.is_writable() {
+    if n > 1000 || !account.owned_by(id) || !account.is_writable() {
         return Err(ProgramError::InvalidAccountData);
     }
     let (policy, repeat) = if policy >= 40 {

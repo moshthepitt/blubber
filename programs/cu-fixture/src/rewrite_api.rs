@@ -4,7 +4,7 @@ use crate::{
     schemas::{KeyWords, Words},
     Funding, Store,
 };
-use blubber::{AccountSchema, Pubkey};
+use blubber::AccountSchema;
 use core::hint::black_box;
 use pinocchio::{error::ProgramError, AccountView, Address, ProgramResult};
 
@@ -18,8 +18,8 @@ const fn texts() -> [&'static str; 1000] {
     out
 }
 const VALUES: [&str; 1000] = texts();
-const fn pairs(common: bool) -> [(Pubkey, &'static str); 1000] {
-    let mut out = [(Pubkey::from_bytes([0; 32]), ""); 1000];
+const fn pairs(common: bool) -> [(Address, &'static str); 1000] {
+    let mut out = [(Address::new_from_array([0; 32]), ""); 1000];
     let mut i = 0;
     while i < 1000 {
         let mut key = [42; 32];
@@ -30,13 +30,13 @@ const fn pairs(common: bool) -> [(Pubkey, &'static str); 1000] {
             key[at + j] = word[j];
             j += 1;
         }
-        out[i] = (Pubkey::from_bytes(key), VALUES[i]);
+        out[i] = (Address::new_from_array(key), VALUES[i]);
         i += 1;
     }
     out
 }
-static PLAIN: [(Pubkey, &str); 1000] = pairs(false);
-static COMMON: [(Pubkey, &str); 1000] = pairs(true);
+static PLAIN: [(Address, &str); 1000] = pairs(false);
+static COMMON: [(Address, &str); 1000] = pairs(true);
 
 // These borrowed inputs are supplied as static program data. Their storage is
 // outside the account and the operation uses no allocator or length scratch.
@@ -83,7 +83,7 @@ fn combined(
     store: &mut dyn blubber::raw::Resize,
     layout: u8,
     inputs: &[&str],
-    entries: &[(Pubkey, &str)],
+    entries: &[(Address, &str)],
 ) -> ProgramResult {
     if layout == 1 {
         let mut root = Words::load_checked_mut(store)?;
@@ -135,7 +135,7 @@ fn map_fill(store: &mut dyn blubber::raw::Resize) -> ProgramResult {
     Ok(())
 }
 #[inline(never)]
-fn map_rewrite(store: &mut dyn blubber::raw::Resize, entries: &[(Pubkey, &str)]) -> ProgramResult {
+fn map_rewrite(store: &mut dyn blubber::raw::Resize, entries: &[(Address, &str)]) -> ProgramResult {
     let mut root = KeyWords::load_checked_mut(store)?;
     mark(2);
     root.value_mut().rewrite_values_from(entries)?;
@@ -159,7 +159,7 @@ fn idle<S: AccountSchema>(
     store: &mut dyn blubber::raw::Resize,
     op: u8,
     inputs: &[&str],
-    entries: &[(Pubkey, &str)],
+    entries: &[(Address, &str)],
 ) -> ProgramResult {
     let edit = blubber::raw::Edit::load::<S>(store, S::DISCRIMINATOR)?;
     mark(2);
@@ -174,11 +174,11 @@ fn idle<S: AccountSchema>(
                 &"replacement grows",
             )?);
         } else if op == 23 {
-            black_box(blubber::raw::prepare_map_values::<Pubkey, blubber::Str>(
+            black_box(blubber::raw::prepare_map_values::<Address, blubber::Str>(
                 view, true, inputs,
             )?);
         } else if view.layout().tag() == 8 {
-            black_box(blubber::raw::prepare_map::<Pubkey, blubber::Str>(
+            black_box(blubber::raw::prepare_map::<Address, blubber::Str>(
                 view, true, entries,
             )?);
         } else {

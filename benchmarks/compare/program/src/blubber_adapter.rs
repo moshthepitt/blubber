@@ -1,7 +1,7 @@
 //! Validated and explicit trusted public APIs, sharing operations and oracles.
 use super::*;
 use blubber::pinocchio::{Funding, ReadStore, Store};
-use blubber::Pubkey;
+use blubber::Address;
 use blubber::{List, Map, Str};
 #[blubber::schema(account)]
 /// Matched format-1 account used by the speed fixture.
@@ -13,7 +13,7 @@ pub struct Numbers {
 /// Matched format-1 account used by the speed fixture.
 pub struct PublicKeyMap {
     /// Complete collection measured by this workload.
-    pub value: Map<Pubkey, u64>,
+    pub value: Map<Address, u64>,
 }
 #[blubber::schema(account)]
 /// Matched format-1 account used by the speed fixture.
@@ -25,7 +25,7 @@ pub struct Words {
 /// Matched format-1 account used by the speed fixture.
 pub struct KeyWords {
     /// Complete collection measured by this workload.
-    pub value: Map<Pubkey, Str>,
+    pub value: Map<Address, Str>,
 }
 /// Executes a checked or lazy comparison operation with the selected keys.
 pub fn run<const TRUSTED: bool>(
@@ -60,9 +60,7 @@ pub fn run<const TRUSTED: bool>(
                 };
                 let v = root.value();
                 if op == 1 {
-                    out = v
-                        .get(&Pubkey::from_bytes(middle_key(n)))
-                        .unwrap_or(0);
+                    out = v.get(&Address::new_from_array(middle_key(n))).unwrap_or(0);
                 } else if op == 5 {
                     out = v.iter().map(|(_, x)| x).sum();
                 }
@@ -88,7 +86,7 @@ pub fn run<const TRUSTED: bool>(
                 if op == 1 {
                     out = root
                         .value()
-                        .get(&Pubkey::from_bytes(middle_key(n)))
+                        .get(&Address::new_from_array(middle_key(n)))
                         .map(text_sum)
                         .unwrap_or(0);
                 }
@@ -137,11 +135,11 @@ pub fn run<const TRUSTED: bool>(
                     10 => {}
                     2 => {
                         root.value_mut()
-                            .insert(Pubkey::from_bytes(insert_key(n)), SET)?;
+                            .insert(Address::new_from_array(insert_key(n)), SET)?;
                     }
                     3 => {
                         root.value_mut()
-                            .remove(&Pubkey::from_bytes(middle_key(n)))?;
+                            .remove(&Address::new_from_array(middle_key(n)))?;
                     }
                     4 => root.value_mut().fill_values(SET)?,
                     _ => unreachable!(),
@@ -191,20 +189,9 @@ pub fn run<const TRUSTED: bool>(
                     10 => {}
                     2 => {
                         root.value_mut()
-                            .insert(Pubkey::from_bytes(insert_key(n)), EQUAL)?;
+                            .insert(Address::new_from_array(insert_key(n)), EQUAL)?;
                     }
-                    3 => {
-                        let mut staged = Vec::<[u8; 17]>::with_capacity(n);
-                        for item in root.value().try_iter() {
-                            let (_, old) = item?;
-                            staged.push(grow(old));
-                        }
-                        let values: Vec<&str> = staged
-                            .iter()
-                            .map(|s| core::str::from_utf8(s).unwrap())
-                            .collect();
-                        root.value_mut().rewrite_values(&values)?;
-                    }
+                    3 => rewrite_old_values(&mut root, n)?,
                     _ => unreachable!(),
                 }
                 root.commit()?;
@@ -213,4 +200,23 @@ pub fn run<const TRUSTED: bool>(
         }
     }
     Ok(out)
+}
+
+#[inline(never)]
+fn rewrite_old_values(root: &mut KeyWordsMut<'_>, n: usize) -> blubber::Result<()> {
+    transform_map(root, n)
+}
+
+#[inline(always)]
+pub(super) fn transform_map(root: &mut KeyWordsMut<'_>, n: usize) -> blubber::Result<()> {
+    root.value_mut().rewrite_values_with(17 * n, |old, output| {
+        if old.len() != 8 {
+            return Err(blubber::ErrorKind::InvalidBoundary.into());
+        }
+        let output = output
+            .first_chunk_mut::<17>()
+            .ok_or(blubber::ErrorKind::Capacity)?;
+        *output = grow(old);
+        Ok(output.len())
+    })
 }

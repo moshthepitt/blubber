@@ -4,9 +4,6 @@
 extern crate alloc;
 use alloc::{collections::BTreeMap, string::String, vec::Vec};
 use pinocchio::{error::ProgramError, AccountView, Address, ProgramResult};
-#[cfg(feature = "anchor-slab")]
-#[allow(unsafe_code)] // Upstream bytemuck derive expansions implement unsafe marker traits.
-pub mod anchor_slab_adapter;
 pub mod blubber_adapter;
 pub mod blubber_checked_adapter;
 #[cfg(feature = "baselines")]
@@ -129,7 +126,7 @@ pub fn run(id: &Address, accounts: &mut [AccountView], ix: &[u8]) -> ProgramResu
         return Err(ProgramError::NotEnoughAccountKeys);
     };
     let n = u16::from_le_bytes([*lo, *hi]) as usize;
-    if n > CAPACITY || state.owner() != id || !state.is_writable() {
+    if n > CAPACITY || !state.owned_by(id) || !state.is_writable() {
         return Err(ProgramError::InvalidAccountData);
     }
     let checksum = match lib {
@@ -149,8 +146,6 @@ pub fn run(id: &Address, accounts: &mut [AccountView], ix: &[u8]) -> ProgramResu
         7 => pinapod_adapter::run(state, *w, *op, n)?,
         #[cfg(feature = "light")]
         8 => light_adapter::run(state, *w, *op)?,
-        #[cfg(feature = "anchor-slab")]
-        9 => anchor_slab_adapter::run(state, *op)?,
         #[cfg(feature = "baselines")]
         10 => critbit_adapter::run(state, *op, n)?,
         #[cfg(feature = "manifest")]

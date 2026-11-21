@@ -10,7 +10,10 @@ use mollusk_svm::{
 use solana_account::Account;
 use solana_instruction::{AccountMeta, Instruction};
 use solana_pubkey::Pubkey;
+use solana_sdk_ids::system_program::ID as SYSTEM;
 
+#[path = "support/invalid_rent.rs"]
+mod invalid_rent;
 #[path = "support/rent.rs"]
 mod rent_check;
 
@@ -19,12 +22,7 @@ const RATE: u64 = 19;
 const STATE: Pubkey = Pubkey::new_from_array([8; 32]);
 const PAYER: Pubkey = Pubkey::new_from_array([9; 32]);
 const RECIPIENT: Pubkey = Pubkey::new_from_array([10; 32]);
-const SYSTEM: Pubkey = Pubkey::new_from_array([0; 32]);
 const OWNER: Pubkey = Pubkey::new_from_array([7; 32]);
-
-fn minimum(len: usize) -> u64 {
-    (128 + len as u64) * RATE
-}
 
 fn modes() -> impl Iterator<Item = u8> {
     #[cfg(feature = "alloc")]
@@ -41,6 +39,10 @@ struct Case {
 }
 
 impl Case {
+    fn use_out_of_range_rent(&mut self) {
+        self.accounts.push(invalid_rent::sysvar(&self.mollusk));
+    }
+
     fn new(mode: u8, profile: u8) -> Self {
         let mut mollusk = Mollusk::default();
         // An unusual rate proves settlement reads the current sysvar, rather
@@ -64,18 +66,18 @@ impl Case {
         let mut data = vec![0x19; INITIAL];
         data[..8].copy_from_slice(b"LEASE001");
         data[8..12].copy_from_slice(&(INITIAL as u32).to_le_bytes());
-        let account = |lamports, data, owner| Account {
-            lamports,
-            data,
-            owner,
-            executable: false,
-            rent_epoch: 0,
-        };
+        let account = |lamports, data, owner| Account::new_with_data(lamports, data, &owner);
         let accounts = vec![
-            (STATE, account(minimum(INITIAL), data, OWNER)),
+            (
+                STATE,
+                account(mollusk.sysvars.rent.minimum_balance(INITIAL), data, OWNER),
+            ),
             (PAYER, account(10_000_000, vec![], SYSTEM)),
             mollusk_svm::program::keyed_account_for_system_program(),
-            (RECIPIENT, account(minimum(0), vec![], SYSTEM)),
+            (
+                RECIPIENT,
+                account(mollusk.sysvars.rent.minimum_balance(0), vec![], SYSTEM),
+            ),
         ];
         let mut ix = Instruction {
             program_id: OWNER,
@@ -233,7 +235,8 @@ fn top_up_nets_once_and_does_not_charge_opening_or_amortized_headroom() {
                 case.successful(
                     1,
                     INITIAL + growth,
-                    minimum(INITIAL + growth) - minimum(INITIAL),
+                    case.mollusk.sysvars.rent.minimum_balance(INITIAL + growth)
+                        - case.mollusk.sysvars.rent.minimum_balance(INITIAL),
                     0,
                 );
             }
@@ -273,7 +276,13 @@ fn reserve_retains_rent_bytes_and_shrink_to_fit_clears_retention() {
                 case.ix.data[4] = 10;
             }
             let len = INITIAL + if clear { 0 } else { 200 };
-            case.successful(usize::from(!clear), len, minimum(len) - minimum(INITIAL), 0);
+            case.successful(
+                usize::from(!clear),
+                len,
+                case.mollusk.sysvars.rent.minimum_balance(len)
+                    - case.mollusk.sysvars.rent.minimum_balance(INITIAL),
+                0,
+            );
         }
     }
 }
@@ -286,7 +295,13 @@ fn direct_refund_uses_final_length_and_never_invokes_system() {
             case.ix.data[2] = u8::from(top_up);
             case.ix.data[3] = 1;
             case.used(64);
-            case.successful(0, 64, 0, minimum(INITIAL) - minimum(64));
+            case.successful(
+                0,
+                64,
+                0,
+                case.mollusk.sysvars.rent.minimum_balance(INITIAL)
+                    - case.mollusk.sysvars.rent.minimum_balance(64),
+            );
         }
     }
 }
@@ -299,13 +314,20 @@ fn retained_capacity_reduces_refund_and_top_up_with_refund_does_not_double_pay()
         case.ix.data[3] = 1;
         case.used(64);
         case.reserve(10);
-        case.successful(0, 74, 0, minimum(INITIAL) - minimum(74));
+        case.successful(
+            0,
+            74,
+            0,
+            case.mollusk.sysvars.rent.minimum_balance(INITIAL)
+                - case.mollusk.sysvars.rent.minimum_balance(74),
+        );
         case.used(INITIAL + 200);
         case.reserve(0);
         case.successful(
             1,
             INITIAL + 200,
-            minimum(INITIAL + 200) - minimum(INITIAL),
+            case.mollusk.sysvars.rent.minimum_balance(INITIAL + 200)
+                - case.mollusk.sysvars.rent.minimum_balance(INITIAL),
             0,
         );
     }
@@ -360,10 +382,16 @@ fn grow_and_shrink_reopens_settle_net_rent_without_resetting_sdk_window() {
                 case.ix.data[2] = 1;
                 case.ix.data[4] = action;
                 let first_len = if action == 1 { INITIAL + 501 } else { INITIAL };
-                case.accounts[0].1.lamports = minimum(first_len);
+                case.accounts[0].1.lamports = case.mollusk.sysvars.rent.minimum_balance(first_len);
                 let final_len = INITIAL + 900;
                 case.used(final_len);
-                case.successful(1, final_len, minimum(final_len) - minimum(first_len), 0);
+                case.successful(
+                    1,
+                    final_len,
+                    case.mollusk.sysvars.rent.minimum_balance(final_len)
+                        - case.mollusk.sysvars.rent.minimum_balance(first_len),
+                    0,
+                );
             }
         }
     }
@@ -437,15 +465,13 @@ fn refund_recipient_must_be_writable_non_executable_and_unborrowed() {
 }
 
 #[test]
-#[allow(deprecated)]
-fn legacy_and_simd0194_rent_use_runtime_minima_for_funding_and_refunds() {
-    for (rate, threshold) in [(3480, 2f64), (6960, 1f64), (19, 2f64), (19, 1f64)] {
+fn funding_and_refunds_use_the_runtime_rent_minimum() {
+    for rate in [6960, RATE] {
         for mode in modes() {
             for profile in 0..3 {
                 for final_len in [64, INITIAL, INITIAL + 200] {
                     let mut case = Case::new(mode, profile);
                     case.mollusk.sysvars.rent.lamports_per_byte = rate;
-                    case.mollusk.sysvars.rent.exemption_threshold = threshold.to_le_bytes();
                     let before = case.mollusk.sysvars.rent.minimum_balance(INITIAL);
                     let after = case.mollusk.sysvars.rent.minimum_balance(final_len);
                     case.accounts[0].1.lamports = before;
@@ -472,36 +498,31 @@ fn legacy_and_simd0194_rent_use_runtime_minima_for_funding_and_refunds() {
 }
 
 #[test]
-#[allow(deprecated)]
-fn unsupported_thresholds_fail_before_any_transfer_or_refund() {
-    for threshold in [0.5f64, 1.5, 2.5] {
-        for mode in modes() {
-            for final_len in [64, INITIAL + 200] {
-                let mut case = Case::new(mode, 1);
-                case.mollusk.sysvars.rent.exemption_threshold = threshold.to_le_bytes();
-                case.accounts[0].1.lamports = case.mollusk.sysvars.rent.minimum_balance(INITIAL);
-                case.ix.data[2] = 1;
-                case.ix.data[3] = 1;
-                case.used(final_len);
-                case.run(
-                    Some(pinocchio::error::ProgramError::UnsupportedSysvar.into()),
-                    0,
-                );
-            }
+fn out_of_range_rent_fails_before_any_transfer_or_refund() {
+    for mode in modes() {
+        for final_len in [64, INITIAL + 200] {
+            let mut case = Case::new(mode, 1);
+            case.use_out_of_range_rent();
+            case.ix.data[2] = 1;
+            case.ix.data[3] = 1;
+            case.used(final_len);
+            case.run(
+                Some(pinocchio::error::ProgramError::InvalidArgument.into()),
+                0,
+            );
         }
     }
 }
 
 #[test]
-#[allow(deprecated)]
-fn unchanged_settlement_skips_unsupported_rent_in_every_mapping_and_lease_mode() {
+fn unchanged_settlement_skips_rent_in_every_mapping_and_lease_mode() {
     for mode in modes() {
         for profile in 0..3 {
             for top_up in [0, 1] {
                 let mut case = Case::new(mode, profile);
-                // Full settlement rejects this threshold. Success proves
+                // Full settlement rejects this rent rate. Success proves
                 // that unchanged sessions bypass that path altogether.
-                case.mollusk.sysvars.rent.exemption_threshold = 1.5f64.to_le_bytes();
+                case.use_out_of_range_rent();
                 case.ix.data[2] = top_up;
                 case.successful(0, INITIAL, 0, 0);
             }
@@ -510,13 +531,12 @@ fn unchanged_settlement_skips_unsupported_rent_in_every_mapping_and_lease_mode()
 }
 
 #[test]
-#[allow(deprecated)]
 fn growth_retention_refunds_and_either_balance_change_force_live_rent() {
     for mode in modes() {
         for profile in 0..3 {
             for reason in 0..7 {
                 let mut case = Case::new(mode, profile);
-                case.mollusk.sysvars.rent.exemption_threshold = 1.5f64.to_le_bytes();
+                case.use_out_of_range_rent();
                 case.ix.data[2] = 1;
                 match reason {
                     0 => case.used(INITIAL + 1),
@@ -528,7 +548,7 @@ fn growth_retention_refunds_and_either_balance_change_force_live_rent() {
                     _ => case.used(INITIAL + 10_240),
                 }
                 case.run(
-                    Some(pinocchio::error::ProgramError::UnsupportedSysvar.into()),
+                    Some(pinocchio::error::ProgramError::InvalidArgument.into()),
                     0,
                 );
             }
@@ -546,7 +566,7 @@ fn changed_balance_top_up_still_nets_only_the_final_deficit() {
             let result = case.run(None, 1);
             assert_eq!(
                 result.get_account(&STATE).unwrap().lamports,
-                minimum(INITIAL)
+                case.mollusk.sysvars.rent.minimum_balance(INITIAL)
             );
             assert_eq!(
                 result.get_account(&PAYER).unwrap().lamports,
@@ -570,21 +590,24 @@ fn changed_balance_top_up_still_nets_only_the_final_deficit() {
             let result = case.run(None, 0);
             assert_eq!(
                 result.get_account(&STATE).unwrap().lamports,
-                minimum(INITIAL) + 1
+                case.mollusk.sysvars.rent.minimum_balance(INITIAL) + 1
             );
-            assert_eq!(result.get_account(&RECIPIENT).unwrap().lamports, minimum(0));
+            assert_eq!(
+                result.get_account(&RECIPIENT).unwrap().lamports,
+                case.mollusk.sysvars.rent.minimum_balance(0)
+            );
         }
     }
 }
 
 #[test]
-#[allow(deprecated)]
 fn poisoned_and_invalid_completions_close_before_any_rent_lookup() {
     for mode in modes() {
         for profile in 0..3 {
             for action in [14, 15] {
                 let mut case = Case::new(mode, profile);
-                case.mollusk.sysvars.rent.exemption_threshold = 1.5f64.to_le_bytes();
+                let opening_balance = case.accounts[0].1.lamports;
+                case.use_out_of_range_rent();
                 case.ix.data[4] = action;
                 let physical = if mode == 2 { INITIAL } else { INITIAL + 10_240 };
                 let result = if physical > INITIAL {
@@ -595,7 +618,7 @@ fn poisoned_and_invalid_completions_close_before_any_rent_lookup() {
                 assert_eq!(result.get_account(&STATE).unwrap().data.len(), physical);
                 assert_eq!(
                     result.get_account(&STATE).unwrap().lamports,
-                    minimum(INITIAL)
+                    opening_balance
                 );
             }
         }
@@ -603,17 +626,16 @@ fn poisoned_and_invalid_completions_close_before_any_rent_lookup() {
 }
 
 #[test]
-#[allow(deprecated)]
 fn a_shrunk_reopen_uses_its_own_opening_extent_for_the_rent_decision() {
     for mode in modes() {
         for profile in 0..3 {
             let mut case = Case::new(mode, profile);
-            case.mollusk.sysvars.rent.exemption_threshold = 1.5f64.to_le_bytes();
-            // The first session shrinks by 37 and must settle. An unsupported
-            // Rent sysvar fails before a second session can reopen.
+            case.use_out_of_range_rent();
+            // The first session shrinks by 37 and must settle. An out-of-range
+            // quote fails before a second session can reopen.
             case.ix.data[4] = 2;
             case.run(
-                Some(pinocchio::error::ProgramError::UnsupportedSysvar.into()),
+                Some(pinocchio::error::ProgramError::InvalidArgument.into()),
                 0,
             );
         }
@@ -621,67 +643,63 @@ fn a_shrunk_reopen_uses_its_own_opening_extent_for_the_rent_decision() {
 }
 
 #[test]
-#[allow(deprecated)]
-fn raised_rent_shrink_settles_and_passes_legacy_transaction_checks() {
+fn raised_rent_shrink_settles_and_passes_transaction_checks() {
     use solana_svm::rent_calculator::{
         get_post_exec_account_rent_state, get_pre_exec_account_rent_state, transition_allowed,
     };
 
-    for (rate, threshold) in [(3480, 2f64), (6960, 1f64)] {
-        for mode in modes() {
-            for profile in 0..3 {
-                for final_len in [64, INITIAL] {
-                    let mut case = Case::new(mode, profile);
-                    case.mollusk.sysvars.rent.lamports_per_byte = rate;
-                    case.mollusk.sysvars.rent.exemption_threshold = threshold.to_le_bytes();
-                    let old_minimum = case.mollusk.sysvars.rent.minimum_balance(INITIAL);
-                    case.accounts[0].1.lamports = old_minimum;
-                    case.mollusk.sysvars.rent.lamports_per_byte = rate * 2;
-                    case.used(final_len);
-                    let top_up = if final_len < INITIAL {
-                        case.ix.data[2] = 1;
-                        case.mollusk.sysvars.rent.minimum_balance(final_len) - old_minimum
-                    } else {
-                        0
-                    };
-                    if final_len < INITIAL {
-                        case.ix.data[2] = 0;
-                        case.run(Some(ErrorKind::RentShortfall.into()), 0);
-                        case.ix.data[2] = 1;
-                    }
-                    let result = case.run(None, usize::from(top_up > 0));
-                    let state = result.get_account(&STATE).unwrap();
-                    assert_eq!(state.data.len(), final_len);
-                    assert_eq!(state.lamports, old_minimum + top_up);
-                    assert_eq!(
-                        result.get_account(&PAYER).unwrap().lamports,
-                        case.accounts[1].1.lamports - top_up
-                    );
-                    if final_len < INITIAL {
-                        assert_eq!(top_up, 890_880);
-                    }
+    for mode in modes() {
+        for profile in 0..3 {
+            for final_len in [64, INITIAL] {
+                let mut case = Case::new(mode, profile);
+                case.mollusk.sysvars.rent.lamports_per_byte = 6960;
+                let old_minimum = case.mollusk.sysvars.rent.minimum_balance(INITIAL);
+                case.accounts[0].1.lamports = old_minimum;
+                case.mollusk.sysvars.rent.lamports_per_byte *= 2;
+                case.used(final_len);
+                let top_up = if final_len < INITIAL {
+                    case.ix.data[2] = 1;
+                    case.mollusk.sysvars.rent.minimum_balance(final_len) - old_minimum
+                } else {
+                    0
+                };
+                if final_len < INITIAL {
+                    case.ix.data[2] = 0;
+                    case.run(Some(ErrorKind::RentShortfall.into()), 0);
+                    case.ix.data[2] = 1;
+                }
+                let result = case.run(None, usize::from(top_up > 0));
+                let state = result.get_account(&STATE).unwrap();
+                assert_eq!(state.data.len(), final_len);
+                assert_eq!(state.lamports, old_minimum + top_up);
+                assert_eq!(
+                    result.get_account(&PAYER).unwrap().lamports,
+                    case.accounts[1].1.lamports - top_up
+                );
+                if final_len < INITIAL {
+                    assert_eq!(top_up, 890_880);
+                }
 
-                    // Mollusk checks its activated rent profile after execution.
-                    // Also exercise both pinned runtime predicate modes:
-                    // A settled shrink becomes exempt under legacy and SIMD-0392 rules.
-                    for relaxed in [false, true] {
-                        let rent = &case.mollusk.sysvars.rent;
-                        let pre = get_pre_exec_account_rent_state(
-                            old_minimum,
-                            INITIAL,
-                            rent.minimum_balance(INITIAL),
-                            relaxed,
-                        );
-                        let post = get_post_exec_account_rent_state(
-                            state.lamports,
-                            final_len,
-                            rent.minimum_balance(final_len),
-                            &pre,
-                            old_minimum,
-                            relaxed,
-                        );
-                        assert!(transition_allowed(&pre, &post));
-                    }
+                // Mollusk checks its activated rent profile after execution.
+                // Also exercise both pinned runtime predicate modes:
+                // A settled shrink becomes exempt under legacy and SIMD-0392 rules.
+                for relaxed in [false, true] {
+                    let rent = &case.mollusk.sysvars.rent;
+                    let pre = get_pre_exec_account_rent_state(
+                        old_minimum,
+                        INITIAL,
+                        rent.minimum_balance(INITIAL),
+                        relaxed,
+                    );
+                    let post = get_post_exec_account_rent_state(
+                        state.lamports,
+                        final_len,
+                        rent.minimum_balance(final_len),
+                        &pre,
+                        old_minimum,
+                        relaxed,
+                    );
+                    assert!(transition_allowed(&pre, &post));
                 }
             }
         }

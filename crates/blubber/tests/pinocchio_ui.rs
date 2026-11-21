@@ -18,7 +18,7 @@ fn account_store_lifetimes_and_mode_features() {
         fs::write(fixture.join("Cargo.toml"), format!(
             "[workspace]\n[package]\nname = \"pinocchio-ui\"\nversion = \"0.0.0\"\nedition = \"2021\"\n\
              [dependencies]\nwire = {{ package = \"blubber\", path = {:?}, default-features = false, features = [\"derive\", \"pinocchio\"{}{}] }}\n\
-             pinocchio = {{ version = \"=0.11.2\", default-features = false, features = [\"account-resize\"] }}\n",
+             pinocchio = {{ version = \"=0.12.0\", default-features = false, features = [\"account-resize\"] }}\n",
             root.join("crates/blubber"), if alloc { ", \"alloc\"" } else { "" }, if cfg!(feature = "verify-on-load") { ", \"verify-on-load\"" } else { "" }
         )).unwrap();
         let mode = if alloc {

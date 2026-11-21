@@ -1,7 +1,7 @@
 //! Primitive byte views, public codec bindings and exact surrounding frames.
 #![forbid(unsafe_code)]
 
-use blubber::{Fixed, Pubkey, Schema, Str};
+use blubber::{Address, Fixed, Schema, Str};
 use blubber_core::encoding::{encode_frame, Encoder};
 use blubber_core::{encoding_leaf as leaf, encoding_text as text};
 
@@ -76,7 +76,7 @@ fn projected_numeric_widths_and_boolean_domain() {
     width!(i32, i32::MIN, signed);
     width!(i64, i64::MIN, signed);
     width!(i128, i128::MIN, signed);
-    let key = Pubkey::from_bytes([37; 32]);
+    let key = Address::new_from_array([37; 32]);
     assert_eq!(key.encode(), [37; 32]);
 }
 

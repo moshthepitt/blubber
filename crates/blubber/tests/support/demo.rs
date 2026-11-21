@@ -2,7 +2,7 @@
 
 #![forbid(unsafe_code)]
 
-use blubber::{List, Map, Pubkey, Str};
+use blubber::{Address, List, Map, Str};
 
 /// Native limits with a three-byte packed codec.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, blubber::Fixed)]
@@ -26,13 +26,13 @@ pub struct Record {
 #[blubber::schema(account)]
 pub struct MyAccount {
     /// Account authority.
-    pub authority: Pubkey,
+    pub authority: Address,
     /// Example counter.
     pub counter: u64,
     /// Variable records.
     pub records: List<Record>,
     /// Fixed map values.
-    pub balances: Map<Pubkey, u64>,
+    pub balances: Map<Address, u64>,
     /// Variable map values.
     pub labels: Map<u16, Str>,
     /// Uncounted UTF-8.
@@ -48,13 +48,13 @@ pub struct MyAccount {
 /// Borrowed fixture with references to promoted immutable arrays.
 pub fn input() -> MyAccountInit<'static> {
     const INPUT: MyAccountInit<'static> = MyAccountInit {
-        authority: Pubkey::from_bytes([0x11; 32]),
+        authority: Address::new_from_array([0x11; 32]),
         counter: 1,
         records: &[RecordInit {
             name: "A",
             tags: &[7, 9],
         }],
-        balances: &[(Pubkey::from_bytes([0x22; 32]), 5)],
+        balances: &[(Address::new_from_array([0x22; 32]), 5)],
         labels: &[(1, "x"), (256, "")],
         note: "ok",
         attachment: &[0xaa, 0xbb],

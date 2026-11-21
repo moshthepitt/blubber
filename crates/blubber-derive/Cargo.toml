@@ -11,6 +11,9 @@ include = ["/Cargo.toml", "/README.md", "/LICENSE", "/src/**/*.rs"]
 keywords = ["solana", "serialization", "derive"]
 categories = ["encoding", "development-tools::procedural-macro-helpers"]
 
+[package.metadata.docs.rs]
+features = []
+
 [lib]
 proc-macro = true
 
@@ -19,7 +22,6 @@ proc-macro2.workspace = true
 proc-macro-crate.workspace = true
 quote.workspace = true
 syn.workspace = true
-sha2.workspace = true
 
 [dev-dependencies]
 blubber = { path = "../blubber", default-features = false }

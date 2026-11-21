@@ -1,13 +1,14 @@
 //! Fresh uninstrumented instruction totals; every result is checked for correctness.
 #![forbid(unsafe_code)]
 
-use blubber::{Pubkey as WireKey, Schema};
+use blubber::Schema;
 use blubber_cu_fixture::{key, schemas::*, text};
 use mollusk_svm::{result::Check, Mollusk};
 use mollusk_svm_bencher::MolluskComputeUnitBencher;
 use solana_account::Account;
 use solana_instruction::{AccountMeta, Instruction};
 use solana_pubkey::Pubkey;
+use solana_sdk_ids::system_program::ID as SYSTEM;
 
 #[path = "../fixtures/invocation_boundaries.rs"]
 mod invocation_boundaries;
@@ -57,7 +58,7 @@ fn fixture(op: u8) -> Vec<u8> {
                         bytes = [42; 32];
                         bytes[31] = i * 2;
                     }
-                    (WireKey::from_bytes(bytes), u64::from(i))
+                    (Pubkey::new_from_array(bytes), u64::from(i))
                 })
                 .collect();
             if op < 9 {
@@ -66,10 +67,6 @@ fn fixture(op: u8) -> Vec<u8> {
                     PublicKeyMap::DISCRIMINATOR,
                 )
             } else {
-                let items: Vec<_> = items
-                    .into_iter()
-                    .map(|(k, v)| (pinocchio::Address::new_from_array(k.to_bytes()), v))
-                    .collect();
                 encode::<AddressMap>(AddressMapInit { value: &items }, AddressMap::DISCRIMINATOR)
             }
         }
@@ -103,12 +100,12 @@ fn check(op: u8, bytes: &[u8]) {
                     bytes[31] = i * 2;
                 }
                 assert_eq!(
-                    root.value().get(&WireKey::from_bytes(bytes)),
+                    root.value().get(&Pubkey::new_from_array(bytes)),
                     Some(u64::from(i))
                 );
             }
             assert_eq!(
-                root.value().get(&WireKey::from_bytes(key(op - 5))),
+                root.value().get(&Pubkey::new_from_array(key(op - 5))),
                 Some(123)
             );
         }
@@ -394,7 +391,7 @@ fn main() {
     tour.program_cache =
         mollusk_svm::program::ProgramCache::new(&tour.feature_set, &tour.compute_budget, false);
     tour.add_program(&OWNER, "blubber_demo");
-    let init = blubber_demo::state::seed(WireKey::from_bytes(PAYER.to_bytes()));
+    let init = blubber_demo::state::seed(PAYER);
     let data = encode::<blubber_demo::state::MyAccount>(
         init,
         blubber_demo::state::MyAccount::DISCRIMINATOR,
@@ -402,7 +399,7 @@ fn main() {
     let before = data.len();
     let accounts = [
         (STATE, account(data)),
-        (PAYER, Account::new(100_000_000_000, 0, &Pubkey::default())),
+        (PAYER, Account::new(100_000_000_000, 0, &SYSTEM)),
         mollusk_svm::program::keyed_account_for_system_program(),
     ];
     let ix = Instruction {
@@ -410,7 +407,7 @@ fn main() {
         accounts: vec![
             AccountMeta::new(STATE, false),
             AccountMeta::new(PAYER, true),
-            AccountMeta::new_readonly(Pubkey::default(), false),
+            AccountMeta::new_readonly(SYSTEM, false),
         ],
         data: vec![2],
     };
@@ -507,7 +504,7 @@ fn lifecycle() {
         data[8..12].copy_from_slice(&(INITIAL as u32).to_le_bytes());
         let mut state = account(data);
         state.lamports = vm.sysvars.rent.minimum_balance(INITIAL);
-        let recipient = Account::new(vm.sysvars.rent.minimum_balance(0), 0, &Pubkey::default());
+        let recipient = Account::new(vm.sysvars.rent.minimum_balance(0), 0, &SYSTEM);
         let mut ix_data = vec![40, 0, u8::from(top_up), u8::from(refund), 0];
         ix_data.extend_from_slice(&(used as u32).to_le_bytes());
         ix_data.extend_from_slice(&reserve.to_le_bytes());
@@ -517,7 +514,7 @@ fn lifecycle() {
             accounts: vec![
                 AccountMeta::new(STATE, false),
                 AccountMeta::new(PAYER, true),
-                AccountMeta::new_readonly(Pubkey::default(), false),
+                AccountMeta::new_readonly(SYSTEM, false),
                 AccountMeta::new(RECIPIENT, false),
             ],
             data: ix_data,
@@ -535,7 +532,7 @@ fn lifecycle() {
             &ix,
             &[
                 (STATE, state),
-                (PAYER, Account::new(100_000_000_000, 0, &Pubkey::default())),
+                (PAYER, Account::new(100_000_000_000, 0, &SYSTEM)),
                 mollusk_svm::program::keyed_account_for_system_program(),
                 (RECIPIENT, recipient.clone()),
             ],

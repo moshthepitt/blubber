@@ -1,0 +1,858 @@
+{
+  "numbers": [
+    {
+      "id": "cmp.environment.agave",
+      "unit": "version",
+      "source": "benchmarks/compare/Cargo.lock",
+      "selector": "^name = \"solana-svm\"\\nversion = \"(?P<value>[\\d.]+)\"",
+      "field": "value"
+    },
+    {
+      "id": "cmp.environment.cu_meter",
+      "unit": "CU",
+      "source": "benchmarks/compare/results/receipt.json",
+      "selector": "\"compute_unit_limit\": (?P<value>\\d+)",
+      "field": "value"
+    },
+    {
+      "id": "cmp.environment.heap_kib",
+      "unit": "KiB",
+      "source": "benchmarks/compare/results/receipt.json",
+      "selector": "\"heap_limit\": (?P<value>\\d+)",
+      "field": "value:kib"
+    },
+    {
+      "id": "cmp.environment.mollusk",
+      "unit": "version",
+      "source": "benchmarks/compare/Cargo.lock",
+      "selector": "^name = \"mollusk-svm\"\\nversion = \"(?P<value>[\\d.]+)\"",
+      "field": "value"
+    },
+    {
+      "id": "cmp.environment.platform_tools",
+      "unit": "version",
+      "source": "benchmarks/compare/results/receipt.json",
+      "selector": "\"platform_tools\": \"v(?P<value>[\\d.]+)\"",
+      "field": "value"
+    },
+    {
+      "id": "cmp.fixture.initial_string",
+      "unit": "bytes",
+      "source": "benchmarks/compare/harness/src/main.rs",
+      "selector": "^\\s*3 => Data::Words.*format!\\(\"\\{i:0(?P<value>\\d+)x\\}\"\\)",
+      "field": "value"
+    },
+    {
+      "id": "cmp.fixture.longer_string",
+      "unit": "bytes",
+      "source": "benchmarks/compare/program/src/lib.rs",
+      "selector": "^pub const GROWN: &str = \"(?P<value>[^\"]+)\";$",
+      "field": "value:utf8_len"
+    },
+    {
+      "id": "cmp.v0.n100.list_sum.bytemuck.account_bytes",
+      "unit": "bytes",
+      "source": "benchmarks/compare/results/all.csv",
+      "selector": "arch=v0,lib=bytemuck,workload=1,n=100,op=read_all,status=ok",
+      "field": "before_bytes"
+    },
+    {
+      "id": "cmp.v0.n100.list_sum.lazy.account_bytes",
+      "unit": "bytes",
+      "source": "benchmarks/compare/results/all.csv",
+      "selector": "arch=v0,lib=blubber_trusted,workload=1,n=100,op=read_all,status=ok",
+      "field": "before_bytes"
+    },
+    {
+      "id": "cmp.v0.n1000.list_grow_constant.borsh",
+      "unit": "CU",
+      "source": "benchmarks/compare/results/all.csv",
+      "selector": "arch=v0,lib=borsh,workload=3,n=1000,op=grow_all,status=ok",
+      "field": "whole_cu"
+    },
+    {
+      "id": "cmp.v0.n1000.list_grow_constant.lazy",
+      "unit": "CU",
+      "source": "benchmarks/compare/results/all.csv",
+      "selector": "arch=v0,lib=blubber_trusted,workload=3,n=1000,op=grow_all,status=ok",
+      "field": "whole_cu"
+    },
+    {
+      "id": "cmp.v0.n1000.derived.constant_fill_borsh_ratio_rounded",
+      "unit": "ratio",
+      "source": "@calculate",
+      "selector": "cmp.v0.n1000.list_grow_constant.borsh,cmp.v0.n1000.list_grow_constant.lazy",
+      "field": "ratio:0"
+    },
+    {
+      "id": "cmp.v0.n1000.list_grow_constant.star_frame",
+      "unit": "CU",
+      "source": "benchmarks/compare/results/all.csv",
+      "selector": "arch=v0,lib=star_frame,workload=3,n=1000,op=grow_all,status=ok",
+      "field": "whole_cu"
+    },
+    {
+      "id": "cmp.v0.n1000.derived.constant_fill_star_frame_ratio_rounded",
+      "unit": "ratio",
+      "source": "@calculate",
+      "selector": "cmp.v0.n1000.list_grow_constant.star_frame,cmp.v0.n1000.list_grow_constant.lazy",
+      "field": "ratio:1"
+    },
+    {
+      "id": "cmp.v0.n1000.list_push.lazy",
+      "unit": "CU",
+      "source": "benchmarks/compare/results/all.csv",
+      "selector": "arch=v0,lib=blubber_trusted,workload=1,n=1000,op=push,status=ok",
+      "field": "whole_cu"
+    },
+    {
+      "id": "cmp.v0.n1000.list_push.anchor_slab",
+      "unit": "CU",
+      "source": "benchmarks/compare/results/all.csv",
+      "selector": "arch=v0,lib=anchor_slab,workload=1,n=1000,op=push,status=ok",
+      "field": "whole_cu"
+    },
+    {
+      "id": "cmp.v0.n1000.derived.list_push_anchor_slab_extra_rounded",
+      "unit": "CU",
+      "source": "@calculate",
+      "selector": "cmp.v0.n1000.list_push.lazy,cmp.v0.n1000.list_push.anchor_slab",
+      "field": "difference_rounded:50"
+    },
+    {
+      "id": "cmp.v0.n1000.map_insert.lazy",
+      "unit": "CU",
+      "source": "benchmarks/compare/results/all.csv",
+      "selector": "arch=v0,lib=blubber_trusted,workload=2,n=1000,op=insert_middle,status=ok",
+      "field": "whole_cu"
+    },
+    {
+      "id": "cmp.v0.n1000.map_insert.manifest",
+      "unit": "CU",
+      "source": "benchmarks/compare/results/all.csv",
+      "selector": "arch=v0,lib=manifest,workload=2,n=1000,op=insert_middle,status=ok",
+      "field": "whole_cu"
+    },
+    {
+      "id": "cmp.v0.n1000.derived.map_insert_manifest_ratio",
+      "unit": "ratio",
+      "source": "@calculate",
+      "selector": "cmp.v0.n1000.map_insert.lazy,cmp.v0.n1000.map_insert.manifest",
+      "field": "ratio:1"
+    },
+    {
+      "id": "cmp.v0.n1000.map_lookup.lazy",
+      "unit": "CU",
+      "source": "benchmarks/compare/results/all.csv",
+      "selector": "arch=v0,lib=blubber_trusted,workload=2,n=1000,op=lookup,status=ok",
+      "field": "whole_cu"
+    },
+    {
+      "id": "cmp.v0.n1000.map_lookup.zeropod",
+      "unit": "CU",
+      "source": "benchmarks/compare/results/all.csv",
+      "selector": "arch=v0,lib=zeropod,workload=2,n=1000,op=lookup,status=ok",
+      "field": "whole_cu"
+    },
+    {
+      "id": "cmp.v0.n1000.derived.map_lookup_zeropod_extra_rounded",
+      "unit": "CU",
+      "source": "@calculate",
+      "selector": "cmp.v0.n1000.map_lookup.lazy,cmp.v0.n1000.map_lookup.zeropod",
+      "field": "difference_rounded:50"
+    },
+    {
+      "id": "cmp.v0.n1000.list_grow_constant.checked",
+      "unit": "CU",
+      "source": "benchmarks/compare/results/all.csv",
+      "selector": "arch=v0,lib=blubber_checked,workload=3,n=1000,op=grow_all,status=ok",
+      "field": "whole_cu"
+    },
+    {
+      "id": "cmp.v0.n1000.list_push.borsh",
+      "unit": "CU",
+      "source": "benchmarks/compare/results/all.csv",
+      "selector": "arch=v0,lib=borsh,workload=1,n=1000,op=push,status=ok",
+      "field": "whole_cu"
+    },
+    {
+      "id": "cmp.v0.n1000.list_push.checked",
+      "unit": "CU",
+      "source": "benchmarks/compare/results/all.csv",
+      "selector": "arch=v0,lib=blubber_checked,workload=1,n=1000,op=push,status=ok",
+      "field": "whole_cu"
+    },
+    {
+      "id": "cmp.v0.n1000.list_set.callback.lazy",
+      "unit": "CU",
+      "source": "benchmarks/compare/results/all.csv",
+      "selector": "arch=v0,lib=blubber_trusted,workload=1,n=1000,op=set_all,status=ok",
+      "field": "whole_cu"
+    },
+    {
+      "id": "cmp.v0.n1000.list_set.fill.lazy",
+      "unit": "CU",
+      "source": "benchmarks/compare/results/all.csv",
+      "selector": "arch=v0,lib=blubber_trusted,workload=1,n=1000,op=set_all_fill,status=ok",
+      "field": "whole_cu"
+    },
+    {
+      "id": "cmp.v0.n1000.list_sum.borsh",
+      "unit": "CU",
+      "source": "benchmarks/compare/results/all.csv",
+      "selector": "arch=v0,lib=borsh,workload=1,n=1000,op=read_all,status=ok",
+      "field": "whole_cu"
+    },
+    {
+      "id": "cmp.v0.n1000.list_sum.bytemuck",
+      "unit": "CU",
+      "source": "benchmarks/compare/results/all.csv",
+      "selector": "arch=v0,lib=bytemuck,workload=1,n=1000,op=read_all,status=ok",
+      "field": "whole_cu"
+    },
+    {
+      "id": "cmp.v0.n1000.list_sum.checked",
+      "unit": "CU",
+      "source": "benchmarks/compare/results/all.csv",
+      "selector": "arch=v0,lib=blubber_checked,workload=1,n=1000,op=read_all,status=ok",
+      "field": "whole_cu"
+    },
+    {
+      "id": "cmp.v0.n1000.list_sum.lazy",
+      "unit": "CU",
+      "source": "benchmarks/compare/results/all.csv",
+      "selector": "arch=v0,lib=blubber_trusted,workload=1,n=1000,op=read_all,status=ok",
+      "field": "whole_cu"
+    },
+    {
+      "id": "cmp.v0.n1000.map_grow_from_old.lazy",
+      "unit": "CU",
+      "source": "benchmarks/compare/results/all.csv",
+      "selector": "arch=v0,lib=blubber_trusted,workload=4,n=1000,op=grow_all_old,status=ok",
+      "field": "whole_cu"
+    },
+    {
+      "id": "cmp.v0.n1000.map_grow_from_old.lazy.delta",
+      "unit": "CU",
+      "source": "benchmarks/compare/results/all.csv",
+      "selector": "arch=v0,lib=blubber_trusted,workload=4,n=1000,op=grow_all_old,status=ok",
+      "field": "delta_cu"
+    },
+    {
+      "id": "cmp.v0.n1000.map_grow_from_old.lazy.heap_bytes",
+      "unit": "bytes",
+      "source": "benchmarks/compare/results/all.csv",
+      "selector": "arch=v0,lib=blubber_trusted,workload=4,n=1000,op=grow_all_old,status=ok",
+      "field": "heap_bytes"
+    },
+    {
+      "id": "cmp.v0.n1000.map_grow_from_old.zeropod",
+      "unit": "CU",
+      "source": "benchmarks/compare/results/all.csv",
+      "selector": "arch=v0,lib=zeropod,workload=4,n=1000,op=grow_all_old,status=ok",
+      "field": "whole_cu"
+    },
+    {
+      "id": "cmp.v0.n1000.map_grow_from_old.zeropod.delta",
+      "unit": "CU",
+      "source": "benchmarks/compare/results/all.csv",
+      "selector": "arch=v0,lib=zeropod,workload=4,n=1000,op=grow_all_old,status=ok",
+      "field": "delta_cu"
+    },
+    {
+      "id": "cmp.v0.n1000.map_grow_from_old.zeropod.heap_bytes",
+      "unit": "bytes",
+      "source": "benchmarks/compare/results/all.csv",
+      "selector": "arch=v0,lib=zeropod,workload=4,n=1000,op=grow_all_old,status=ok",
+      "field": "heap_bytes"
+    },
+    {
+      "id": "cmp.v0.n1000.map_insert_string.lazy",
+      "unit": "CU",
+      "source": "benchmarks/compare/results/all.csv",
+      "selector": "arch=v0,lib=blubber_trusted,workload=4,n=1000,op=insert_middle,status=ok",
+      "field": "whole_cu"
+    },
+    {
+      "id": "cmp.v0.n1000.map_insert_string.star_frame",
+      "unit": "CU",
+      "source": "benchmarks/compare/results/all.csv",
+      "selector": "arch=v0,lib=star_frame,workload=4,n=1000,op=insert_middle,status=ok",
+      "field": "whole_cu"
+    },
+    {
+      "id": "cmp.v0.n1000.map_lookup.borsh",
+      "unit": "CU",
+      "source": "benchmarks/compare/results/all.csv",
+      "selector": "arch=v0,lib=borsh,workload=2,n=1000,op=lookup,status=ok",
+      "field": "whole_cu"
+    },
+    {
+      "id": "cmp.v0.n1000.map_lookup.checked",
+      "unit": "CU",
+      "source": "benchmarks/compare/results/all.csv",
+      "selector": "arch=v0,lib=blubber_checked,workload=2,n=1000,op=lookup,status=ok",
+      "field": "whole_cu"
+    },
+    {
+      "id": "cmp.v0.n1000.summary.borsh_heap_exhausted",
+      "unit": "operations",
+      "source": "benchmarks/compare/results/all.csv",
+      "selector": "@v0_n1000_comparison",
+      "field": "borsh_heap_exhausted"
+    },
+    {
+      "id": "cmp.v0.n1000.summary.operations",
+      "unit": "operations",
+      "source": "benchmarks/compare/results/all.csv",
+      "selector": "@v0_n1000_comparison",
+      "field": "operations"
+    },
+    {
+      "id": "cmp.v0.n1000.summary.other_losses",
+      "unit": "operations",
+      "source": "benchmarks/compare/results/all.csv",
+      "selector": "@v0_n1000_comparison",
+      "field": "other_losses"
+    },
+    {
+      "id": "cmp.v0.n1000.summary.other_wins",
+      "unit": "operations",
+      "source": "benchmarks/compare/results/all.csv",
+      "selector": "@v0_n1000_comparison",
+      "field": "other_wins"
+    },
+    {
+      "id": "compare.gaps.large_entries",
+      "unit": "entries",
+      "value": "1000"
+    },
+    {
+      "id": "compare.gaps.small_entries",
+      "unit": "entries",
+      "value": "100"
+    },
+    {
+      "id": "compare.gaps.threshold",
+      "unit": "ratio",
+      "value": "1.5"
+    },
+    {
+      "id": "fuzz.cargo_fuzz.version",
+      "unit": "version",
+      "source": "scripts/reproduce.sh",
+      "selector": "\\A(?s:.*?)require_version 'cargo-fuzz (?P<value>[\\d.]+)' cargo fuzz",
+      "field": "value"
+    },
+    {
+      "id": "fuzz.history.command_bytes",
+      "unit": "bytes",
+      "source": "fuzz/src/edits.rs",
+      "selector": "^        \\.as_chunks::<(?P<value>\\d+)>\\(\\)$",
+      "field": "value"
+    },
+    {
+      "id": "fuzz.history.commands",
+      "unit": "commands",
+      "source": "fuzz/src/edits.rs",
+      "selector": "^        \\.take\\((?P<value>\\d+)\\)$",
+      "field": "value"
+    },
+    {
+      "id": "fuzz.host.initial_bytes",
+      "unit": "bytes",
+      "source": "fuzz/src/edits.rs",
+      "selector": "^const MAX_STORAGE: usize = (?P<value>\\d+);",
+      "field": "value"
+    },
+    {
+      "id": "fuzz.host.iteration_items",
+      "unit": "items",
+      "source": "fuzz/src/validation.rs",
+      "selector": "S::visit\\(value, &mut (?P<value>\\d+)\\);",
+      "field": "value"
+    },
+    {
+      "id": "fuzz.host.rust_nightly",
+      "unit": "toolchain",
+      "source": "scripts/reproduce.sh",
+      "selector": "^                export RUSTUP_TOOLCHAIN=(?P<value>nightly-[\\d-]+)$",
+      "field": "value"
+    },
+    {
+      "id": "fuzz.host.schemas",
+      "unit": "schemas",
+      "source": "fuzz/src/lib.rs",
+      "selector": "^const SCHEMAS: usize = (?P<value>\\d+);",
+      "field": "value"
+    },
+    {
+      "id": "fuzz.libfuzzer_sys.version",
+      "unit": "version",
+      "source": "fuzz/Cargo.toml",
+      "selector": "^libfuzzer-sys = \"(?P<value>[\\d.]+)\"$",
+      "field": "value"
+    },
+    {
+      "id": "fuzz.sdk.iteration_items",
+      "unit": "items",
+      "source": "programs/policy/src/corrupt.rs",
+      "selector": "let mut iter = root\\.try_fixed\\(\\)\\?\\.try_iter\\(\\);\\n[^\\n]+\\n\\s*for _ in 0\\.\\.(?P<value>\\d+) \\{",
+      "field": "value"
+    },
+    {
+      "id": "fuzz.sdk.rust_version",
+      "unit": "version",
+      "source": "scripts/reproduce.sh",
+      "selector": "^                export RUSTUP_TOOLCHAIN=(?P<value>[\\d.]+)$",
+      "field": "value"
+    },
+    {
+      "id": "fuzz.wrapper.host.rss_mb",
+      "unit": "MB",
+      "source": "scripts/reproduce.sh",
+      "selector": "^                seed=34\\n                rss=(?P<value>\\d+)$",
+      "field": "value"
+    },
+    {
+      "id": "fuzz.wrapper.host.seed",
+      "unit": "seed",
+      "source": "scripts/reproduce.sh",
+      "selector": "^                seed=(?P<value>\\d+)\\n                rss=2048$",
+      "field": "value"
+    },
+    {
+      "id": "fuzz.wrapper.input_bytes",
+      "unit": "bytes",
+      "source": "scripts/reproduce.sh",
+      "selector": "-max_len=(?P<value>\\d+) -seed=",
+      "field": "value"
+    },
+    {
+      "id": "fuzz.wrapper.sdk.rss_mb",
+      "unit": "MB",
+      "source": "scripts/reproduce.sh",
+      "selector": "^                seed=217\\n                rss=(?P<value>\\d+)$",
+      "field": "value"
+    },
+    {
+      "id": "fuzz.wrapper.sdk.seed",
+      "unit": "seed",
+      "source": "scripts/reproduce.sh",
+      "selector": "^                seed=(?P<value>\\d+)\\n                rss=4096$",
+      "field": "value"
+    },
+    {
+      "id": "fuzz.wrapper.time_seconds",
+      "unit": "seconds",
+      "source": "scripts/reproduce.sh",
+      "selector": "^        seconds=(?P<value>\\d+)$",
+      "field": "value"
+    },
+    {
+      "id": "fuzz.wrapper.timeout_seconds",
+      "unit": "seconds",
+      "source": "scripts/reproduce.sh",
+      "selector": "-timeout=(?P<value>\\d+) -rss_limit_mb=",
+      "field": "value"
+    },
+    {
+      "id": "proof.verus.errors",
+      "unit": "errors",
+      "source": "verification/results/core/all.log",
+      "selector": "\"errors\":(?P<value>\\d+),",
+      "field": "value"
+    },
+    {
+      "id": "proof.verus.verified",
+      "unit": "obligations",
+      "source": "verification/results/core/all.log",
+      "selector": "\"verified\":(?P<value>\\d+),",
+      "field": "value"
+    },
+    {
+      "id": "quickstart.opcode.create",
+      "unit": "opcode",
+      "source": "programs/blubber-quickstart/src/lib.rs",
+      "selector": "^        \\[(?P<value>\\d+)\\] => create\\(",
+      "field": "value"
+    },
+    {
+      "id": "quickstart.opcode.push",
+      "unit": "opcode",
+      "source": "programs/blubber-quickstart/src/lib.rs",
+      "selector": "^        \\[(?P<value>\\d+), value @ \\.\\.\\] => \\{",
+      "field": "value"
+    },
+    {
+      "id": "quickstart.queue.append_bytes",
+      "unit": "bytes",
+      "source": "programs/blubber-quickstart/src/lib.rs",
+      "selector": "headroom: Headroom::UpTo\\((?P<value>\\d+)\\), // One u64",
+      "field": "value"
+    },
+    {
+      "id": "quickstart.queue.empty_bytes",
+      "unit": "bytes",
+      "source": "tests/mollusk/tests/quickstart.rs",
+      "selector": "let exact_lengths = \\[(?P<value>\\d+)",
+      "field": "value"
+    },
+    {
+      "id": "quickstart.queue.first_append_bytes",
+      "unit": "bytes",
+      "source": "tests/mollusk/tests/quickstart.rs",
+      "selector": "let exact_lengths = \\[(?:\\d+, )(?P<value>\\d+)",
+      "field": "value"
+    },
+    {
+      "id": "quickstart.queue.second_append_bytes",
+      "unit": "bytes",
+      "source": "tests/mollusk/tests/quickstart.rs",
+      "selector": "let exact_lengths = \\[(?:\\d+, )(?:\\d+, )(?P<value>\\d+)",
+      "field": "value"
+    },
+    {
+      "id": "recipe.indexed_append.additional_room_bytes",
+      "unit": "bytes",
+      "source": "tests/doc-examples/src/lib.rs",
+      "selector": "assert_eq!\\(growth - runtime_spare, (?P<value>\\d+)\\);",
+      "field": "value"
+    },
+    {
+      "id": "recipe.indexed_append.encoded_growth_bytes",
+      "unit": "bytes",
+      "source": "tests/doc-examples/src/lib.rs",
+      "selector": "assert_eq!\\(growth, (?P<value>\\d+)\\);",
+      "field": "value"
+    },
+    {
+      "id": "recipe.indexed_append.host_spare_bytes",
+      "unit": "bytes",
+      "source": "tests/doc-examples/src/lib.rs",
+      "selector": "let mut bytes = vec!\\[0; used \\+ (?P<value>\\d+)\\];",
+      "field": "value"
+    },
+    {
+      "id": "recipe.indexed_append.opening_spare_bytes",
+      "unit": "bytes",
+      "source": "tests/doc-examples/src/lib.rs",
+      "selector": "let runtime_spare = (?P<value>\\d+);",
+      "field": "value"
+    },
+    {
+      "id": "recipe.indexed_append.payload_bytes",
+      "unit": "bytes",
+      "source": "tests/doc-examples/src/lib.rs",
+      "selector": "assert_eq!\\(new.len\\(\\), (?P<value>\\d+)\\);",
+      "field": "value"
+    },
+    {
+      "id": "release.blubber.version",
+      "unit": "version",
+      "value": "0.1.0"
+    },
+    {
+      "id": "release.rust.minimum",
+      "unit": "version",
+      "source": "Cargo.toml",
+      "selector": "^rust-version = \"(?P<value>[\\d.]+)\"$",
+      "field": "value"
+    },
+    {
+      "id": "roadmap.enums.version",
+      "unit": "version",
+      "value": "0.2"
+    },
+    {
+      "id": "roadmap.stable.quarter",
+      "unit": "quarter",
+      "value": "Q1 2027"
+    },
+    {
+      "id": "roadmap.stable.version",
+      "unit": "version",
+      "value": "1.0"
+    },
+    {
+      "id": "runtime.account.max_mib",
+      "unit": "MiB",
+      "source": "SPEC.md",
+      "selector": "separate account cap is (?P<value>\\d+) MiB",
+      "field": "value"
+    },
+    {
+      "id": "runtime.default.heap_kib",
+      "unit": "KiB",
+      "value": "32"
+    },
+    {
+      "id": "runtime.headroom.default_bytes",
+      "unit": "bytes",
+      "source": "SPEC.md",
+      "selector": "^`Headroom::default\\(\\) == Headroom::UpTo\\((?P<value>\\d+)\\)`",
+      "field": "value"
+    },
+    {
+      "id": "runtime.invocation.growth_bytes",
+      "unit": "bytes",
+      "source": "SPEC.md",
+      "selector": "^(?P<value>[\\d,]+) bytes\\. Local SDK acceptance",
+      "field": "value"
+    },
+    {
+      "id": "runtime.profile.copy",
+      "unit": "profile",
+      "source": "benchmarks/data/runtime-v0.csv",
+      "selector": "scenario=fresh_windows_profile0",
+      "field": "profile"
+    },
+    {
+      "id": "runtime.profile.direct",
+      "unit": "profile",
+      "source": "benchmarks/data/runtime-v0.csv",
+      "selector": "scenario=fresh_windows_profile2",
+      "field": "profile"
+    },
+    {
+      "id": "runtime.profile.simd0460",
+      "unit": "profile",
+      "source": "benchmarks/data/runtime-v0.csv",
+      "selector": "scenario=fresh_windows_profile1",
+      "field": "profile"
+    },
+    {
+      "id": "runtime.sbf.stack_frame_bytes",
+      "unit": "bytes",
+      "source": "scripts/sbf-stack.sh",
+      "selector": "SBF stack diagnostic rejected \\((?P<value>[\\d,]+)-byte frame limit\\)",
+      "field": "value"
+    },
+    {
+      "id": "scaling.v0.n1000.map_lookup.common_prefix_front_hit",
+      "unit": "CU",
+      "source": "benchmarks/data/scaling-v0.csv",
+      "selector": "scenario=map_fixed_n1000_lookup_hit_front_common",
+      "field": "whole_cu"
+    },
+    {
+      "id": "scaling.v0.n1000.map_lookup.end_hit",
+      "unit": "CU",
+      "source": "benchmarks/data/scaling-v0.csv",
+      "selector": "scenario=map_fixed_n1000_lookup_hit_end_plain",
+      "field": "whole_cu"
+    },
+    {
+      "id": "scaling.v0.n1000.map_lookup.front_hit",
+      "unit": "CU",
+      "source": "benchmarks/data/scaling-v0.csv",
+      "selector": "scenario=map_fixed_n1000_lookup_hit_front_plain",
+      "field": "whole_cu"
+    },
+    {
+      "id": "scaling.v0.n1000.map_lookup.middle_miss",
+      "unit": "CU",
+      "source": "benchmarks/data/scaling-v0.csv",
+      "selector": "scenario=map_fixed_n1000_lookup_miss_middle_plain",
+      "field": "whole_cu"
+    },
+    {
+      "id": "schema.default.depth",
+      "unit": "nodes",
+      "source": "SPEC.md",
+      "selector": "^budget is (?P<value>\\d+);",
+      "field": "value"
+    },
+    {
+      "id": "schema.depth16.depth",
+      "unit": "nodes",
+      "source": "SPEC.md",
+      "selector": "raises it to (?P<value>\\d+) without changing bytes",
+      "field": "value"
+    },
+    {
+      "id": "schema.identity.default_epoch",
+      "unit": "epoch",
+      "source": "crates/blubber-derive/src/schema.rs",
+      "selector": "let semantic_epoch = options.semantic_epoch.unwrap_or\\((?P<value>\\d+)\\);",
+      "field": "value"
+    },
+    {
+      "id": "traversal.v0.n1000.map_rewrite.batched.heap_bytes",
+      "unit": "bytes",
+      "source": "benchmarks/traversal-mixed-v0.csv",
+      "selector": "case=map_indexed_n1000_map_grow_from_old_values_batched_plain",
+      "field": "?heap_bytes"
+    },
+    {
+      "id": "traversal.v0.n1000.map_rewrite.batched.whole",
+      "unit": "CU",
+      "source": "benchmarks/traversal-mixed-v0.csv",
+      "selector": "case=map_indexed_n1000_map_grow_from_old_values_batched_plain",
+      "field": "?whole"
+    },
+    {
+      "id": "traversal.v0.n1000.map_rewrite.fixed_width.heap_bytes",
+      "unit": "bytes",
+      "source": "benchmarks/traversal-mixed-v0.csv",
+      "selector": "case=map_indexed_n1000_map_grow_from_old_values_fixed_width_plain",
+      "field": "heap_bytes"
+    },
+    {
+      "id": "traversal.v0.n1000.map_rewrite.string_ends.heap_bytes",
+      "unit": "bytes",
+      "source": "benchmarks/traversal-mixed-v0.csv",
+      "selector": "case=map_indexed_n1000_map_grow_from_old_values_plain",
+      "field": "heap_bytes"
+    },
+    {
+      "id": "traversal.v0.n1000.map_rewrite.with.whole",
+      "unit": "CU",
+      "source": "benchmarks/traversal-mixed-v0.csv",
+      "selector": "case=map_indexed_n1000_map_grow_from_old_values_with_plain",
+      "field": "?whole"
+    },
+    {
+      "id": "traversal.v0.n1000.map_rewrite.transform_saving",
+      "unit": "CU",
+      "source": "@calculate",
+      "selector": "traversal.v0.n1000.map_rewrite.batched.whole,traversal.v0.n1000.map_rewrite.with.whole",
+      "field": "difference"
+    },
+    {
+      "id": "traversal.v0.n1000.map_rewrite.with.heap_bytes",
+      "unit": "bytes",
+      "source": "benchmarks/traversal-mixed-v0.csv",
+      "selector": "case=map_indexed_n1000_map_grow_from_old_values_with_plain",
+      "field": "?heap_bytes"
+    },
+    {
+      "id": "wire.account.discriminator_bytes",
+      "unit": "bytes",
+      "source": "SPEC.md",
+      "selector": "^\\| 0 \\| (?P<value>\\d+) \\| Discriminator \\|",
+      "field": "value"
+    },
+    {
+      "id": "wire.account.header_bytes",
+      "unit": "bytes",
+      "source": "SPEC.md",
+      "selector": "including these (?P<value>\\d+) envelope bytes",
+      "field": "value"
+    },
+    {
+      "id": "wire.account.used_len_bytes",
+      "unit": "bytes",
+      "source": "SPEC.md",
+      "selector": "^\\| 8 \\| (?P<value>\\d+) \\| `used_len`, including",
+      "field": "value"
+    },
+    {
+      "id": "wire.address.bytes",
+      "unit": "bytes",
+      "source": "SPEC.md",
+      "selector": "^\\| `Address` \\| Exactly (?P<value>\\d+) raw bytes",
+      "field": "value"
+    },
+    {
+      "id": "wire.list.count_bytes",
+      "unit": "bytes",
+      "source": "SPEC.md",
+      "selector": "^\\| Variable T, n>0 \\| .*? \\| `(?P<value>\\d+) \\+ \\d+\\*\\(n-1\\) \\+ s`",
+      "field": "value"
+    },
+    {
+      "id": "wire.list.end_bytes",
+      "unit": "bytes",
+      "source": "SPEC.md",
+      "selector": "^\\| Variable T, n>0 \\| .*? \\| `\\d+ \\+ (?P<value>\\d+)\\*\\(n-1\\) \\+ s`",
+      "field": "value"
+    }
+  ],
+  "excerpts": [
+    {
+      "name": "schema",
+      "source": "programs/blubber-quickstart/src/lib.rs",
+      "proof_source": "tests/mollusk/tests/quickstart.rs",
+      "proof_test": "creates_and_pushes_with_exact_lengths_and_rent",
+      "parts": "1"
+    },
+    {
+      "name": "create",
+      "source": "programs/blubber-quickstart/src/lib.rs",
+      "proof_source": "tests/mollusk/tests/quickstart.rs",
+      "proof_test": "creates_and_pushes_with_exact_lengths_and_rent",
+      "parts": "1"
+    },
+    {
+      "name": "push",
+      "source": "programs/blubber-quickstart/src/lib.rs",
+      "proof_source": "tests/mollusk/tests/quickstart.rs",
+      "proof_test": "creates_and_pushes_with_exact_lengths_and_rent",
+      "parts": "1"
+    },
+    {
+      "name": "borsh-migrate",
+      "source": "programs/blubber-quickstart/src/lib.rs",
+      "proof_source": "tests/mollusk/tests/quickstart.rs",
+      "proof_test": "migrates_borsh_queues_in_place",
+      "parts": "1"
+    },
+    {
+      "name": "queue-client-read",
+      "source": "tests/mollusk/tests/quickstart.rs",
+      "proof_source": "tests/mollusk/tests/quickstart.rs",
+      "proof_test": "creates_and_pushes_with_exact_lengths_and_rent",
+      "parts": "1"
+    },
+    {
+      "name": "indexed-append",
+      "source": "tests/doc-examples/src/lib.rs",
+      "proof_source": "tests/doc-examples/src/lib.rs",
+      "proof_test": "indexed_append_preserves_sibling",
+      "parts": "1"
+    },
+    {
+      "name": "nested-string-edit",
+      "source": "programs/blubber-demo/src/exercise.rs",
+      "proof_source": "tests/mollusk/tests/tour.rs",
+      "proof_test": "each_tour_opcode_matches_the_model_in_all_memory_profiles",
+      "parts": "1"
+    },
+    {
+      "name": "callback-progress",
+      "source": "tests/doc-examples/src/lib.rs",
+      "proof_source": "tests/doc-examples/src/lib.rs",
+      "proof_test": "list_callback_absence_and_partial_progress",
+      "parts": "1"
+    },
+    {
+      "name": "map-transform",
+      "source": "crates/blubber/tests/rewrite_kernel.rs",
+      "proof_source": "crates/blubber/tests/rewrite_kernel.rs",
+      "proof_test": "doc_map_transform_and_short_output",
+      "parts": "1"
+    },
+    {
+      "name": "host-round-trip",
+      "source": "crates/blubber/src/lib.rs",
+      "proof_source": "crates/blubber/src/lib.rs",
+      "proof_test": "rustdoc",
+      "parts": "1"
+    },
+    {
+      "name": "core-utf8",
+      "source": "crates/blubber-core/src/lib.rs",
+      "proof_source": "crates/blubber-core/src/lib.rs",
+      "proof_test": "rustdoc",
+      "parts": "1"
+    },
+    {
+      "name": "direct-schema",
+      "source": "crates/blubber-derive/src/lib.rs",
+      "proof_source": "crates/blubber-derive/src/lib.rs",
+      "proof_test": "rustdoc",
+      "parts": "1"
+    }
+  ]
+}

@@ -1,18 +1,20 @@
-//! Checked byte regions and format-1 operations for Blubber.
+//! `blubber-core` is the allocator-free byte kernel for layout tables, [`validate`], encoding and byte moves. Most programs should use [`blubber`](https://docs.rs/blubber/0.1.0/blubber/) instead, because raw kernel functions require you to uphold their layout premises.
 //!
-//! Most applications use the `blubber` crate's generated schemas and typed stores.
-//! This kernel exposes checked layouts, validation, encoding and byte operations.
-//! Errors retain their kind and byte offset. Root preservation requires a valid
-//! starting encoding and matching codecs; raw operations carry narrower local
-//! contracts. The crate is `no_std` and forbids unsafe code.
+//! ## Validate bytes
+//!
+//! Errors include an [`ErrorKind`] and a byte offset when the fault has a byte location. [`validate_utf8`] checks a slice in constant space:
 //!
 //! ```
+//! // docs:start core-utf8
 //! use blubber_core::validate_utf8;
 //!
 //! validate_utf8("hello λ".as_bytes())?;
 //! assert!(validate_utf8(&[b'a', 0xff]).is_err());
+//! // docs:end core-utf8
 //! # Ok::<(), blubber_core::Error>(())
 //! ```
+//!
+//! Verus checks the byte operations under their stated premises. See the [crate README](https://github.com/moshthepitt/blubber/blob/main/crates/blubber-core/README.md#work-with-encoded-bytes), [`SPEC.md`](https://github.com/moshthepitt/blubber/blob/main/SPEC.md#strict-raw-gateways) and [`ASSURANCE.md`](https://github.com/moshthepitt/blubber/blob/main/ASSURANCE.md#production-proofs-and-bounds).
 
 #![no_std]
 #![forbid(unsafe_code)]

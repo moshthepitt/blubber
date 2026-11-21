@@ -22,4 +22,4 @@ solana-svm = { version = "4.3.0", features = ["agave-unstable-api"] }
 blubber-mollusk = { path = "../../../tests/mollusk" }
 
 [features]
-competitors = ["compare-program/manifest", "compare-program/anchor-slab", "compare-program/baselines", "compare-program/zeropod", "compare-program/wincode", "compare-program/pinapod", "compare-program/light"]
+competitors = ["compare-program/manifest", "compare-program/baselines", "compare-program/zeropod", "compare-program/wincode", "compare-program/pinapod", "compare-program/light"]

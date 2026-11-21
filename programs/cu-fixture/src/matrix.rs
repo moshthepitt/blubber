@@ -7,11 +7,11 @@
 
 use crate::{mark, schemas::*};
 use blubber::raw::Resize;
-use blubber::{pinocchio::ReadStore, Pubkey, ReadStorage, Result};
+use blubber::{pinocchio::ReadStore, ReadStorage, Result};
 use core::hint::black_box;
 use pinocchio::{error::ProgramError, AccountView, Address, ProgramResult};
 
-/// Layout codes: fixed/indexed list, fixed/indexed Pubkey map, fixed/indexed Address map.
+/// Layout codes: fixed/indexed list, fixed/indexed Address map, fixed/indexed Address map.
 pub const LAYOUTS: [&str; 6] = [
     "list_fixed",
     "list_indexed",
@@ -180,7 +180,7 @@ pub fn run(id: &Address, accounts: &mut [AccountView], ix: &[u8]) -> ProgramResu
     let index = usize::from(u16::from_le_bytes([*lo, *hi]));
     let count = u32::from(u16::from_le_bytes([*nlo, *nhi]));
     let missing = matches!(*op, 5 | 19 | 21 | 29 | 32 | 35 | 37 | 48);
-    let key = Pubkey::from_bytes(matrix_key(
+    let key = Address::new_from_array(matrix_key(
         2 * index as u32 + if missing { 1 } else { 2 },
         *common != 0,
     ));
@@ -199,20 +199,8 @@ pub fn run(id: &Address, accounts: &mut [AccountView], ix: &[u8]) -> ProgramResu
         1 => words(state, id, op, index, key)?,
         2 => public_keys(state, id, op, index, key)?,
         3 => key_words(state, id, op, index, key)?,
-        4 => addresses(
-            state,
-            id,
-            op,
-            index,
-            Address::new_from_array(key.to_bytes()),
-        )?,
-        5 => address_words(
-            state,
-            id,
-            op,
-            index,
-            Address::new_from_array(key.to_bytes()),
-        )?,
+        4 => addresses(state, id, op, index, key)?,
+        5 => address_words(state, id, op, index, key)?,
         _ => return Err(ProgramError::InvalidInstructionData),
     }
     mark(4);
@@ -404,10 +392,10 @@ macro_rules! collection_fn {
         }
     };
 }
-collection_fn!(numbers, Numbers, list, Pubkey, 123u64, 17u64);
-collection_fn!(words, Words, list, Pubkey, REPLACEMENT, ORIGINAL);
-collection_fn!(public_keys, PublicKeyMap, map, Pubkey, 123u64, 17u64);
-collection_fn!(key_words, KeyWords, map, Pubkey, REPLACEMENT, ORIGINAL);
+collection_fn!(numbers, Numbers, list, Address, 123u64, 17u64);
+collection_fn!(words, Words, list, Address, REPLACEMENT, ORIGINAL);
+collection_fn!(public_keys, PublicKeyMap, map, Address, 123u64, 17u64);
+collection_fn!(key_words, KeyWords, map, Address, REPLACEMENT, ORIGINAL);
 collection_fn!(addresses, AddressMap, map, Address, 123u64, 17u64);
 collection_fn!(
     address_words,
@@ -555,7 +543,7 @@ pub fn scalar_kinds(id: &Address, accounts: &mut [AccountView]) -> ProgramResult
         signed_huge: i128::MIN,
         enabled: true,
         raw: [0xa5; 17],
-        key: Pubkey::from_bytes([0x31; 32]),
+        key: Address::new_from_array([0x31; 32]),
         address: Address::new_from_array([0x32; 32]),
     };
     let mut value = root.value_mut();

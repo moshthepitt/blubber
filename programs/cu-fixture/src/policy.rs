@@ -18,11 +18,6 @@ pub struct PolicyState {
     pub flags: List<bool>,
 }
 
-#[cfg(feature = "policy")]
-impl blubber_anchor::sdk::Owner for PolicyState {
-    const OWNER: Address = Address::new_from_array([7; 32]);
-}
-
 /// Runs a scoped policy control with the genuine runtime account guard.
 pub fn run(owner: &Address, accounts: &mut [AccountView], op: u8) -> ProgramResult {
     let [account] = accounts else {
@@ -119,33 +114,6 @@ pub fn run(owner: &Address, accounts: &mut [AccountView], op: u8) -> ProgramResu
             assert!(
                 matches!(ReadStore::new(&alias, owner), Err(e) if e == ErrorKind::BorrowConflict.into())
             );
-        }
-        #[cfg(feature = "policy")]
-        6 => {
-            use blubber_anchor::{sdk::AnchorAccount, Blubber};
-            let root = Blubber::<PolicyState, blubber_anchor::Checked>::load(*account)?;
-            if account.check_borrow_mut().is_ok() {
-                return Err(pinocchio::error::ProgramError::InvalidAccountData);
-            }
-            if !root.flag {
-                return Err(pinocchio::error::ProgramError::InvalidAccountData);
-            }
-        }
-        #[cfg(feature = "policy")]
-        7 => {
-            use blubber_anchor::{sdk::AnchorAccount, Blubber};
-            let mut root = Blubber::<PolicyState, blubber_anchor::Checked>::load_mut(*account)?;
-            if Blubber::<PolicyState, blubber_anchor::Checked>::load(*account).is_ok() {
-                return Err(pinocchio::error::ProgramError::InvalidAccountData);
-            }
-            root.edit(|_| Ok(()))?;
-        }
-        #[cfg(feature = "policy")]
-        8 => {
-            use blubber_anchor::{sdk::AnchorAccount, Blubber};
-            let root = Blubber::<PolicyState>::load(*account)?;
-            root.verify()?;
-            root.read(|reader| reader.verify())?;
         }
         _ => return Err(pinocchio::error::ProgramError::InvalidInstructionData),
     }

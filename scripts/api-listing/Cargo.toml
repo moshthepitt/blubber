@@ -1,0 +1,10 @@
+[package]
+name = "blubber-api-listing"
+version = "0.0.0"
+edition = "2021"
+publish = false
+[workspace]
+[dependencies]
+syn = { version = "=2.0.119", features = ["full", "visit"] }
+quote = "=1.0.47"
+proc-macro2 = "=1.0.107"

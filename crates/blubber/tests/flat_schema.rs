@@ -2,7 +2,7 @@
 #![forbid(unsafe_code)]
 #![cfg(feature = "derive")]
 
-use blubber::{List, Map, Pubkey, RootSchema, Schema, Str};
+use blubber::{Address, List, Map, RootSchema, Schema, Str};
 
 #[blubber::schema]
 struct Packed {
@@ -19,7 +19,7 @@ struct Mixed {
 #[blubber::schema]
 struct Root {
     records: List<Mixed>,
-    map: Map<Pubkey, Option<Str>>,
+    map: Map<Address, Option<Str>>,
 }
 
 #[test]
@@ -53,7 +53,7 @@ fn concrete_tables_have_packed_ordinals_and_rebased_children() {
 #[test]
 fn hidden_concrete_context_supports_generic_collections_without_standalone_tables() {
     const TABLE: blubber_core::CheckedLayout<'static> =
-        blubber::__layout_of!(List<Map<Pubkey, Option<Str>>>);
+        blubber::__layout_of!(List<Map<Address, Option<Str>>>);
     assert_eq!(TABLE.words()[TABLE.root()], 7);
     assert_eq!(TABLE.words()[TABLE.root() + 2], 4);
 }
@@ -243,7 +243,7 @@ fn public_child_selection_checks_ordinals_before_creating_a_witness() {
 #[blubber::schema]
 struct BitPatterns {
     number: u64,
-    key: Pubkey,
+    key: Address,
     bytes: [u8; 7],
 }
 #[blubber::schema]

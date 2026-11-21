@@ -5,20 +5,20 @@ M7c exact ceilings: benchmarks/m7c-cu-decisions.csv (user decision 2026-11-02)
 fill measures=1 when nonempty; rewrite measures<=2n; encodes=n; ends<=n;
 reserve/suffix move/ancestor publication<=1; source/codec counters checked in list_edits;
 Q1 recursive measures/input: Str=0; 8-byte List<u8>=8 u8; MeasuredRecord=1 u64+1 List+8 Str;
-source-sha256=8d9f752a0e8e232752b9c7929f02a0f0176405383ec160f794bca34a0b1f0da3
-raw-sha256=0a080303105c53fcdf3a6572dfdc58726fb26f1024dfe37d2d0f2db6fe743aff
-elf-sha256=64685e884baa8a79df15642bc8ae44d2c0149840bac2d122c52327c73dbb6df7
-diagnostic-elf-sha256=848f4d42fc777254778cb2586c02f3f871ee2845e9a917075c1373592179a467
-bencher-sha256=1083b614d2927f3930fa48978862fda5f698c14f91a0e409748dd843c894080c
+source-sha256=74ff527799aaf29b4b5b1890b106324f68a6103fa6bc1eae6a1a1373ab902b7b
+raw-sha256=b6c86715f27eddcfb0904e0f4f3db07021c35b891ab36fd756ed6bbcfbf8ec2f
+elf-sha256=e38f5e94ada5410e17f2db9ad1b9d56920e44616214efd5177f8bbd4658cd75e
+diagnostic-elf-sha256=15c2641847d35044ba0025fc67a3301b3205c17f605dca5a5f4aee9207c38d0a
+bencher-sha256=3efee96e9dd5c64935bbc24f835e3eb336dc5bb4ff6a5f13074f385aa6079bc5
 oracles={"tests/mollusk/benches/support/traversal.rs": "91cc403bd7b01e87c3e1d8ac4be2ca71c1a69173dc0c11afae1c58c826cf8367", "tests/mollusk/src/matrix.rs": "87882b0399e2f11b0e43109906a9ee706b9e13361e1db7f0c5ef7070073e3b78", "tests/mollusk/src/traversal.rs": "d408ecf7397db341ba2c20a41c2cebc7e28a08bf164daf14735eba2c24baf85d"}
-tools={"Cargo.lock": "9528ae88ac74e95b66a907779acfb3b4f57ee29fcadf1ef98023742de7460efd", "host-rust/bin/rustc": "d3a664c970a9fd8361b64194861bebc1ae37b9054e5ee3400dc1c9e691797eea", "platform-tools/rust/bin/rustc": "d95c95b68e321ad76634e1fd26b0a7c20ccdbae9ad9ca733f3ae2f2b4a0b6002"}
-map_indexed_n0_rewrite_values_plain: whole=1803 common=1395 admitted=1949 delta=408
-map_indexed_n1_rewrite_values_plain: whole=2491 common=1628 admitted=2253 delta=863
-map_indexed_n10_rewrite_values_plain: whole=3768 common=2077 admitted=2882 delta=1691
-map_indexed_n100_rewrite_values_plain: whole=14860 common=5288 admitted=7893 delta=9572
-map_indexed_n1000_rewrite_values_plain: whole=127935 common=39263 admitted=59868 delta=88672
-map_indexed_n0_rewrite_values_common31_adjacent: whole=1801 common=1393 admitted=1947 delta=408
-map_indexed_n1_rewrite_values_common31_adjacent: whole=2489 common=1626 admitted=2251 delta=863
-map_indexed_n10_rewrite_values_common31_adjacent: whole=3847 common=2156 admitted=2961 delta=1691
-map_indexed_n100_rewrite_values_common31_adjacent: whole=15749 common=6177 admitted=8782 delta=9572
-map_indexed_n1000_rewrite_values_common31_adjacent: whole=136924 common=48252 admitted=68857 delta=88672
+tools={"Cargo.lock": "4c47a7f4f331b0cc3918d454a195bad2ffab0ddbc1b38f0297c389da875c1a8a", "host-rust/bin/rustc": "d3a664c970a9fd8361b64194861bebc1ae37b9054e5ee3400dc1c9e691797eea", "platform-tools/rust/bin/rustc": "d95c95b68e321ad76634e1fd26b0a7c20ccdbae9ad9ca733f3ae2f2b4a0b6002"}
+map_indexed_n0_rewrite_values_plain: whole=1801 common=1400 admitted=1953 delta=401
+map_indexed_n1_rewrite_values_plain: whole=2438 common=1633 admitted=2260 delta=805
+map_indexed_n10_rewrite_values_plain: whole=3689 common=2082 admitted=2889 delta=1607
+map_indexed_n100_rewrite_values_plain: whole=14512 common=5293 admitted=7900 delta=9219
+map_indexed_n1000_rewrite_values_plain: whole=124937 common=39268 admitted=59875 delta=85669
+map_indexed_n0_rewrite_values_common31_adjacent: whole=1799 common=1398 admitted=1951 delta=401
+map_indexed_n1_rewrite_values_common31_adjacent: whole=2436 common=1631 admitted=2258 delta=805
+map_indexed_n10_rewrite_values_common31_adjacent: whole=3768 common=2161 admitted=2968 delta=1607
+map_indexed_n100_rewrite_values_common31_adjacent: whole=15401 common=6182 admitted=8789 delta=9219
+map_indexed_n1000_rewrite_values_common31_adjacent: whole=133926 common=48257 admitted=68864 delta=85669

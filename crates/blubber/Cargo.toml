@@ -12,29 +12,29 @@ include = ["/Cargo.toml", "/README.md", "/LICENSE", "/src/**/*.rs", "!/src/**/te
 keywords = ["solana", "serialization", "zero-copy"]
 categories = ["no-std", "data-structures", "encoding"]
 
+[package.metadata.docs.rs]
+features = ["alloc", "derive", "pinocchio"]
+rustdoc-args = ["--cfg", "docsrs"]
+
 [features]
-account-runtime = ["alloc", "pinocchio"]
 default = ["derive"]
 derive = ["dep:blubber-derive"]
 alloc = []
 verify-on-load = []
-pinocchio = ["dep:pinocchio", "dep:pinocchio-system", "dep:solana-account-view", "dep:solana-address", "blubber-core/program-error"]
+pinocchio = ["dep:pinocchio", "dep:pinocchio-system", "dep:solana-program-log", "solana-address/curve25519", "blubber-core/program-error"]
 max-depth-16 = ["blubber-core/max-depth-16"]
 
 [dependencies]
 blubber-core.workspace = true
+sha2-const-stable = "0.1.0"
+solana-address = { workspace = true, features = ["copy"] }
+solana-program-log = { workspace = true, optional = true }
 blubber-derive = { workspace = true, optional = true }
 pinocchio = { workspace = true, optional = true }
 pinocchio-system = { workspace = true, optional = true }
-solana-account-view = { workspace = true, optional = true }
-
-# SBF derives addresses through the SDK syscall; hosts need its curve checker.
-[target.'cfg(not(target_os = "solana"))'.dependencies]
-solana-address = { workspace = true, features = ["curve25519"], optional = true }
 
 [dev-dependencies]
 sha2.workspace = true
-solana-rent = "4.4.0"
 bumpalo = "3.20.3"
 serde_json = "1.0.154"
 blubber-model.workspace = true

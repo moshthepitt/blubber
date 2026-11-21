@@ -1,13 +1,21 @@
-# Reporting a problem privately
+# Security policy
 
-Open the repository's Security tab on GitHub and start a private report. Include the library version and a small case that reproduces
-the problem. Report panics or incorrect results on arbitrary bytes under
-checked loading, incorrect bytes after a successful edit, and failures of an
-[assurance claim](ASSURANCE.md).
+## Report privately
 
-Lazy loads can leave untouched invalid bytes unchecked. Your program is
-responsible for checking application authority. See the
-[trust model](docs/trust-model.md) for these boundaries.
+Report security issues through the repository's GitHub Security tab instead of opening a public issue. A public issue exposes the flaw before a fix is ready.
 
-The latest 0.1.x release is supported. There has been no external audit.
-One maintainer handles reports on a best effort basis.
+## Describe the failure
+
+Include the `blubber` version and a small case that reproduces the bug. Report any of the following:
+
+- A checked load that panics or returns a wrong result. A checked load scans the whole used encoding against the schema before returning a view or calling your edit callback.
+- An edit that succeeds but turns a valid encoding into an invalid one.
+- A broken claim in [`ASSURANCE.md#find-a-claim`](ASSURANCE.md#find-a-claim).
+
+Your handler still checks who may act, and a lazy load skips untouched bytes by design; see [`docs/trust-model.md#choose-a-load`](docs/trust-model.md#choose-a-load).
+
+## Release support and review
+
+This policy covers the latest `0.1.x` release. I handle reports myself on a best-effort basis.
+
+Blubber has not had an external audit yet, though I plan to arrange one before `1.0`. For what the in-tree proofs and tests cover and what stays outside them, see [`ASSURANCE.md#trust-boundaries`](ASSURANCE.md#trust-boundaries).

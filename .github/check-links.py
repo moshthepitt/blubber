@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Check local links and the published receipt inventory."""
+"""Check local links, published receipts and Rust fences."""
 
 from collections import Counter
 from pathlib import Path
@@ -18,7 +18,10 @@ REPO_PATH = re.compile(
     r'(?:scripts|verification|benchmarks|programs|crates|tests|fuzz|docs|\.github|\.cargo)/'
     r'[\w.%+@~-]+(?:/[\w.%+@~-]+)*/?(?:#[\w.%-]+)?'
 )
-FENCES = re.compile(r'^[ \t]*((`|~)\2{2,})(?!\2)[^\n]*\n(.*?)^[ \t]*\1\2*[ \t]*$', re.M | re.S)
+FENCES = re.compile(
+    r'^[ \t]*((`|~)\2{2,})(?!\2)([^\n]*)\n(.*?)^[ \t]*\1\2*[ \t]*$',
+    re.M | re.S,
+)
 COMMENTS = re.compile(r"<!--.*?-->", re.S)
 
 
@@ -46,15 +49,30 @@ def anchors(path):
     return result
 
 
+def rustdoc_scaffolding(text, path):
+    # Remove the Markdown block quote prefix while preserving source line numbers.
+    text = re.sub(r"^(?:[ \t]*>[ \t]?)+", "", text, flags=re.M)
+    for fence in FENCES.finditer(text):
+        tags = re.split(r"[,\s]+", fence[3].strip())
+        if tags[0] not in {"rust", "rs"}:
+            continue
+        first = text.count("\n", 0, fence.start(4)) + 1
+        for line_number, line in enumerate(fence[4].splitlines(), first):
+            if re.match(r"^\s*#(?:\s|$)", line):
+                yield f"{path}:{line_number}: rustdoc-only line in a public Rust fence"
+
+
 def check(root=ROOT):
     errors = []
     receipts = set()
     for doc, text in docs(root):
+        if doc.suffix == ".md":
+            errors.extend(rustdoc_scaffolding(text, doc.relative_to(root)))
         text = COMMENTS.sub("", text)
         prose = FENCES.sub("", text)
         links = [(target, False) for target in INLINE.findall(prose) + REFERENCE.findall(prose)]
         snippets = [snippet for _, snippet in CODE.findall(prose)]
-        snippets.extend(body for _, _, body in FENCES.findall(text))
+        snippets.extend(fence[4] for fence in FENCES.finditer(text))
         links.extend((target, True) for target in dict.fromkeys(
             target for snippet in snippets for target in REPO_PATH.findall(snippet)))
         for raw, code in links:
