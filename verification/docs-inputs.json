@@ -560,21 +560,6 @@
       "field": "value"
     },
     {
-      "id": "roadmap.enums.version",
-      "unit": "version",
-      "value": "0.2"
-    },
-    {
-      "id": "roadmap.stable.quarter",
-      "unit": "quarter",
-      "value": "Q1 2027"
-    },
-    {
-      "id": "roadmap.stable.version",
-      "unit": "version",
-      "value": "1.0"
-    },
-    {
       "id": "runtime.account.max_mib",
       "unit": "MiB",
       "source": "SPEC.md",

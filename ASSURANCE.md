@@ -6,7 +6,7 @@ This file maps Blubber's assurance claims to their proof or test records and sta
 
 The byte kernel is the low-level byte-moving and validation code in `blubber-core`. Verus is the contract verifier that checks those functions against their specifications (1,707<!-- num:proof.verus.verified --> verified items, 0<!-- num:proof.verus.errors --> errors in the pinned run). Kani is the bounded model checker that checks finite widths and unwind bounds. Miri is the host execution checker. A ground truth model is an independent owned implementation that computes expected values or bytes. A differential test feeds the same edits to the model and to production storage, then compares the result. A benchmark receipt is the recorded inputs, tools, hashes and output for a pinned run.
 
-First-party production, test and generated crate roots forbid `unsafe` Rust. Dependencies and the comparison workspace sit outside that rule. There has been no external audit yet, and I plan an external review before 1.0<!-- num:roadmap.stable.version -->; see [`SECURITY.md#release-support-and-review`](https://github.com/moshthepitt/blubber/blob/v0.1.0/SECURITY.md#release-support-and-review).
+First-party production, test and generated crate roots forbid `unsafe` Rust. Dependencies and the comparison workspace sit outside that rule. There has been no external audit yet, and I plan an external review; see [`SECURITY.md#release-support-and-review`](https://github.com/moshthepitt/blubber/blob/v0.1.0/SECURITY.md#release-support-and-review).
 
 ## Find a claim
 

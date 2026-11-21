@@ -18,4 +18,4 @@ Your handler still checks who may act, and a lazy load skips untouched bytes by 
 
 This policy covers the latest `0.1.x` release. I handle reports myself on a best-effort basis.
 
-Blubber has not had an external audit yet, though I plan to arrange one before `1.0`. For what the in-tree proofs and tests cover and what stays outside them, see [`ASSURANCE.md#trust-boundaries`](ASSURANCE.md#trust-boundaries).
+Blubber has not had an external audit yet, though I plan to arrange one. For what the in-tree proofs and tests cover and what stays outside them, see [`ASSURANCE.md#trust-boundaries`](ASSURANCE.md#trust-boundaries).

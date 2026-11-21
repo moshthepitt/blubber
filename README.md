@@ -2,9 +2,9 @@
 
 Blubber is a Rust library for Solana programs that stores lists, strings and maps inside an account and edits them in place.
 
-I have been writing Solana programs since the first version of Anchor. Back then, if you wanted a map, the advice was to use a PDA per entry. That works, but every instruction and client call has to pass around all those extra accounts. The other options have their own costs: `bytemuck` and Anchor zero-copy make you pick a maximum length up front and pay rent for empty slots, while Borsh copies the whole account onto the heap and writes it back. When I was one of the developers on the Star Atlas programs, we needed variable-size types badly enough that we left Anchor and wrote our own framework, Star Frame.
+I have been writing Solana programs since the first version of [Anchor](https://github.com/otter-sec/anchor). Back then, if you wanted a map, the advice was to use a PDA per entry. That works, but every instruction and client call has to pass around all those extra accounts. The other options have their own costs: [`bytemuck`](https://github.com/Lokathor/bytemuck) and Anchor zero-copy make you pick a maximum length up front and pay rent for empty slots, while [Borsh](https://github.com/near/borsh-rs) copies the whole account onto the heap and writes it back. When I was one of the developers on the Star Atlas programs, we needed variable-size types badly enough that we left Anchor and wrote our own framework, [Star Frame](https://github.com/staratlasmeta/star_frame).
 
-So I built Blubber to solve that problem as a library, not a framework. You declare an account struct with `List`, `Str` and `Map` fields, and Blubber generates typed readers and editors that work on the account bytes directly. That lets you keep a player inventory, an allowlist or a registry in one account. When data grows, the account grows and the handler pays the rent difference. It plugs into Pinocchio today, and Anchor support is coming.
+So I built Blubber to solve that problem as a library, not a framework. You declare an account struct with `List`, `Str` and `Map` fields, and Blubber generates typed readers and editors that work on the account bytes directly. That lets you keep a player inventory, an allowlist or a registry in one account. When data grows, the account grows and the handler pays the rent difference. It plugs into [Pinocchio](https://github.com/anza-xyz/pinocchio) today, and Anchor support is coming.
 
 Here is a queue account with an authority and a list of `u64`:
 
@@ -63,7 +63,7 @@ fn push(
 
 The account has no spare bytes when the edit opens, so `Headroom::UpTo(8)` asks for up to eight more, enough for one `u64`. `Funding::TopUp` moves the extra rent from `payer` when the account grows. The closure runs on the account bytes, so nothing is decoded into a `Vec`.
 
-Other in-place libraries exist too, including Star Frame, which I helped build, and Zeropod. Below is the measured cost of four operations on SBF v0 with 1,000 items:
+Other in-place libraries exist too, including Star Frame and [Zeropod](https://github.com/blueshift-gg/zeropod). Below is the measured cost of four operations on SBF v0 with 1,000 items:
 
 | Operation (1,000 items, SBF v0) | Blubber (lazy load) | Blubber (checked load) | Borsh | Fastest other library |
 | --- | --- | --- | --- | --- |
@@ -76,7 +76,7 @@ A lazy load checks the account header up front and checks fields as you read the
 
 At 1,000 items, lazy Blubber used fewer CU than Borsh on every operation Borsh could finish, and Borsh ran out of heap on 1<!-- num:cmp.v0.n1000.summary.borsh_heap_exhausted --> more. Rewriting many strings is where Blubber is the fastest library measured: setting every string to a longer one costs about 4.5<!-- num:cmp.v0.n1000.derived.constant_fill_star_frame_ratio_rounded --> times less CU than Star Frame and about 9<!-- num:cmp.v0.n1000.derived.constant_fill_borsh_ratio_rounded --> times less than Borsh, and uses no heap. A single push or lookup costs about 550<!-- num:cmp.v0.n1000.derived.map_lookup_zeropod_extra_rounded --> to 1,050<!-- num:cmp.v0.n1000.derived.list_push_anchor_slab_extra_rounded --> CU more than the fastest library measured; see [`benchmarks/COMPARE.md`](benchmarks/COMPARE.md) and [`benchmarks/compare/GAPS.md`](benchmarks/compare/GAPS.md).
 
-Blubber's source has no `unsafe` code. Verus checks the byte-moving core, with all 1,707<!-- num:proof.verus.verified --> proof obligations passing, and there is no external audit yet. See [`ASSURANCE.md`](ASSURANCE.md).
+Blubber's source has no `unsafe` code. [Verus](https://github.com/verus-lang/verus) checks the byte-moving core, with all 1,707<!-- num:proof.verus.verified --> proof obligations passing, and there is no external audit yet. See [`ASSURANCE.md`](ASSURANCE.md).
 
 ## Install
 
@@ -97,11 +97,11 @@ Run `cargo add blubber@0.1.0 --features pinocchio`<!-- num-code:"cargo add blubb
 
 I plan to build:
 
-- Enums in 0.2<!-- num:roadmap.enums.version -->
+- Enums
 - String map keys
 - Cheaper single lookups
 - Client and IDL tooling, and a TypeScript decoder
-- External review before the 1.0<!-- num:roadmap.stable.version --> release planned for Q1 2027<!-- num:roadmap.stable.quarter -->
+- External review
 
 ## Where to go next
 
