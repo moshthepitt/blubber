@@ -4,11 +4,11 @@ M7c exact delta ceilings: benchmarks/m7c-cu-decisions.csv (user decision 2026-11
 Per n: top-level measures=2n; encodes=n; ends=list max(n-1,0)/map n;
 fixture reserve=0; outer suffix=0; ancestor/envelope publication=1 when n>0;
 nested suffix/ancestor and backend failure controls: rewrite_kernel tests
-source-sha256=74ff527799aaf29b4b5b1890b106324f68a6103fa6bc1eae6a1a1373ab902b7b
-raw-sha256=8041de3441583fddd79cba9fc7c4f2dff47e3d2924ab4ccad4ab4ab51fe46255
+source-sha256=7fb27e0ae17978c4b5d103dbfef3793a27f18eff9ffd151168c3604557bc545d
+raw-sha256=b354992793293cb5e1c23c24dc6dcd2dc3d476cbfd3bd8a63804e0a44d4a44cc
 elf-sha256=072ab699e4995b8f2edcacad974bd0a7cec5edb3f5e3c0c7a10eba34f40253ae
 diagnostic-elf-sha256=1e4a21b5a0994c9864541de3ccdd73ff66254eef1e82c140c6b0ec254022e006
-bencher-sha256=2a65ae8d049fbc2362c2eb29fa62d088712b428902559d87d0b6a3825d400a58
+bencher-sha256=957c551f4960e17909d4cad936bc35040d4f0085cde25208014d6866c0973b61
 oracles={"tests/mollusk/benches/support/traversal.rs": "91cc403bd7b01e87c3e1d8ac4be2ca71c1a69173dc0c11afae1c58c826cf8367", "tests/mollusk/src/matrix.rs": "87882b0399e2f11b0e43109906a9ee706b9e13361e1db7f0c5ef7070073e3b78", "tests/mollusk/src/traversal.rs": "d408ecf7397db341ba2c20a41c2cebc7e28a08bf164daf14735eba2c24baf85d"}
 tools={"Cargo.lock": "4c47a7f4f331b0cc3918d454a195bad2ffab0ddbc1b38f0297c389da875c1a8a", "host-rust/bin/rustc": "d3a664c970a9fd8361b64194861bebc1ae37b9054e5ee3400dc1c9e691797eea", "platform-tools/rust/bin/rustc": "d95c95b68e321ad76634e1fd26b0a7c20ccdbae9ad9ca733f3ae2f2b4a0b6002"}
 list_indexed_n0_kernel_rewrite_plain: whole=1468 common=1210 admitted=1442 delta=258

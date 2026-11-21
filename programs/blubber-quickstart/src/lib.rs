@@ -11,7 +11,7 @@ use pinocchio_sdk::{
     address::address_eq,
     error::ProgramError,
     sysvars::{rent::Rent, Sysvar},
-    AccountView, Address, ProgramResult, Resize,
+    AccountView, ProgramResult, Resize,
 };
 use pinocchio_system::instructions::Transfer;
 
@@ -23,7 +23,7 @@ pinocchio_sdk::no_allocator!();
 pinocchio_sdk::nostd_panic_handler!();
 
 // docs:start schema
-use blubber::List;
+use blubber::{Address, List};
 
 /// An append-only queue of numbers.
 #[blubber::schema(account)]

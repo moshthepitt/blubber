@@ -2,7 +2,7 @@
 repository.workspace = true
 license = "MIT"
 name = "blubber"
-description = "Typed views and edits for contiguous account storage"
+description = "Growable lists, strings and maps inside a Solana account, edited in place."
 version.workspace = true
 edition.workspace = true
 rust-version.workspace = true

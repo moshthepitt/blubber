@@ -11,7 +11,7 @@ A schema describes your fields and how to encode them: an account root covers th
 
 See the [guide](../../docs/guide.md#define-a-schema) for field types and account identity.
 
-## Use the facade or invoke the macros directly
+## Depend on `blubber` or invoke the macros directly
 
 Depend on [`blubber`](../blubber/README.md#install) with its default `derive` feature, because it re-exports `schema` and `Fixed` alongside the traits their expanded code uses.
 

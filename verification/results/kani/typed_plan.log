@@ -3,8 +3,8 @@ CBMC 6.11.0
 rustc 1.100.0-nightly (8925ea358 2026-08-20)
 Kani: 21 passed; 0 failed; 203119 properties (15187 unreachable); default checks enabled
 D14 typed_plan: real production bodies; jobs=1; per-harness timeout=600s; unwind=0 denotes loop-free
-source-tree-sha256 (154 paths; sorted path-NUL-content-hash): 01c74f721bbc957b919ed7a6fc6077de129421b5079be214e1c0d1cdb6b18c37
-kani-raw-sha256: 3423c01fcc3c03783c343375c2df2f28c8228fea05d057a88af31205f7ca6540
+source-tree-sha256 (154 paths; sorted path-NUL-content-hash): 742b0d68679097cb2fdee2418f6cc42f642598857aa86828e00345b54615894d
+kani-raw-sha256: 361e4a4d775a8c8a75105eb2d5fd11f8e0b88acc66029b4ed0e5bfd44a87c9d3
 Coverage: 21 expected covers satisfied; all 21 per-harness counts matched
 cover-inventory-sha256 (sorted name:count lines): 48caa7eccfe70532bc7b5037d7a7075d21974e5e5c39537ef114bf956a9ed565
 D14 typed plan: Map<u8,u8> fixed upsert/remove/clear; counts 0..2; symbolic u8 values; capacity=32

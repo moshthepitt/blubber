@@ -3,8 +3,8 @@ CBMC 6.11.0
 rustc 1.100.0-nightly (8925ea358 2026-08-20)
 Kani: 5 passed; 0 failed; 2388 properties (89 unreachable); default checks enabled
 Symbolic inputs: full-domain native fields and corrupted bytes; exact lengths 0..17; real derive output; jobs=1; per-harness timeout=600s
-source-tree-sha256 (154 paths; sorted path-NUL-content-hash): 01c74f721bbc957b919ed7a6fc6077de129421b5079be214e1c0d1cdb6b18c37
-kani-raw-sha256: b9bb3f869d33587a0ed0727e543a58b300e389657d9aa6c2e3a6241710dcc728
+source-tree-sha256 (154 paths; sorted path-NUL-content-hash): 742b0d68679097cb2fdee2418f6cc42f642598857aa86828e00345b54615894d
+kani-raw-sha256: 91fab94d0cbdd9ec9d3ccc9d72a194704743f2cf616a38744b50714f64c50feb
 Coverage: 0 expected covers satisfied; all 5 per-harness counts matched
 cover-inventory-sha256 (sorted name:count lines): 621b1a6d4cc2cd645f347dacc352aba52c2b38b7f3145bbbe6653a26df0796ee
 fixed_struct_exact_lengths: PASS; width=17; unwind=18

@@ -1453,9 +1453,6 @@ proof fn directory_suffix_witness()
     reveal(crate::layout_head::head_spec);
     reveal_with_fuel(crate::layout::descriptor_valid, 4);
         reveal_with_fuel(crate::layout::descriptor_fields, 4);
-    reveal_with_fuel(validation::schema_valid, 4);
-    reveal_with_fuel(validation::children_valid, 5);
-    reveal_with_fuel(crate::utf8::utf8_valid, 3);
     assert(crate::search::same_prefix(seq![1u8], seq![2u8], 0));
     assert(crate::search::lex_less(seq![1u8], seq![2u8]));
     let before = witnesses::account(seq![1u8,0,0,0,1,1,0,0,0,97]);

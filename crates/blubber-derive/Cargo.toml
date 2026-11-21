@@ -2,7 +2,7 @@
 repository.workspace = true
 license = "MIT"
 name = "blubber-derive"
-description = "Schema and fixed-codec macros for Blubber"
+description = "Procedural macros #[blubber::schema] and #[derive(Fixed)], re-exported by blubber."
 version.workspace = true
 edition.workspace = true
 rust-version.workspace = true

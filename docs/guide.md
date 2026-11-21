@@ -16,7 +16,7 @@ First, declare the account schema. A schema describes the fields of a type and h
 
 <!-- code:schema -->
 ```rust
-use blubber::List;
+use blubber::{Address, List};
 
 /// An append-only queue of numbers.
 #[blubber::schema(account)]

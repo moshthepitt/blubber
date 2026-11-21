@@ -178,7 +178,7 @@ fn plan_checked_map<'key>(bytes: &[u8], used: u32, path: &InlinePath, trail: Tra
         12 <= used <= bytes.len() <= u32::MAX, words::le_word(bytes@, 8) == used,
     ensures result.is_ok() ==> admitted(bytes@, result.unwrap()),
 {
-    reveal(admitted); reveal(base); reveal(replacement_checked); reveal(replacement_admitted); reveal(subtree_plan);
+    reveal(admitted); reveal(base); reveal(replacement_admitted); reveal(subtree_plan);
     broadcast use vstd::array::group_array_axioms;
     let region = trail.nodes[trail.depth].region;
     if bytes.len() > limit as usize { return Err(ErrorKind::Capacity.into()); }
@@ -656,7 +656,7 @@ impl<'a, 'key> CheckedListApply<'a, 'key> {
         hide(words::le_word);
         proof {
             use_type_invariant(&self); reveal(admitted); reveal(refines); reveal(base);
-            reveal(replacement_result); reveal(count_changed); reveal(target); reveal(destination_start); reveal(input_size);
+            reveal(replacement_result); reveal(count_changed); reveal(target); reveal(destination_start);
             reveal(indexed_insert::indexed_checked); reveal(indexed_remove::splice_checked);
             reveal(with_insert); reveal(with_splice); reveal(ancestor_changed); reveal(ancestors_delta);
             reveal(subtree_plan); reveal(list_checked); reveal(fixed_map::map_checked); reveal(indexed_map::checked);
@@ -789,7 +789,7 @@ proof fn checked_pass_witness()
     reveal(crate::layout_head::head_spec);
     reveal_with_fuel(crate::layout::descriptor_valid, 4);
     reveal_with_fuel(crate::layout::descriptor_fields, 4);
-    reveal(admitted); reveal(base); reveal(replacement_checked); reveal(subtree_plan);
+    reveal(admitted); reveal(base); reveal(subtree_plan);
     let before = witnesses::account(seq![3u8,0,0,0,1,0,0,0,2,0,0,0,97,98,99]);
     let c = IndexedInsert { index: 0, count: 3, payload: 24, offset: 0, table_growth: 4, input_len: 1 };
     let p = CheckedListPlan { inner: Plan { indexed: Some(c), ..witnesses::replacement(before, witnesses::INDEXED_LIST, 20) } };

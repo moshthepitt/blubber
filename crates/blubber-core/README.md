@@ -6,9 +6,9 @@
 
 This crate has `validate`, `validate_utf8` and the shared `Error` and `ErrorKind` types, which report the error kind and byte offset. `validate_utf8` checks a byte slice in constant space without allocating. See the validation example in [crate rustdoc](https://docs.rs/blubber-core/0.1.0/blubber_core/#validate-bytes).
 
-## Use the typed facade
+## Depend on `blubber` in program code
 
-Depend on `blubber` in application code instead of calling `blubber-core` directly, because these raw byte operations have local contracts you must uphold yourself. `blubber` generates typed readers and editors that satisfy those contracts for you; see [`../blubber/README.md#use-the-facade`](../blubber/README.md#use-the-facade).
+Depend on `blubber` in application code instead of calling `blubber-core` directly, because these raw byte operations have local contracts you must uphold yourself. `blubber` generates typed readers and editors that satisfy those contracts for you; see [`../blubber/README.md#what-this-crate-gives-you`](../blubber/README.md#what-this-crate-gives-you).
 
 ## Find the contracts and proofs
 

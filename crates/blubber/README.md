@@ -2,7 +2,7 @@
 
 `blubber` is the main crate for Blubber, a Rust library for Solana programs that edits lists, strings and maps in place.
 
-## Use the facade
+## What this crate gives you
 
 Your program's state lives in account data, which is the account's byte slice. A borrowed view reads those bytes while the borrow is live, copying scalars and borrowing strings. You can append to a list through a generated editor without decoding the account into owned values.
 

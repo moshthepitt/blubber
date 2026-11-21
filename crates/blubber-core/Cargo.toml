@@ -2,7 +2,7 @@
 repository.workspace = true
 license = "MIT"
 name = "blubber-core"
-description = "Checked wire-format kernel for Blubber"
+description = "Low-level byte encoding and validation under blubber (most programs use blubber)."
 version.workspace = true
 edition.workspace = true
 rust-version.workspace = true

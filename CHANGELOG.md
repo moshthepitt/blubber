@@ -2,6 +2,8 @@
 
 ## 0.1.0<!-- num:release.blubber.version -->
 
+Released 2026-11-21.
+
 ### What ships
 
 `blubber`, `blubber-core` and `blubber-derive` 0.1.0<!-- num:release.blubber.version --> are on crates.io and docs.rs. The package check passes an external archive consumer check with the package inventory's feature selections. See [`README.md#release-status`](README.md#release-status).

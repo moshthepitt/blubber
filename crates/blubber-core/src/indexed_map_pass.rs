@@ -415,7 +415,6 @@ proof fn insert_refinement(before: Seq<u8>, after: Seq<u8>, plan: Plan, result: 
 proof fn insert_witness()
 {
     reveal(crate::layout_head::head_spec);
-    reveal_with_fuel(crate::layout::descriptor_valid, 4);
     broadcast use vstd::array::group_array_axioms;
     let before = witnesses::account(seq![1u8,0,0,0,2,1,0,0,0,97]);
     let c = IndexedMap { change: MapChange { operation: MapEdit::Insert, key_width: 1, value_width: 1, index: 0, found: true },
@@ -464,7 +463,6 @@ proof fn replace_refinement(before: Seq<u8>, after: Seq<u8>, plan: Plan, result:
 proof fn replace_witness()
 {
     reveal(crate::layout_head::head_spec);
-    reveal_with_fuel(crate::layout::descriptor_valid, 4);
     broadcast use vstd::array::group_array_axioms;
     let before = witnesses::account(seq![1u8,0,0,0,2,1,0,0,0,97]);
     let c = IndexedMap { change: MapChange { operation: MapEdit::Replace, key_width: 1, value_width: 1, index: 0, found: true },
@@ -513,7 +511,6 @@ proof fn remove_refinement(before: Seq<u8>, after: Seq<u8>, plan: Plan, result: 
 proof fn remove_witness()
 {
     reveal(crate::layout_head::head_spec);
-    reveal_with_fuel(crate::layout::descriptor_valid, 4);
     broadcast use vstd::array::group_array_axioms;
     let before = witnesses::account(seq![1u8,0,0,0,2,0,0,0,0]);
     let c = IndexedMap { change: MapChange { operation: MapEdit::Remove, key_width: 1, value_width: 0, index: 0, found: true },
@@ -563,7 +560,6 @@ proof fn clear_refinement(before: Seq<u8>, after: Seq<u8>, plan: Plan, result: R
 proof fn clear_witness()
 {
     reveal(crate::layout_head::head_spec);
-    reveal_with_fuel(crate::layout::descriptor_valid, 4);
     broadcast use vstd::array::group_array_axioms;
     let before = witnesses::account(seq![1u8,0,0,0,2,0,0,0,0]);
     let c = IndexedMap { change: MapChange { operation: MapEdit::Clear, key_width: 1, value_width: 0, index: 0, found: false },

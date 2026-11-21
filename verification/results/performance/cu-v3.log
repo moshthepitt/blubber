@@ -3,7 +3,7 @@ stage=cu; all cases passed
 scope=uninstrumented instructions; typed=open/load/edit/commit; lease_*=raw storage; Patch100=borrow + both passes
 runtime=Mollusk default features/sysvars; typed=Prepaid with default UpTo(0) or explicit growth budget; raw lease=declared policy/funding/refund; no allocator; fat LTO; codegen-units=1
 platform=rustc 1.89.0-dev; LLVM 20.1.7; cargo-build-sbf 4.0.0; host Rust 1.97.1
-sources-sha256=74ff527799aaf29b4b5b1890b106324f68a6103fa6bc1eae6a1a1373ab902b7b
+sources-sha256=7fb27e0ae17978c4b5d103dbfef3793a27f18eff9ffd151168c3604557bc545d
 blubber_borrow_resize.so sha256=de2865fd8423efca9c7a0bffcf49937908be8df0e5f111b73b318c142f6e9377
 blubber_borrow_resize_runtime.so sha256=2488e1bcc56d0b0e13fb124ce0835188f466c1eaba25b139c8adf24faf93b649
 blubber_cu_fixture.so sha256=e8649537b737515bf42db7474235549d5adcfdf6c560f6521ebb48aa197bdf92

@@ -1,7 +1,7 @@
 {
   "stage": "Q7",
   "architecture": "v3",
-  "source_sha256": "74ff527799aaf29b4b5b1890b106324f68a6103fa6bc1eae6a1a1373ab902b7b",
+  "source_sha256": "7fb27e0ae17978c4b5d103dbfef3793a27f18eff9ffd151168c3604557bc545d",
   "indexed_limits": "enforced",
   "recovery_targets_sha256": "5aa790bde74214f20aa690a44d536ae9c3e75980098dee8fcb23378d37021867",
   "tools": {
@@ -10,9 +10,9 @@
     "runtime": "Mollusk 0.16.2/Agave 4.3.0",
     "bencher": "0.16.2"
   },
-  "bencher_sha256": "dad2f7a903f81d48a003da31ae3337ddf7fbd09f87e490fc3b3f02999f549a79",
-  "raw_sha256": "62f3ce4554dd9e18ffed5573d56c78024deabdcd4c9fc29e9434c25ed923d407",
-  "diagnostic_sha256": "a3b9bcc0840054ee31dd36289d81cf6ca9d11847d547e4e431775112403c1561",
+  "bencher_sha256": "19f93a4ebea2d18c1d7c5e4b57ee383eaa9b6dffdaa074a5c603cbe019943066",
+  "raw_sha256": "e6446a7a6fc3dc4eaffb68f925f88906c29c1cc06d0bb730c5bd502fda83419a",
+  "diagnostic_sha256": "bb655d35e33f4b2773f3427ee859b7304bc0c6afd3bbbda4a24707785a21318e",
   "baseline_sha256": "eeaae58e738be566114f746befd807335a010e45c8317d4ad4e8ef6b2baefd7d",
   "oracles": {
     "tests/mollusk/src/matrix.rs": "87882b0399e2f11b0e43109906a9ee706b9e13361e1db7f0c5ef7070073e3b78",

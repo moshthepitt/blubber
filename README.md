@@ -10,7 +10,7 @@ Here is a queue account with an authority and a list of `u64`:
 
 <!-- code:schema -->
 ```rust
-use blubber::List;
+use blubber::{Address, List};
 
 /// An append-only queue of numbers.
 #[blubber::schema(account)]
@@ -21,6 +21,8 @@ pub struct Queue {
     pub values: List<u64>,
 }
 ```
+
+And here is a Pinocchio handler that appends a value to that queue, checks the authority signed, and tops up rent from the payer when the account grows:
 
 <!-- code:push -->
 ```rust
