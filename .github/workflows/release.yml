@@ -1,0 +1,114 @@
+name: Release crates
+
+'on':
+  push:
+    tags:
+      - 'v*.*.*'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  verify:
+    if: github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && github.ref_type == 'tag' && github.ref_name != 'v0.1.0')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Check the tag is on main
+        if: github.event_name == 'push'
+        run: git merge-base --is-ancestor HEAD refs/remotes/origin/main
+      - uses: dtolnay/rust-toolchain@df2a88e9fe4098bad09cb42c3dec7187f15861fc # master 2026-11-15
+        with:
+          toolchain: 1.97.1
+          components: rustfmt
+      - name: Fetch locked dependencies
+        run: cargo fetch --locked
+      - name: Check the release receipt
+        if: github.event_name == 'push'
+        env:
+          RELEASE_TAG: ${{ github.ref_name }}
+        run: python3 scripts/check-crates-receipt.py verify "$RELEASE_TAG"
+      - name: Print packaged source digests
+        if: github.event_name == 'workflow_dispatch'
+        run: python3 scripts/check-crates-receipt.py digests
+      - run: cargo fmt --all -- --check
+      - run: bash scripts/reproduce.sh docs
+      - run: python3 .github/check-links.py
+      - name: Dry-run all three packages together
+        run: cargo publish --dry-run --locked --registry crates-io -p blubber-core -p blubber-derive -p blubber
+
+  publish:
+    if: github.event_name == 'push' && github.ref_type == 'tag'
+    needs: verify
+    runs-on: ubuntu-latest
+    environment: release
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Find unpublished versions
+        id: pending
+        env:
+          RELEASE_TAG: ${{ github.ref_name }}
+        shell: bash
+        run: |
+          pending=()
+          for crate in blubber-core blubber-derive blubber; do
+            if python3 scripts/check-crates-receipt.py exists "$crate" "$RELEASE_TAG"; then
+              echo "$crate already has version ${RELEASE_TAG#v}"
+            else
+              status=$?
+              if [[ "$status" != 1 ]]; then
+                exit "$status"
+              fi
+              pending+=("$crate")
+            fi
+          done
+          printf 'crates=%s\n' "${pending[*]}" >> "$GITHUB_OUTPUT"
+      - if: steps.pending.outputs.crates != ''
+        uses: dtolnay/rust-toolchain@df2a88e9fe4098bad09cb42c3dec7187f15861fc # master 2026-11-15
+        with:
+          toolchain: 1.97.1
+      - if: steps.pending.outputs.crates != ''
+        uses: rust-lang/crates-io-auth-action@3268eb413133e2960fa4ae0e963ca76380c54cd9 # v1.0.6
+        id: auth
+      - name: Publish pending crates together
+        if: steps.pending.outputs.crates != ''
+        env:
+          CARGO_REGISTRY_TOKEN: ${{ steps.auth.outputs.token }}
+          PENDING_CRATES: ${{ steps.pending.outputs.crates }}
+        shell: bash
+        run: |
+          read -r -a crates <<< "$PENDING_CRATES"
+          packages=()
+          for crate in "${crates[@]}"; do
+            packages+=(-p "$crate")
+          done
+          cargo publish --locked --registry crates-io "${packages[@]}"
+
+  rehearse:
+    if: github.event_name == 'workflow_dispatch'
+    needs: verify
+    runs-on: ubuntu-latest
+    environment: release
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: rust-lang/crates-io-auth-action@3268eb413133e2960fa4ae0e963ca76380c54cd9 # v1.0.6
+        id: auth
+      - name: Check that crates.io issued a token
+        env:
+          REHEARSAL_TOKEN: ${{ steps.auth.outputs.token }}
+        run: test -n "$REHEARSAL_TOKEN"

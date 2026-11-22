@@ -9,6 +9,7 @@ from urllib.parse import unquote, urlsplit
 
 ROOT = Path(__file__).resolve().parents[1]
 RECEIPTS = ROOT / "verification/results"
+WORKFLOW_RECEIPTS = {Path("verification/results/release/crates.json")}
 REPO_URL = "https://github.com/moshthepitt/blubber/blob/v0.1.0/"
 INLINE = re.compile(r'\]\(<?([^\s)<>]+)>?(?:\s+"[^"]*")?\)')
 REFERENCE = re.compile(r'^\s*\[[^\]\n]+\]:\s+<?([^\s<>]+)>?', re.M)
@@ -101,7 +102,7 @@ def check(root=ROOT):
                 else:
                     receipts.add(target)
     shipped = {p for p in (root / "verification/results").rglob("*") if p.is_file()}
-    for path in sorted(shipped - receipts):
+    for path in sorted(shipped - receipts - {root / path for path in WORKFLOW_RECEIPTS}):
         errors.append(f"Unlinked receipt: {path.relative_to(root)}")
     return errors
 
