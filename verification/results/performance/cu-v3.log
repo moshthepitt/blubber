@@ -3,16 +3,16 @@ stage=cu; all cases passed
 scope=uninstrumented instructions; typed=open/load/edit/commit; lease_*=raw storage; Patch100=borrow + both passes
 runtime=Mollusk default features/sysvars; typed=Prepaid with default UpTo(0) or explicit growth budget; raw lease=declared policy/funding/refund; no allocator; fat LTO; codegen-units=1
 platform=rustc 1.89.0-dev; LLVM 20.1.7; cargo-build-sbf 4.0.0; host Rust 1.97.1
-sources-sha256=7fb27e0ae17978c4b5d103dbfef3793a27f18eff9ffd151168c3604557bc545d
-blubber_borrow_resize.so sha256=de2865fd8423efca9c7a0bffcf49937908be8df0e5f111b73b318c142f6e9377
-blubber_borrow_resize_runtime.so sha256=2488e1bcc56d0b0e13fb124ce0835188f466c1eaba25b139c8adf24faf93b649
-blubber_cu_fixture.so sha256=e8649537b737515bf42db7474235549d5adcfdf6c560f6521ebb48aa197bdf92
-blubber_cu_fixture_metrics.so sha256=362e6d43673c6ab3d939c57f26cf50d5bfd1c00cd25f1637d246fdb3aa257409
-blubber_cu_matrix.so sha256=2fa477ba0c8e5c84adaf5a2111741b7884a41a735bdb82f5d36080e679a3e075
-blubber_cu_matrix_alloc.so sha256=ec035de160f1dcfa9f21c720f9f50b1c53759c8913bc2be50fc00c7676f18b09
-blubber_cu_matrix_alloc_metrics.so sha256=1d0abee254e61a5a90996ebbafe3c5ad6f5d12f4b7bd32b968e346cd7ee62604
-blubber_cu_matrix_metrics.so sha256=f44fa9823d6719cf32da2c12554434cd45e1075581e0599bd35770738b28a36d
-blubber_demo.so sha256=02614033f12b3978e74a42483e7205e532d4b9330800aed046ec3fb77ea51c6b
+sources-sha256=bd9f6d8e35a147e84110c8de4ae2c9717e90a267e8a96f5d036d2c244d644fd3
+blubber_borrow_resize.so sha256=816e29b624d36e9fe3a48e97a6130481069549c3ef5a593e514b576cfe196547
+blubber_borrow_resize_runtime.so sha256=d67d06beba8658244911fb7e723ff9180e8398df5907034f53cf444cf5ddcaa7
+blubber_cu_fixture.so sha256=273fa7db65d17e10f6a9f888e4f333693d114d7f8d9f504ad9dc266a7dfb62a3
+blubber_cu_fixture_metrics.so sha256=24bc4d52dfff6892c2ac91ce7a135bf7161fe46794dcf7dec55900d24bac9719
+blubber_cu_matrix.so sha256=f83dd99aaa71d7b9c7dd878627886246ddf6e66abe3bbca1df89cfccf2b40c1b
+blubber_cu_matrix_alloc.so sha256=56b2bfd894221ceae04ccba9f10dbf84c1c8fed667dda8ac801eeeda3c8ce173
+blubber_cu_matrix_alloc_metrics.so sha256=d355cb5ea4ba367c64ee0bbe14060cf584a2ea8b0adc3af8ceb8babdc54e61ec
+blubber_cu_matrix_metrics.so sha256=3bd5ed46117115b733639d95a3ad40a846c3af3dccd30ce515bedcebe49797b0
+blubber_demo.so sha256=edf61feb12e863a0d7b00d2c5ff82d8cd0ec40c0bd4c7afaf294f9d984f8a252
 lease rent CPIs: prepaid_same=0, topup_grow200=1, refund_shrink64=0, retained32=1; direct refund has no CPI
 lease resize calls: open=1 (10240 zeroed bytes), commit=1; retained storage=used+32 only for retained32
 case,whole_instruction_cu,before_len,after_len
@@ -36,4 +36,4 @@ lease_prepaid_same,787,128,128
 lease_topup_grow200,2253,128,328
 lease_refund_shrink64,1044,128,64
 lease_retained32,2308,128,160
-tour,139664,146,118
+tour,138170,146,118

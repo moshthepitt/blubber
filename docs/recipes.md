@@ -223,7 +223,7 @@ An in-place shift only works when the wire layouts match. Borsh strings carry a 
 
 For those accounts, parse and validate the old values, build the new schema's typed input, and call `initialize` into a staging buffer. For schemas with variable-size fields, the generated `encoded_len_of` gives the staging length, while [`crates/blubber/tests/migration.rs`](../crates/blubber/tests/migration.rs) shows the staging and publish order in a fixed-size buffer. On chain, check growth and funding before writing, copy the verified encoding from byte 8<!-- num:wire.account.discriminator_bytes --> onward under an exclusive borrow, verify the destination, write the new discriminator last, and reopen with a checked load.
 
-Blubber 0.1.0 has no allocator-free general converter; your program supplies the old decoder and the staging space. A larger conversion may need an allocator or a migration planned across instructions; see [`docs/trust-model.md#migrate-an-account`](trust-model.md#migrate-an-account).
+Blubber 0.1.1<!-- num:release.blubber.version --> has no allocator-free general converter; your program supplies the old decoder and the staging space. A larger conversion may need an allocator or a migration planned across instructions; see [`docs/trust-model.md#migrate-an-account`](trust-model.md#migrate-an-account).
 
 ## Call another program
 

@@ -15,8 +15,8 @@ See the [guide](../../docs/guide.md#define-a-schema) for field types and account
 
 Depend on [`blubber`](../blubber/README.md#install) with its default `derive` feature, because it re-exports `schema` and `Fixed` alongside the traits their expanded code uses.
 
-If you invoke `blubber_derive` directly, you must still depend on `blubber`, because macro expansion resolves `blubber` as its companion crate. See the example in the [crate rustdoc](https://docs.rs/blubber-derive/0.1.0/blubber_derive/#invoke-the-macros-directly).
+If you invoke `blubber_derive` directly, you must still depend on `blubber`, because macro expansion resolves `blubber` as its companion crate. See the example in the [crate rustdoc](https://docs.rs/blubber-derive/latest/blubber_derive/#invoke-the-macros-directly).
 
 ## Find generated methods
 
-See the generated item table on the [`schema` macro page](https://docs.rs/blubber-derive/0.1.0/blubber_derive/attr.schema.html#generated-account-api) and the rendered [`blubber::example_generated`](https://docs.rs/blubber/0.1.0/blubber/example_generated/index.html) module on docs.rs.
+See the generated item table on the [`schema` macro page](https://docs.rs/blubber-derive/latest/blubber_derive/attr.schema.html#generated-account-api) and the rendered [`blubber::example_generated`](https://docs.rs/blubber/latest/blubber/example_generated/index.html) module on docs.rs.

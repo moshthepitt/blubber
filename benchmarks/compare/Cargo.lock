@@ -543,7 +543,7 @@ dependencies = [
 
 [[package]]
 name = "blubber"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "blubber-core",
  "blubber-derive",
@@ -556,7 +556,7 @@ dependencies = [
 
 [[package]]
 name = "blubber-core"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "solana-program-error",
  "vstd",
@@ -564,7 +564,7 @@ dependencies = [
 
 [[package]]
 name = "blubber-cu-fixture"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "blubber",
  "blubber-core",
@@ -573,7 +573,7 @@ dependencies = [
 
 [[package]]
 name = "blubber-derive"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "proc-macro-crate",
  "proc-macro2",
@@ -583,11 +583,11 @@ dependencies = [
 
 [[package]]
 name = "blubber-model"
-version = "0.1.0"
+version = "0.1.1"
 
 [[package]]
 name = "blubber-mollusk"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "blubber-cu-fixture",
  "blubber-model",

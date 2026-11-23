@@ -1,39 +1,39 @@
 T7 d21-corrupt receipt; each line below comes from this run's logs
 versions: cargo-fuzz 0.12.0; cargo 1.97.1; rustc 1.97.1; clang version 20.1.7-rust-dev
-host corrupt_histories Rust1.97.1 verify-on-load-off: PASS 9; raw-sha256=32fb1fc4107d9a3036ac3a3c1b1aae900c43637276a437c75670fa45bc645ee1
-host corrupt_histories Rust1.97.1 verify-on-load-on: PASS 9; raw-sha256=127270301e7b90f86550dca88423a07c51db0e96b6960b1c448f275b9d56e4ec
-host corrupt_histories Rust1.89.0 verify-on-load-off: PASS 9; raw-sha256=c84232ed36ac46b56da4d50a9f1e7c4addc58aa404d6104ab51e0d197a383353
-host corrupt_histories Rust1.89.0 verify-on-load-on: PASS 9; raw-sha256=fbea40899b2bf6a272f5033f2c9ea860b2e23a596c2ad24b00a110ae4759e3aa
+host corrupt_histories Rust1.97.1 verify-on-load-off: PASS 9; raw-sha256=0f41bab839ae528708bb810f8c5f6e15332b248a0f26bc4faf02457b0f8b70b6
+host corrupt_histories Rust1.97.1 verify-on-load-on: PASS 9; raw-sha256=63036eae7a5f458be320c2cfc2f9a76c148b5fbaf628d269b7aa3e4da4c3f86f
+host corrupt_histories Rust1.89.0 verify-on-load-off: PASS 9; raw-sha256=cb914b63a404785c42326bddbfa4165126bf9ddacbd845937741554138b4abf6
+host corrupt_histories Rust1.89.0 verify-on-load-on: PASS 9; raw-sha256=5b960b56597680541ef1db4559f7a3589e92564b6c020bb755769ed4023b2f16
 host tests: fixed_value_writes_preserve_every_key_and_spare_byte, interrupted_encoder_keeps_old_publication_and_poison_until_checked_recovery, lazy_clear_discards_distant_damage_and_repairs_the_root, lazy_clear_poisons_on_a_malformed_count_without_writing, lazy_history_cannot_mint_strict_directory_evidence, lazy_list_splices_poison_on_a_malformed_selected_end_without_writing, lazy_map_edits_poison_on_a_malformed_selected_end_without_writing, lazy_nested_growth_poisons_on_a_later_ancestor_end, selected_bounds_reject_full_width_and_distant_end_without_panics
-negative baseline-sha256=ffec914341d85ce70f9d621a336e9358191ce40d78b798ae2172451def9b204b
-negative replay-baseline-sha256=facfb87d5d30c8f5cb620c945f3707da392db468813003ad408c4e87bcf6500e
-negative REJECTED removed-bounds; test=selected_bounds_reject_full_width_and_distant_end_without_panics; replay=lazy read probe: selected-list-end; replay-sha256=8f3f5e305a2565603c90697c947cfca3eb7e534aa6a5242534571ce06ebb2c20; mutant-sha256=d1d488af5705432cbe1b35c2fe1b72a46369e257d1682b2e61a1c6dca34af672; raw-sha256=8265938687bcf312e2f256a027dc50c04c1972e4760a1a687e4666bf044d6b2e
-negative REJECTED false-strict-evidence; test=lazy_history_cannot_mint_strict_directory_evidence; replay=lazy edit probe poison: selected-list-end; replay-sha256=74e9104cf6d3a699368e50bb1fd974b312cc5761948b3f7884ec2033c7392a9f; mutant-sha256=e497883086502f8dd8f1e1e6eb70b28372d919abe66f4669bee65c88476b8ec5; raw-sha256=158547e911505c831eb62ddc88dd770717e91b2c15c2e50a3bc71b575d195cca
-negative REJECTED key-frame-damage; test=fixed_value_writes_preserve_every_key_and_spare_byte; replay=lazy edit probe bytes: descending-key; replay-sha256=be42cf9fb046a3cb8c68814360905012947fe1f119b057db5caf556daf40d376; mutant-sha256=fd29daf36853fd295856bb486200f9c2438ee10f444003d2d6bd0cbc36ce1045; raw-sha256=239818e83898099488ca7928cd8e91259cd76c97d93943643f03e5c1cc1afdb7
-negative REJECTED early-publication; test=interrupted_encoder_keeps_old_publication_and_poison_until_checked_recovery; replay n/a: State has no tail collection; mutant-sha256=b78a142095727d5ad8f8f8b307153c48272ea7a79f7f71fc55bfa63d32ba5895; raw-sha256=d569665c571dd13da3db4a6a7f9a6dcc38f3059a112d0e29a56b2b8904fd3668
-negative REJECTED lazy-clear-poison; test=lazy_clear_poisons_on_a_malformed_count_without_writing; replay=SDK/host policy, error, read value and poison trace; replay-sha256=3837b371159e0561bb01a3dc14a8112b2e7face820648c9ec9b8995f0969c3e2; mutant-sha256=f952c60d8c5a35b0264d0707127c2628af6492c89e74da77fb35e05d208c61e9; raw-sha256=49e31d48533cc4f026fcda968a88553f90630db85283c7539606e29d6ddcff43
-negative REJECTED lazy-splice-poison; test=lazy_list_splices_poison_on_a_malformed_selected_end_without_writing; replay=lazy edit probe poison: selected-list-end; replay-sha256=191b888871f84b94e3ad011f5a1d1f2909d40f051462b93c4e3ba41f35186649; mutant-sha256=6f7fba339a185f81168cca7f51af23cbcb4f94d6505cb5aceecad770b1f8477d; raw-sha256=cdad7ba121ace1b7df8d31b355133506ca4272918148683a7bb3e4a7c283932a
-negative REJECTED lazy-map-walk-poison; test=lazy_map_edits_poison_on_a_malformed_selected_end_without_writing; replay=SDK/host policy, error, read value and poison trace; replay-sha256=456c1d16e3d34c2f5472376c28dfbff915632056b0a82d7f44fe04238bd54897; mutant-sha256=2033e8f9cdae0fed9e313df363563ae71d44554ecd414db56c45779b4d121407; raw-sha256=86bf4a23479f4892b098fa27d7c77f0ba401699f7ade33871f34d08f149019be
-negative REJECTED nested-ancestor-poison; test=lazy_nested_growth_poisons_on_a_later_ancestor_end; replay n/a: seeds pin pre-write damage; SBF rollback in speed lane; mutant-sha256=59088684b2c5416b99559cddb1bb0bc6b6eb76f3f98bc291bc6522b3eff65693; raw-sha256=9418f2a1c9dc76ba247f04874414054c5ebfffe37492d365e7e3b3b2d263b136
-negative restored-sha256=9b8a7bd1c112269c6fdbea87bf01929728272e52bee63a3f8962dfdd369dac72
-negative replay-restored-sha256=a6b818aeb3f6f169d034554459778ec4e29fb755f6bcaed959e8139418a46ed5
+negative baseline-sha256=7a7e8cc6b110170a79f9480d0e282a19cb3387dd38ee978144e05617bc3c5d5c
+negative replay-baseline-sha256=9a4d39e9aa24b820bb10841d146ec6e424b80250eb011961d2d14ad077c630e7
+negative REJECTED removed-bounds; test=selected_bounds_reject_full_width_and_distant_end_without_panics; replay=lazy read probe: selected-list-end; replay-sha256=df2a54f7892ce8a61617b394d042c8c7ce998e5929f2867d91549d061256d781; mutant-sha256=d1d488af5705432cbe1b35c2fe1b72a46369e257d1682b2e61a1c6dca34af672; raw-sha256=23a5e224614b6419cef6e084d5aa6bda156a71c6b0bba355d8afa041fab3a239
+negative REJECTED false-strict-evidence; test=lazy_history_cannot_mint_strict_directory_evidence; replay=lazy edit probe poison: selected-list-end; replay-sha256=9413aa7d8f60af85f5e616622a639ca101d0a2bd2b0be5e726a86f644b7b79f5; mutant-sha256=bf1b082f899b2e6dcf9d28fc527132009ec97053de3784bca10bed1ff53f1729; raw-sha256=f171378d7de19264f897950e75f64614a1459e047135f9ae6bd22fe8e7a7530e
+negative REJECTED key-frame-damage; test=fixed_value_writes_preserve_every_key_and_spare_byte; replay=lazy edit probe bytes: descending-key; replay-sha256=a828e1fe02736955468fd101e2faf5e2bac4552b827b78fd11409ca9fbf52045; mutant-sha256=fd29daf36853fd295856bb486200f9c2438ee10f444003d2d6bd0cbc36ce1045; raw-sha256=ea59d270f851df86db81f70310d029c4aba8e98efbec45ea4d21457997bbd40a
+negative REJECTED early-publication; test=interrupted_encoder_keeps_old_publication_and_poison_until_checked_recovery; replay n/a: State has no tail collection; mutant-sha256=b78a142095727d5ad8f8f8b307153c48272ea7a79f7f71fc55bfa63d32ba5895; raw-sha256=8362ecfec1cea5844111c34a8f00aad3d16c380e642e77307572fa2cfe8d5c55
+negative REJECTED lazy-clear-poison; test=lazy_clear_poisons_on_a_malformed_count_without_writing; replay=SDK/host policy, error, read value and poison trace; replay-sha256=7c98246c6bdcf2e00e4ee6a1551decee56ba627b9e52eb7ebd53c47ca49bddcf; mutant-sha256=8135f9df2889a3beca67a26c49ead20f540bdafec34807a1866f97e405c11691; raw-sha256=3905cc5cf0d8b1dce42bbe1b7a7b594c7b0e9790a0697712d82ae56ef932f735
+negative REJECTED lazy-splice-poison; test=lazy_list_splices_poison_on_a_malformed_selected_end_without_writing; replay=lazy edit probe poison: selected-list-end; replay-sha256=2d4b081823bf12172a0707fbfa4d586774377927c70a98e25f0425f6a66a943a; mutant-sha256=6711a41027a961838f170134c9a3a82a749747395184edf6a284510beeade5cc; raw-sha256=eb44d425d85eded70fab4439a4c474c35ac69178c2ae46e7a7435caf8281fff7
+negative REJECTED lazy-map-walk-poison; test=lazy_map_edits_poison_on_a_malformed_selected_end_without_writing; replay=SDK/host policy, error, read value and poison trace; replay-sha256=de5f0bacf606585dbbcb0c9d3efaffdc784278140fc48eed1587d2f49d8f2f64; mutant-sha256=2033e8f9cdae0fed9e313df363563ae71d44554ecd414db56c45779b4d121407; raw-sha256=8877e872c9dd679b4f9279947d43e1dd2eb22da4524b77d373702694a64ed99d
+negative REJECTED nested-ancestor-poison; test=lazy_nested_growth_poisons_on_a_later_ancestor_end; replay n/a: seeds pin pre-write damage; SBF rollback in speed lane; mutant-sha256=59088684b2c5416b99559cddb1bb0bc6b6eb76f3f98bc291bc6522b3eff65693; raw-sha256=87749765a3c334f5cd9ba82edfc65b72f38abe0a23bf1f9c1c70928238d436cf
+negative restored-sha256=4dcf9d8da42cbda0215f3333cefe55023699555603cbfa480752281673ee28d2
+negative replay-restored-sha256=99f3f3b2a1bba6df3378a7a9ac06fd29d782c677103a8ed9c4dad887fa068a57
 replay off/v0: d21-corrupt seeds: 324 directed tapes, read and edit; valid-ok edits=[18, 9, 39, 30, 45, 48, 30, 9, 18, 48, 42, 0, 0, 6, 21, 3] reads=[33, 21, 54, 63, 51, 30] list-routes=[21, 6, 6, 6, 9, 6, 9, 6] map-routes=[24, 9, 6, 6, 27, 12, 9, 39, 9]; rejected checked=6324 eager=0; poison lazy=780 malformed-list=27 malformed-map=135 recovered=6 interrupted=36 reopened=228
 replay off/v0: d21-corrupt corpus policy_read: 54 tapes, 54 named families; d21-corrupt corpus policy_edit: 55 tapes, 54 named families
-replay-off-v0-sha256=fa00fd16a17804fb57931f571943f543b025bffe42dc07b1f360b582ad739d52
-ELF-off-v0-sha256=2a47e441f279dc319cabe56651d9c25f657fa9d8ce5c5208814aaa0d8746662e
+replay-off-v0-sha256=b592da32d9b16a2b8f85b2a737c47fa62061518a4513cbf670d248a86809d672
+ELF-off-v0-sha256=d0932966c240d9f8190fcd0b96c4ebd0bd39c9a367acdfa28d8cfb3fd121c586
 replay off/v3: d21-corrupt seeds: 324 directed tapes, read and edit; valid-ok edits=[18, 9, 39, 30, 45, 48, 30, 9, 18, 48, 42, 0, 0, 6, 21, 3] reads=[33, 21, 54, 63, 51, 30] list-routes=[21, 6, 6, 6, 9, 6, 9, 6] map-routes=[24, 9, 6, 6, 27, 12, 9, 39, 9]; rejected checked=6324 eager=0; poison lazy=780 malformed-list=27 malformed-map=135 recovered=6 interrupted=36 reopened=228
 replay off/v3: d21-corrupt corpus policy_read: 54 tapes, 54 named families; d21-corrupt corpus policy_edit: 55 tapes, 54 named families
-replay-off-v3-sha256=3fae93352ce1214a9ad50d841db8b4edb0b6f15ff9e9c2cc5c4a79f464388d17
-ELF-off-v3-sha256=d4473a0929ac682584c12d2b3c4500a11d033ebd936cd0c153bd5bb81a1a28ea
+replay-off-v3-sha256=6a4213f861bc953c79b25029f553c993de092e3d8a5287d6e1a9cdad28a65daf
+ELF-off-v3-sha256=ef6d185cedb496abf055ed61398a750b1ca08eb8a5f2fe307ff838718b542383
 replay on/v0: d21-corrupt seeds: 324 directed tapes, read and edit; valid-ok edits=[9, 3, 27, 24, 33, 24, 6, 6, 6, 24, 18, 0, 0, 6, 3, 3] reads=[33, 21, 54, 63, 51, 30] list-routes=[9, 6, 6, 6, 3, 6, 9, 6] map-routes=[12, 9, 6, 6, 9, 6, 9, 15, 9]; rejected checked=6354 eager=6270; poison lazy=69 malformed-list=0 malformed-map=0 recovered=6 interrupted=24 reopened=78
 replay on/v0: d21-corrupt corpus policy_read: 54 tapes, 54 named families; d21-corrupt corpus policy_edit: 55 tapes, 54 named families
-replay-on-v0-sha256=2a16fcc99ee765e4311b39166331021d9bb849818d3f9b7a9a3bf1d72364e452
-ELF-on-v0-sha256=ee44da85919572d0cc1e0fb9807cb33da4bdd91442028bd58a89d9540c486f6b
+replay-on-v0-sha256=d095f7c788f81310fc6671ade50a2738b085605ec985801a867b7deaaf4a9130
+ELF-on-v0-sha256=f34e3e61a944e5cdb6a1e1972f01742a485c1233c1b8dd86fea8f89ea9255a03
 replay on/v3: d21-corrupt seeds: 324 directed tapes, read and edit; valid-ok edits=[9, 3, 27, 24, 33, 24, 6, 6, 6, 24, 18, 0, 0, 6, 3, 3] reads=[33, 21, 54, 63, 51, 30] list-routes=[9, 6, 6, 6, 3, 6, 9, 6] map-routes=[12, 9, 6, 6, 9, 6, 9, 15, 9]; rejected checked=6354 eager=6270; poison lazy=69 malformed-list=0 malformed-map=0 recovered=6 interrupted=24 reopened=78
 replay on/v3: d21-corrupt corpus policy_read: 54 tapes, 54 named families; d21-corrupt corpus policy_edit: 55 tapes, 54 named families
-replay-on-v3-sha256=af2cc16c88f7e2c5593b62ff130fa9e0f61aaa3a95f33098e5dd7a71bc76f894
-ELF-on-v3-sha256=8d316d48f40922fd711e99a44846d655aafe3e227bfefaa1278ab4cf882edfa7
-policy_read: PASS 251400 executions, 301 seconds, zero crashes/timeouts; -max_total_time=300 -max_len=65536 -seed=217 -timeout=30 -rss_limit_mb=4096; raw-sha256=964d786772498c57e639d026316010dcb75dd7f891634482ccda559d866b1582
-policy_edit: PASS 105313 executions, 301 seconds, zero crashes/timeouts; -max_total_time=300 -max_len=65536 -seed=217 -timeout=30 -rss_limit_mb=4096; raw-sha256=6cbc7893fa2920d5f92ffaafecf7d360f6e4e2e67bbed3a2a842c9f1ad7a93ef
-sources-sha256=7fb27e0ae17978c4b5d103dbfef3793a27f18eff9ffd151168c3604557bc545d
-fuzz-source-corpus-lock-sha256=253af9043bf519c983015d40a776c43fa604f0b42420a2a9f5687a4dbf119e55
+replay-on-v3-sha256=ebd37a3b80ee7dc4cfd0e5d96465546139564d089d8c2002b5a1233cd980daef
+ELF-on-v3-sha256=955a379cddf933aca42595294b1dbad08f0e7bcd0e67f9c8a81800f4ab3ea534
+policy_read: PASS 276750 executions, 301 seconds, zero crashes/timeouts; -max_total_time=300 -max_len=65536 -seed=217 -timeout=30 -rss_limit_mb=4096; raw-sha256=376c0ae0ab061052712cd5b38b8951358669a38c7a67fe8b8e50fa26d3f9c7a7
+policy_edit: PASS 108828 executions, 301 seconds, zero crashes/timeouts; -max_total_time=300 -max_len=65536 -seed=217 -timeout=30 -rss_limit_mb=4096; raw-sha256=f0cdf7655085aa6cddfe1732ee2bf37236a1094838b487e524630770b762742e
+sources-sha256=bd9f6d8e35a147e84110c8de4ae2c9717e90a267e8a96f5d036d2c244d644fd3
+fuzz-source-corpus-lock-sha256=108d533cf5d0990cebcf6766bab49d69799ccb5775f9628860991e814ccc3536

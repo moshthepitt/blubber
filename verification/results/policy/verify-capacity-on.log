@@ -4,30 +4,28 @@ PASS2 FAIL0 Kani 0.68.0 production policy/identity; jobs=1; 600s/harness; both c
 Runtime: 5 counts x 5 damage modes x 18 Pinocchio alloc+no-alloc entry points x 3 mappings per architecture (n0 tail omitted)
 Pinocchio: typed/shared/exclusive/scoped lazy and checked; touched domains, aliases, poison, close, forget; raw-slice fixture remains checked
 MSRV schema metadata and Pinocchio; SBF depth16; fatal stack checks; zero unsafe
-sources-sha256=7fb27e0ae17978c4b5d103dbfef3793a27f18eff9ffd151168c3604557bc545d
+sources-sha256=bd9f6d8e35a147e84110c8de4ae2c9717e90a267e8a96f5d036d2c244d644fd3
 d21.policy-pinocchio-rows: expected=90 actual=90
 v0 verify total/delta CU over matched lazy load: n0=4879/2064,n1=5033/2141,n10=5447/2348,n100=9587/4418,n1000=50987/25118
 d21.policy-pinocchio-rows: expected=90 actual=90
 v3 verify total/delta CU over matched lazy load: n0=4761/2006,n1=4913/2082,n10=5327/2289,n100=9467/4359,n1000=50867/25059
 fb4d2cc432c45991ea8d13c78686acebe358da46b97530afb3666cd9c6bf5d45  verification/kani/src/derive_encode.rs
 25659dd570f40f8e397e9006ab39914ee7c90c83ae4bfa832cb3d6784ef76a27  verification/kani/Cargo.toml
-fd7074afef51ec8f595ae06de1ac7f53e08e62c068d89220342c5bb4d5ac44e7  .tmp/d21-policy-on/build-pinocchio-alloc-v0.log
-4f21a150608e5dc8a532f08391cc4d06de9de82c62a9820f7a26f3b46e610014  .tmp/d21-policy-on/build-pinocchio-alloc-v3.log
-8499ae979e79e640492aadd3bfb5a6b91e91a8372ef47558f996cd8ddd10fec7  .tmp/d21-policy-on/build-pinocchio-v0.log
-15674c18cc40b7ca68e8898fa49a83e6b5d79cc04030f00a4576b53e8c9057c7  .tmp/d21-policy-on/build-pinocchio-v3.log
-87272348b4ccbe0b72b773b963d3b7a40626d62f3c9860b03ac1f63fb184d32b  .tmp/d21-policy-on/host-1.89.0.log
-bb8afd293af0b88bde67e6340d3deb9de624256aa1a043b9a15cd4f58fd0b12d  .tmp/d21-policy-on/host-1.97.1.log
-1f26a66adbc2672825bbe241e72f9ad08b81b8b630dbc0ad1e8d47a25920a456  .tmp/d21-policy-on/kani.log
+9eb3decc2c5a9e65a5dc886a1452166f476a8ce4961ac17afbc356532883db5a  .tmp/d21-policy-on/build-pinocchio-alloc-v0.log
+92ced3f725b59ec712465ab862a8d71de755969267fa2d8e9b45a412e169cc3f  .tmp/d21-policy-on/build-pinocchio-alloc-v3.log
+9ee8a24889f152073a82f97b3135034be2c9e5666bde912fa0f062d0528f275f  .tmp/d21-policy-on/build-pinocchio-v0.log
+73fa36da89d2c005faac258508e80a9ba4b2051e8b9af2dbd8e49068fde5e348  .tmp/d21-policy-on/build-pinocchio-v3.log
+a2181fbc6c657139ca423c7204a7a034ed958fb4ffcd0c07ee9a8c6d09d9c82e  .tmp/d21-policy-on/host-1.89.0.log
+cc217a80a8af04ab275587d93f557992d366225d64f8468fe2fe8e115bf0fe40  .tmp/d21-policy-on/host-1.97.1.log
+5f133881d77da186c2707b24c29dd7c89e0f1e1eb6abcbbab5e419033f13180e  .tmp/d21-policy-on/kani.log
 37bbd6b61d6e3faacf4f75ffc3c7c82dc3cfd8ca8475bfa89c1483f0a8b224b5  .tmp/d21-policy-on/kani-version.log
-27b21a7c20816ec9c6fc6723955ffb41e206df1588691aa9ac3a89df970dea6c  .tmp/d21-policy-on/no-sdk-1.89.0.log
-66c4a8b48d1d730c08a8e8161169be44739cff06f7787a85ccc03b0d90464f76  .tmp/d21-policy-on/no-sdk-1.97.1.log
-2b31d5b98092ce51bff13b869000d15fc41bf460cd0cff68b9e2b9d56eae320c  .tmp/d21-policy-on/runtime-pinocchio-alloc-v0.log
-e4f8063ad92ff2b9de8331972e932fd49ca9a0b4a8e092c149d446337369842d  .tmp/d21-policy-on/runtime-pinocchio-alloc-v3.log
-7536de96638b3328197818bc81b79c669f8c81f50e7a1448124429cda625f45c  .tmp/d21-policy-on/runtime-pinocchio-v0.log
-ad67aeb9932e7d9d44cd448da520e5e2572e2b83b28bcba20440f23beea61906  .tmp/d21-policy-on/runtime-pinocchio-v3.log
-b35f0b35c513c59a2e4756d4b9cc39570dd93384eee696c0f38d6ba7fb5ceb3d  policy-on-native-v0/blubber_cu_fixture.so
-b63c7e2569e90e83172c9412cf7e0e08c5713a03ee1f4f680384bf30faa91be2  policy-on-native-v3/blubber_cu_fixture.so
-e337e9390fb1b0b4fa26c69bdc94308667cc35594bbb38ae4b11bb7889410c7f  policy-on-pinocchio-alloc-v0/blubber_cu_fixture.so
-5a7a71dfffb3f2d2dc0de22121cf2c5755d17116352d8d7204a01706f75f48ea  policy-on-pinocchio-alloc-v3/blubber_cu_fixture.so
-df727f3189c692ab0815a80299010c7ab4eae37e3d19a27916396c67623eb1cf  policy-on-pinocchio-v0/blubber_cu_fixture.so
-8a3f6f483f9c6d7d036ecc12bfd30bc67aea2be25d25dc7fe92effdf90df5a9c  policy-on-pinocchio-v3/blubber_cu_fixture.so
+28fec2b55fb972d64c86027e62a04cdfcb49fdfa1c2f83e6950dd6cf8711bbbe  .tmp/d21-policy-on/no-sdk-1.89.0.log
+a50da0a9b6e7bc23067c8b3fa615a26986a44780d601ff021fd5c14f264b6f93  .tmp/d21-policy-on/no-sdk-1.97.1.log
+0d9353d84fe1f07e5d97f0b603a22824631ce513fca5d953617f50f1905ef87e  .tmp/d21-policy-on/runtime-pinocchio-alloc-v0.log
+9ec657ec887ae2a30d05d997e2c9bef610f46f367f4f9a16c42adbc38220ac9f  .tmp/d21-policy-on/runtime-pinocchio-alloc-v3.log
+f6f181ec0632b5dfcf84136e6f7657839254cf1b179c7f3510068a8350c332ca  .tmp/d21-policy-on/runtime-pinocchio-v0.log
+0af44235bcb13b151311f4707677099f026436db60acb6482a3643de1fdb614c  .tmp/d21-policy-on/runtime-pinocchio-v3.log
+ce8b6f913e9dfb043fa93d666736330d5945964028815f129546e489a80eade1  policy-on-pinocchio-alloc-v0/blubber_cu_fixture.so
+01691875308a409ee878297fb50e130c4ed7388f2924339e205d6132ce9ba658  policy-on-pinocchio-alloc-v3/blubber_cu_fixture.so
+1f7cdfd2e9b8c5121b905f959d74db4061f6cc756d8e5c15a456965f88d11730  policy-on-pinocchio-v0/blubber_cu_fixture.so
+eed4cd91f8569f514bfc6cf08fa1b809a66e232203e01434206dea8311bd5756  policy-on-pinocchio-v3/blubber_cu_fixture.so

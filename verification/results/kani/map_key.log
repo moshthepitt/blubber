@@ -9,10 +9,10 @@ Verus
 
 Kani: 23 passed; 0 failed; 5719 properties (1 unreachable); default checks enabled
 Symbolic inputs: two full-domain values per type; bool additionally checks all tag bytes; jobs=1; per-harness timeout=600s
-source-tree-sha256 (154 paths; sorted path-NUL-content-hash): 742b0d68679097cb2fdee2418f6cc42f642598857aa86828e00345b54615894d
-kani-raw-sha256: 09d65eed3d0cb8c50488afeda1d0ae0e9fdbcca503dd19fb46c91aa97fdd9c37
+source-tree-sha256 (154 paths; sorted path-NUL-content-hash): d278ee0a8547659ff7b4093da06dc5e86e39567ad6f42f2ae7080a5fa89f1745
+kani-raw-sha256: a58786887a904ab4ead1973ab35081473d537da1edfa100d26f0ed45d0e5dbdb
 Verus: 1 verified; 0 errors; theorem raw_key_identity; arbitrary positive u32 width
-verus-raw-sha256: 1c6afdbf9348154d918e41896a37d59bf61204316d9c1eef00c350e94e2dbb17
+verus-raw-sha256: a131bff2aad22b242207244a671d23baa74703ff0c1d2c3f3944e9efbf924cf8
 Coverage: 6 expected covers satisfied; all 23 per-harness counts matched
 cover-inventory-sha256 (sorted name:count lines): 47b40e5ed4bba271a133981fafb4dfad9d14d4e02cd58249275b86cb5ec152a3
 map_key_address_projection: PASS; width=32; unwind=34

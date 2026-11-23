@@ -1,10 +1,10 @@
 Kani Rust Verifier 0.68.0 (standalone)
 CBMC 6.11.0
 rustc 1.100.0-nightly (8925ea358 2026-08-20)
-Kani: 21 passed; 0 failed; 203119 properties (15187 unreachable); default checks enabled
+Kani: 21 passed; 0 failed; 202229 properties (15187 unreachable); default checks enabled
 D14 typed_plan: real production bodies; jobs=1; per-harness timeout=600s; unwind=0 denotes loop-free
-source-tree-sha256 (154 paths; sorted path-NUL-content-hash): 742b0d68679097cb2fdee2418f6cc42f642598857aa86828e00345b54615894d
-kani-raw-sha256: 361e4a4d775a8c8a75105eb2d5fd11f8e0b88acc66029b4ed0e5bfd44a87c9d3
+source-tree-sha256 (154 paths; sorted path-NUL-content-hash): d278ee0a8547659ff7b4093da06dc5e86e39567ad6f42f2ae7080a5fa89f1745
+kani-raw-sha256: 624a7255b6eab5205793a4a3dcd422d1b2597598a17f681859bb7a154e473bdd
 Coverage: 21 expected covers satisfied; all 21 per-harness counts matched
 cover-inventory-sha256 (sorted name:count lines): 48caa7eccfe70532bc7b5037d7a7075d21974e5e5c39537ef114bf956a9ed565
 D14 typed plan: Map<u8,u8> fixed upsert/remove/clear; counts 0..2; symbolic u8 values; capacity=32

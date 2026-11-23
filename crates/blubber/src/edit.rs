@@ -2394,28 +2394,11 @@ fn stage_bytes<'a, 'key, const LIST_FRAME: bool, I, R, E: FnOnce(I, &mut [u8])>(
             }
         }
     };
-    if LIST_FRAME && blubber_core::MAX_DEPTH == 8 && core::mem::size_of::<R>() <= 8 {
-        let prepared = match prepared {
-            Ok(prepared) => prepared,
-            Err(error) => {
-                return Err(error.report(lazy, access.poisoned));
-            }
-        };
-        return stage_selected::<LIST_FRAME, _, _, _>(
-            lazy,
-            prepared,
-            access.poisoned,
-            (access.hard_limit, access.limit, access.limit_error),
-            &mut LoanStage {
-                data: stage,
-                #[cfg(feature = "pinocchio")]
-                preflight: access.preflight,
-            },
-            read_removed,
-        );
-    }
-    let prepared = prepared.map_err(|error| error.report(lazy, access.poisoned));
-    stage_prepared::<LIST_FRAME, _, _, _>(
+    let prepared = match prepared {
+        Ok(prepared) => prepared,
+        Err(error) => return Err(error.report(lazy, access.poisoned)),
+    };
+    stage_selected::<LIST_FRAME, _, _, _>(
         lazy,
         prepared,
         access.poisoned,

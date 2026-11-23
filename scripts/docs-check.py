@@ -47,6 +47,10 @@ def markdown_paths(root):
     return sorted(paths)
 
 
+def rustdoc_paths(root):
+    return sorted(path.relative_to(root) for path in (root / 'crates').glob('*/src/**/*.rs'))
+
+
 def check_api_mentions(source):
     if errors := list(API['findings'](source)):
         raise ValueError('\n'.join(errors))
@@ -68,6 +72,8 @@ def check_public(root=ROOT):
         if path == Path('README.md') or path.parts[0] == 'docs':
             if rust_fences(text, path) and f'"../../{path}"' not in fixtures:
                 raise ValueError(f'{path}: Rust fences are missing from repository doctest inputs')
+    for path in rustdoc_paths(root):
+        CONTENT['rustdoc_numbers'](source.read(path), path, facts)
     check_api_mentions(source)
     print(f'Documentation markers and Rust fences passed ({len(excerpts)} excerpts)')
 

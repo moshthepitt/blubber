@@ -548,9 +548,16 @@
       "field": "value"
     },
     {
-      "id": "release.blubber.version",
+      "id": "release.blubber.v0_1_0",
       "unit": "version",
       "value": "0.1.0"
+    },
+    {
+      "id": "release.blubber.version",
+      "unit": "version",
+      "source": "Cargo.toml",
+      "selector": "^version = \"(?P<value>[\\d.]+)\"$",
+      "field": "value"
     },
     {
       "id": "release.rust.minimum",
@@ -558,6 +565,175 @@
       "source": "Cargo.toml",
       "selector": "^rust-version = \"(?P<value>[\\d.]+)\"$",
       "field": "value"
+    },
+    {
+      "id": "release011.cu.v0.summary",
+      "unit": "measurements",
+      "source": "verification/results/performance/cu-v0.log",
+      "selector": "^[a-z][a-z0-9_]*,(?P<value>\\d+),\\d+,\\d+$",
+      "field": "value:count"
+    },
+    {
+      "id": "release011.cu.v0.scaling",
+      "unit": "measurements",
+      "source": "benchmarks/data/scaling-v0.csv",
+      "selector": "@all",
+      "field": "whole_cu:count"
+    },
+    {
+      "id": "release011.cu.v0.extended",
+      "unit": "measurements",
+      "source": "benchmarks/data/extended-v0.csv",
+      "selector": "@all",
+      "field": "whole_cu:count"
+    },
+    {
+      "id": "release011.cu.v0.lease",
+      "unit": "measurements",
+      "source": "benchmarks/data/lease-v0.csv",
+      "selector": "@all",
+      "field": "whole_cu:count"
+    },
+    {
+      "id": "release011.cu.v0.runtime",
+      "unit": "measurements",
+      "source": "benchmarks/data/runtime-v0.csv",
+      "selector": "@all",
+      "field": "whole_cu:count"
+    },
+    {
+      "id": "release011.cu.v0.entry_explicit",
+      "unit": "measurements",
+      "value": "210"
+    },
+    {
+      "id": "release011.cu.v0.entry_combinator",
+      "unit": "measurements",
+      "value": "210"
+    },
+    {
+      "id": "release011.cu.v0.speed",
+      "unit": "measurements",
+      "value": "1200"
+    },
+    {
+      "id": "release011.cu.v3.summary",
+      "unit": "measurements",
+      "source": "verification/results/performance/cu-v3.log",
+      "selector": "^[a-z][a-z0-9_]*,(?P<value>\\d+),\\d+,\\d+$",
+      "field": "value:count"
+    },
+    {
+      "id": "release011.cu.v3.scaling",
+      "unit": "measurements",
+      "source": "benchmarks/data/scaling-v3.csv",
+      "selector": "@all",
+      "field": "whole_cu:count"
+    },
+    {
+      "id": "release011.cu.v3.extended",
+      "unit": "measurements",
+      "source": "benchmarks/data/extended-v3.csv",
+      "selector": "@all",
+      "field": "whole_cu:count"
+    },
+    {
+      "id": "release011.cu.v3.lease",
+      "unit": "measurements",
+      "source": "benchmarks/data/lease-v3.csv",
+      "selector": "@all",
+      "field": "whole_cu:count"
+    },
+    {
+      "id": "release011.cu.v3.runtime",
+      "unit": "measurements",
+      "source": "benchmarks/data/runtime-v3.csv",
+      "selector": "@all",
+      "field": "whole_cu:count"
+    },
+    {
+      "id": "release011.cu.v3.entry_explicit",
+      "unit": "measurements",
+      "value": "210"
+    },
+    {
+      "id": "release011.cu.v3.entry_combinator",
+      "unit": "measurements",
+      "value": "210"
+    },
+    {
+      "id": "release011.cu.v3.speed",
+      "unit": "measurements",
+      "value": "1200"
+    },
+    {
+      "id": "release011.cu.compared_count",
+      "unit": "measurements",
+      "source": "@calculate",
+      "selector": "release011.cu.v0.summary,release011.cu.v0.scaling,release011.cu.v0.extended,release011.cu.v0.lease,release011.cu.v0.runtime,release011.cu.v0.entry_explicit,release011.cu.v0.entry_combinator,release011.cu.v0.speed,release011.cu.v3.summary,release011.cu.v3.scaling,release011.cu.v3.extended,release011.cu.v3.lease,release011.cu.v3.runtime,release011.cu.v3.entry_explicit,release011.cu.v3.entry_combinator,release011.cu.v3.speed",
+      "field": "sum"
+    },
+    {
+      "id": "release011.frame.checked_builds",
+      "unit": "builds",
+      "value": "50"
+    },
+    {
+      "id": "release011.frame.headroom_floor",
+      "unit": "bytes",
+      "value": "64"
+    },
+    {
+      "id": "release011.frame.sbf_limit",
+      "unit": "bytes",
+      "source": "scripts/sbf-stack.sh",
+      "selector": "SBF stack diagnostic rejected \\((?P<value>[\\d,]+)-byte frame limit\\)",
+      "field": "value"
+    },
+    {
+      "id": "release011.frame.stage_bytes.v3.after",
+      "unit": "bytes",
+      "value": "4032"
+    },
+    {
+      "id": "release011.frame.stage_bytes.v3.before",
+      "unit": "bytes",
+      "value": "4096"
+    },
+    {
+      "id": "release011.frame.stage_checked_map.v0.after",
+      "unit": "bytes",
+      "value": "3456"
+    },
+    {
+      "id": "release011.frame.stage_checked_map.v0.before",
+      "unit": "bytes",
+      "value": "4032"
+    },
+    {
+      "id": "release011.frame.stage_checked_map.v3.after",
+      "unit": "bytes",
+      "value": "3520"
+    },
+    {
+      "id": "release011.frame.stage_checked_map.v3.before",
+      "unit": "bytes",
+      "value": "4096"
+    },
+    {
+      "id": "release011.rustdoc.callback_read.was",
+      "unit": "CU",
+      "value": "158109"
+    },
+    {
+      "id": "release011.rustdoc.cursor_read.was",
+      "unit": "CU",
+      "value": "176229"
+    },
+    {
+      "id": "release011.rustdoc.iter_read_v0.was",
+      "unit": "CU",
+      "value": "660767"
     },
     {
       "id": "runtime.account.max_mib",
@@ -612,6 +788,62 @@
       "source": "scripts/sbf-stack.sh",
       "selector": "SBF stack diagnostic rejected \\((?P<value>[\\d,]+)-byte frame limit\\)",
       "field": "value"
+    },
+    {
+      "id": "rustdoc.list_fixed.manual_set",
+      "unit": "CU/item",
+      "source": "benchmarks/traversal-mixed-v0.csv",
+      "selector": "case=list_fixed_n1000_manual_get_mut_set_plain",
+      "field": "whole_per_item:round=0"
+    },
+    {
+      "id": "rustdoc.list_fixed.scoped_set",
+      "unit": "CU/item",
+      "source": "benchmarks/traversal-mixed-v0.csv",
+      "selector": "case=list_fixed_n1000_callback_equal_set_plain",
+      "field": "whole_per_item:round=1"
+    },
+    {
+      "id": "rustdoc.list_indexed.growing_callback",
+      "unit": "CU/item",
+      "source": "benchmarks/traversal-v0.csv",
+      "selector": "case=list_indexed_n1000_callback_growing_set_plain",
+      "field": "common_delta_per_item:round=-3"
+    },
+    {
+      "id": "rustdoc.map_indexed.callback_read",
+      "unit": "CU",
+      "source": "benchmarks/traversal-mixed-v0.csv",
+      "selector": "case=map_indexed_n1000_callback_get_plain",
+      "field": "common_delta"
+    },
+    {
+      "id": "rustdoc.map_indexed.cursor_read",
+      "unit": "CU",
+      "source": "benchmarks/traversal-mixed-v0.csv",
+      "selector": "case=map_indexed_n1000_cursor_get_plain",
+      "field": "common_delta"
+    },
+    {
+      "id": "rustdoc.map_indexed.growing_callback",
+      "unit": "CU/item",
+      "source": "benchmarks/traversal-v0.csv",
+      "selector": "case=map_indexed_n1000_callback_growing_set_plain",
+      "field": "common_delta_per_item:round=-3"
+    },
+    {
+      "id": "rustdoc.map_indexed.iter_read_v0",
+      "unit": "CU",
+      "source": "benchmarks/traversal-mixed-v0.csv",
+      "selector": "case=map_indexed_n1000_mut_try_iter_plain",
+      "field": "common_delta"
+    },
+    {
+      "id": "rustdoc.map_indexed.iter_read_v3",
+      "unit": "CU",
+      "source": "benchmarks/traversal-mixed-v3.csv",
+      "selector": "case=map_indexed_n1000_mut_try_iter_plain",
+      "field": "common_delta"
     },
     {
       "id": "scaling.v0.n1000.map_lookup.common_prefix_front_hit",

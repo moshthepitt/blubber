@@ -80,11 +80,11 @@ Blubber's source has no `unsafe` code. [Verus](https://github.com/verus-lang/ver
 
 ## Install
 
-Run `cargo add blubber@0.1.0 --features pinocchio`<!-- num-code:"cargo add blubber@{{num:release.blubber.version}} --features pinocchio" --> on Rust 1.89.0<!-- num:release.rust.minimum -->+. See the [guide](docs/guide.md#create-an-account) for crate features.
+Run `cargo add blubber@0.1.1 --features pinocchio`<!-- num-code:"cargo add blubber@{{num:release.blubber.version}} --features pinocchio" --> on Rust 1.89.0<!-- num:release.rust.minimum -->+. See the [guide](docs/guide.md#create-an-account) for crate features.
 
 ## Release status
 
-`blubber`, `blubber-core` and `blubber-derive` 0.1.0<!-- num:release.blubber.version --> are on crates.io and docs.rs. See [`CHANGELOG.md`](CHANGELOG.md#010).
+`blubber`, `blubber-core` and `blubber-derive` 0.1.1<!-- num:release.blubber.version --> are on crates.io and docs.rs. See [`CHANGELOG.md`](CHANGELOG.md#011).
 
 ## What is missing
 

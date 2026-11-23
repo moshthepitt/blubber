@@ -11,6 +11,7 @@ DIGITS = r'[+-]?(?:[0-9]{1,3}(?:[, _][0-9]{3})+|[0-9]+)(?:\.[0-9]+)*'
 DISPLAY = rf'(?:nightly-\d{{4}}-\d{{2}}-\d{{2}}|Q[1-4] \d{{4}}|\d+\.\d+\.x|{DIGITS}(?:-[A-Za-z][A-Za-z0-9.]*\d)?)'
 MARKER = re.compile(rf'(?:\{{\{{num:({ID})\}}\}}|({DISPLAY})<!-- num:({ID}) -->)')
 MARKER_PREFIX = re.compile(r'(?:\{\{\s*num:|<!--\s*num:)')
+RUSTDOC_LINE = re.compile(r'^[ \t]*//(?:/(?!/)|!)[^\n]*', re.M)
 ONES = r'zero|one|two|three|four|five|six|seven|eight|nine'
 TENS = r'twenty|thirty|forty|fifty|sixty|seventy|eighty|ninety'
 TEENS = r'ten|eleven|twelve|thirteen|fourteen|fifteen|sixteen|seventeen|eighteen|nineteen'
@@ -57,24 +58,24 @@ def display(value):
     return f'{int(value):,}' if re.fullmatch(r'-?\d+', value) else value
 
 
-def marked(text, path, facts, *, render=False, inline=True):
+def marked(text, path, facts, *, render=False, inline=True, line_offset=0):
     """Return text with verified markers hidden, or fresh values for rendering."""
     def value(match):
         key = match[1] or match[3]
         fact = facts.get(key)
         if not fact or not fact['value']:
-            raise ValueError(f'{path}:{text.count(chr(10), 0, match.start()) + 1}: unavailable number {key}')
+            raise ValueError(f'{path}:{text.count(chr(10), 0, match.start()) + line_offset + 1}: unavailable number {key}')
         if render:
             return f'{display(fact["value"])}<!-- num:{key} -->' if inline else fact['value']
         actual = re.sub(r'[, _]', '', match[2] or '')
         if actual != re.sub(r'[, _]', '', fact['value']):
-            raise ValueError(f'{path}:{text.count(chr(10), 0, match.start()) + 1}: '
+            raise ValueError(f'{path}:{text.count(chr(10), 0, match.start()) + line_offset + 1}: '
                              f'{key} has {match[2] or "an unrendered marker"}, expected {display(fact["value"])}')
         return '~marked~'
 
     leftovers = MARKER.sub('', text)
     if match := MARKER_PREFIX.search(leftovers):
-        raise ValueError(f'{path}:{leftovers.count(chr(10), 0, match.start()) + 1}: malformed number marker')
+        raise ValueError(f'{path}:{leftovers.count(chr(10), 0, match.start()) + line_offset + 1}: malformed number marker')
     return MARKER.sub(value, text)
 
 
@@ -162,6 +163,18 @@ def marked_numbers(text, path, facts, *, render=False):
     return ''.join(chunks)
 
 
+def rustdoc_numbers(text, path, facts, *, render=False):
+    """Render or verify inline markers in Rust line doc comments."""
+    def replace(match):
+        if not MARKER_PREFIX.search(match[0]):
+            return match[0]
+        line_offset = text.count('\n', 0, match.start())
+        checked = marked(match[0], path, facts, render=render, line_offset=line_offset)
+        return checked if render else match[0]
+
+    return RUSTDOC_LINE.sub(replace, text)
+
+
 CODE_NAME = r'[a-z][a-z0-9_-]*'
 CODE_MARKER = re.compile(
     rf'^\{{\{{code:({CODE_NAME})\}}\}}[ \t]*$|'
@@ -204,11 +217,14 @@ def render_documents(source, facts, destination, *, marker_paths=()):
         candidate = destination / name
         original = candidate.read_text() if candidate.is_file() else source.read(name)
         updated = original
-        if CODE_PREFIX.search(updated):
-            if excerpts is None:
-                excerpts = code_excerpts(source)
-            updated = marked_code(updated, name, excerpts, render=True)
-        updated = marked_numbers(updated, name, facts, render=True)
+        if Path(name).suffix == '.rs':
+            updated = rustdoc_numbers(original, name, facts, render=True)
+        else:
+            if CODE_PREFIX.search(updated):
+                if excerpts is None:
+                    excerpts = code_excerpts(source)
+                updated = marked_code(updated, name, excerpts, render=True)
+            updated = marked_numbers(updated, name, facts, render=True)
         if updated != original:
             changes[name] = updated
     for name, updated in changes.items():

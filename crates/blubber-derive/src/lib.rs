@@ -1,4 +1,4 @@
-//! Procedural macros for [`blubber`](https://docs.rs/blubber/0.1.0/blubber/). [`#[schema]`][macro@schema] generates initializers, borrowed views and editors for fixed- and variable-size records. [`#[derive(Fixed)]`][Fixed] generates packed fixed-width codecs without native Rust padding.
+//! Procedural macros for [`blubber`](https://docs.rs/blubber/latest/blubber/). [`#[schema]`][macro@schema] generates initializers, borrowed views and editors for fixed- and variable-size records. [`#[derive(Fixed)]`][Fixed] generates packed fixed-width codecs without native Rust padding.
 //!
 //! ## Invoke the macros directly
 //!
@@ -89,7 +89,7 @@ pub fn derive_fixed(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
 ///
 /// A schema describes the fields and how to encode them. Use `#[blubber::schema]` on a nested schema, which implements `Schema` and may take type and const generics. Concrete schemas also implement `RootSchema`. Use `#[blubber::schema(account)]` on a concrete account root to also implement `AccountSchema`, compute its canonical identity by default and generate `space`, `encoded_len_of`, `initialize` and `load`.
 ///
-/// For an account root `Queue`, the macro generates `QueueInit`, `QueueRef`, `QueueMut` and `QueuePrefix`, plus `QueueOwned` when `alloc` is enabled on `blubber`. Enabling `pinocchio` on `blubber` adds the on-chain `create`, `create_pda`, `allocate_account`, `allocate_pda`, `with_read` and `with_edit` methods in the tables below. On docs.rs, [`blubber::example_generated`](https://docs.rs/blubber/0.1.0/blubber/example_generated/index.html) shows the full expansion for `Queue`; that module is built only for documentation. See the [guide](https://github.com/moshthepitt/blubber/blob/main/docs/guide.md#define-a-schema).
+/// For an account root `Queue`, the macro generates `QueueInit`, `QueueRef`, `QueueMut` and `QueuePrefix`, plus `QueueOwned` when `alloc` is enabled on `blubber`. Enabling `pinocchio` on `blubber` adds the on-chain `create`, `create_pda`, `allocate_account`, `allocate_pda`, `with_read` and `with_edit` methods in the tables below. On docs.rs, [`blubber::example_generated`](https://docs.rs/blubber/latest/blubber/example_generated/index.html) shows the full expansion for `Queue`; that module is built only for documentation. See the [guide](https://github.com/moshthepitt/blubber/blob/main/docs/guide.md#define-a-schema).
 ///
 /// Accepts nonempty, named structs. Type and const generics are supported for
 /// nested fields. A generic named after a generated marker or companion is

@@ -1,6 +1,6 @@
 Rust SBF v1.53; v3; source-identical host/MSRV/SBF fixed public types
 PASS45 FAIL0: representation and fixed generated slots n=0,1,10,100,1000; complete-byte/read-result oracles
 Q5 generated get/set/empty callback: common delta<=30*n+300; both whole slopes<=30
-source-sha256=7fb27e0ae17978c4b5d103dbfef3793a27f18eff9ffd151168c3604557bc545d
-elf-sha256=510d428733c46affd37e3807daa1d335eb2dcdf181a2302804b37c117a829f4e
-raw-sha256=f15d79099154026714ffd9a557f61fd2d1988198675c5bfc85494eaed9451cde
+source-sha256=bd9f6d8e35a147e84110c8de4ae2c9717e90a267e8a96f5d036d2c244d644fd3
+elf-sha256=f56d15ced04d8f6710da5de5c4b35afa43f76759f2df6dfdd5715c2aa0930a88
+raw-sha256=db56e8532a624966a8689b5b2b3faf8d3c03a8d222817b7c2219c5f54f801f66

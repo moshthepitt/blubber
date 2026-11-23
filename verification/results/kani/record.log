@@ -1,10 +1,10 @@
 Kani Rust Verifier 0.68.0 (standalone)
 CBMC 6.11.0
 rustc 1.100.0-nightly (8925ea358 2026-08-20)
-Kani: 259 passed; 0 failed; 1133812 properties (93214 unreachable); default checks enabled
+Kani: 259 passed; 0 failed; 1133002 properties (93214 unreachable); default checks enabled
 D14 record: real production bodies; jobs=4; per-harness timeout=600s; unwind=0 denotes loop-free
-source-tree-sha256 (154 paths; sorted path-NUL-content-hash): 742b0d68679097cb2fdee2418f6cc42f642598857aa86828e00345b54615894d
-kani-raw-sha256: a24925159b56b6c536575134cf0d36220502e72fba063f3df8d80392675722a6
+source-tree-sha256 (154 paths; sorted path-NUL-content-hash): d278ee0a8547659ff7b4093da06dc5e86e39567ad6f42f2ae7080a5fa89f1745
+kani-raw-sha256: d95dc3cf0c77c39857b678016ffeca66e5cd840638886df4b75c306dfe400e0e
 Coverage: 327 expected covers satisfied; all 259 per-harness counts matched
 cover-inventory-sha256 (sorted name:count lines): ea1cabbd82b7285e3955948e18fd35053ce78df9d7ca0a16dccadb9ad1ec4b11
 Root List<u32> edits; List<u32>/List<Record> admission; independent byte oracle; unwind=49; all unwind assertions enabled

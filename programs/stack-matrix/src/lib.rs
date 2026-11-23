@@ -36,10 +36,30 @@ pub fn process_instruction(id: &Address, accounts: &mut [AccountView], ix: &[u8]
         constraint_prefix::run(id, accounts, ix)
     }
     #[cfg(not(any(feature = "overflow", feature = "constraint-prefix")))]
-    fixture::run(id, accounts, ix)
+    {
+        #[cfg(all(
+            not(feature = "depth16"),
+            not(feature = "medium"),
+            not(feature = "wide"),
+            not(feature = "alloc")
+        ))]
+        if let Some((&7, rest)) = ix.split_first() {
+            return op_screen::run(id, accounts, rest);
+        }
+        fixture::run(id, accounts, ix)
+    }
 }
 
 #[cfg(all(not(feature = "overflow"), feature = "constraint-prefix"))]
 mod constraint_prefix;
 #[cfg(not(any(feature = "overflow", feature = "constraint-prefix")))]
 mod fixture;
+#[cfg(all(
+    not(feature = "overflow"),
+    not(feature = "constraint-prefix"),
+    not(feature = "depth16"),
+    not(feature = "medium"),
+    not(feature = "wide"),
+    not(feature = "alloc")
+))]
+mod op_screen;

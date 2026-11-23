@@ -8,7 +8,7 @@ Your program's state lives in account data, which is the account's byte slice. A
 
 By default, `blubber` enables the `derive` feature and re-exports `#[blubber::schema]` and `#[derive(blubber::Fixed)]`. The schema macro generates initializers and typed accessors. `Fixed` encodes fixed-width structs without Rust struct padding.
 
-`blubber` 0.1.0<!-- num:release.blubber.version --> is published under the MIT licence; see [release status](../../README.md#release-status). Some libraries with fixed slots or single-item edits are faster on individual benchmark rows; see [the comparison](../../benchmarks/COMPARE.md).
+`blubber` 0.1.1<!-- num:release.blubber.version --> is published under the MIT licence; see [release status](../../README.md#release-status). Some libraries with fixed slots or single-item edits are faster on individual benchmark rows; see [the comparison](../../benchmarks/COMPARE.md).
 
 ## Install
 
@@ -17,13 +17,13 @@ By default, `blubber` enables the `derive` feature and re-exports `#[blubber::sc
 For a Pinocchio program, enable `pinocchio` so the crate exposes the account guards, funding, sizing and account creation APIs:
 
 ```sh
-cargo add blubber@0.1.0 --features pinocchio
+cargo add blubber@0.1.1 --features pinocchio
 ```
 <!-- num-fence:{"1": "cargo add blubber@{{num:release.blubber.version}} --features pinocchio"} -->
 
 ```toml
 [dependencies]
-blubber = { version = "0.1.0", features = ["pinocchio"] }
+blubber = { version = "0.1.1", features = ["pinocchio"] }
 ```
 <!-- num-fence:{"2": "blubber = { version = \"{{num:release.blubber.version}}\", features = [\"pinocchio\"] }"} -->
 
@@ -33,7 +33,7 @@ Enable `alloc` when you need `VecStore` or owned values.
 
 Host storage runs off-chain in tests and tools. `SliceStore::new(room)` wraps a mutable byte slice. `VecStore::new(buffer)` wraps a growable vector when `alloc` is enabled.
 
-The runnable host round-trip doctest ships in [`src/lib.rs`](src/lib.rs) and in the crate-level rustdoc under [`#try-it-on-the-host`](https://docs.rs/blubber/0.1.0/blubber/#try-it-on-the-host). For an on-chain handler, see [create an account](../../docs/guide.md#create-an-account) and [choose a load](../../docs/trust-model.md#choose-a-load).
+The runnable host round-trip doctest ships in [`src/lib.rs`](src/lib.rs) and in the crate-level rustdoc under [`#try-it-on-the-host`](https://docs.rs/blubber/latest/blubber/#try-it-on-the-host). For an on-chain handler, see [create an account](../../docs/guide.md#create-an-account) and [choose a load](../../docs/trust-model.md#choose-a-load).
 
 ## Check the handler
 

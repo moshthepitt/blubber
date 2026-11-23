@@ -1,7 +1,7 @@
 {
   "stage": "Q7",
   "architecture": "v0",
-  "source_sha256": "7fb27e0ae17978c4b5d103dbfef3793a27f18eff9ffd151168c3604557bc545d",
+  "source_sha256": "bd9f6d8e35a147e84110c8de4ae2c9717e90a267e8a96f5d036d2c244d644fd3",
   "indexed_limits": "enforced",
   "recovery_targets_sha256": "5aa790bde74214f20aa690a44d536ae9c3e75980098dee8fcb23378d37021867",
   "tools": {
@@ -10,9 +10,9 @@
     "runtime": "Mollusk 0.16.2/Agave 4.3.0",
     "bencher": "0.16.2"
   },
-  "bencher_sha256": "f67ea6c1c34088d059d32dd164728c28f5cedfdac1556cff237d624e65486655",
-  "raw_sha256": "5927fcf15cb5fffdfdc5eb9327cee10d7f860b7decbba71d549d221f57647d33",
-  "diagnostic_sha256": "4769bd04dc0883c9690c52a906c6fb18e91cc4318e6af1c9e561f2f25a47e568",
+  "bencher_sha256": "66e9acaa955974461a9b0f7d2d7ff5296da8a15c419dce7eec7f10f6937af204",
+  "raw_sha256": "c349c07f2adcac39f6654fbb3ba749bda473e4b92f72507cd04ed65b039d0517",
+  "diagnostic_sha256": "fa598e3dc0dde6204c04ab98adf67f9a7d824f7b48fdd78b3870c5c91290deba",
   "baseline_sha256": "0ddb05d4e28d078f144e3036298af7be557d6243d5f3c33b3333b2c0c867c6d5",
   "oracles": {
     "tests/mollusk/src/matrix.rs": "87882b0399e2f11b0e43109906a9ee706b9e13361e1db7f0c5ef7070073e3b78",
@@ -20,13 +20,13 @@
     "tests/mollusk/benches/support/traversal.rs": "91cc403bd7b01e87c3e1d8ac4be2ca71c1a69173dc0c11afae1c58c826cf8367"
   },
   "elfs": {
-    "blubber_cu_traversal": "33c89ee7fd9432d70dae86d575026721a221efd4a1dd7b27b542b86ba900bb54",
-    "blubber_cu_traversal_metrics": "b513e34acc63c5719caaa2620f6d29840e334b73a44c5be8efe05679af784725"
+    "blubber_cu_traversal": "61f7de11555c3c693b8252787ec0e34d47a00da196f5034b15b0b015b7e0d7b6",
+    "blubber_cu_traversal_metrics": "1ca921a2b701fdc38f1c46e5f5ca2d57e90d994d5bb0345b28f9a873c59a1b01"
   },
   "tool_sha256": {
     "host_rustc": "d3a664c970a9fd8361b64194861bebc1ae37b9054e5ee3400dc1c9e691797eea",
     "sbf_rustc": "d95c95b68e321ad76634e1fd26b0a7c20ccdbae9ad9ca733f3ae2f2b4a0b6002",
-    "lockfile": "4c47a7f4f331b0cc3918d454a195bad2ffab0ddbc1b38f0297c389da875c1a8a"
+    "lockfile": "824fa179c45802a314e0202737a712caaa1c041c721990dfabb2484e7eb1bf45"
   },
   "pass": 1215,
   "fail": 0

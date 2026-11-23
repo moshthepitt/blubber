@@ -723,6 +723,79 @@ fn borrowed_map_selectors_reuse_after_growth_and_consuming_children() {
 }
 
 #[test]
+fn borrowed_and_consuming_entries_match_results_and_storage() {
+    fn run(room: &mut [u8], borrowed: bool) {
+        let mut store = SliceStore::new(room);
+        let mut root = Account::initialize(&mut store, init()).unwrap();
+
+        let mut fixed = root.fixed_mut();
+        let entry = if borrowed {
+            fixed.entry(1)
+        } else {
+            fixed.into_entry(1)
+        };
+        match entry.unwrap() {
+            Entry::Occupied(entry) => assert_eq!(entry.insert(20), Ok(10)),
+            Entry::Vacant(_) => panic!("existing key"),
+        }
+
+        let large = "x".repeat(256);
+        for (key, input, expected) in [
+            (1, "!", Ok(4)),
+            (2, "two", Ok(3)),
+            (3, large.as_str(), Err(ErrorKind::Capacity.into())),
+        ] {
+            let mut texts = root.texts_mut();
+            let entry = if borrowed {
+                texts.entry(key)
+            } else {
+                texts.into_entry(key)
+            };
+            let result = entry
+                .and_then(|entry| entry.and_modify(|value| value.push_str(input)))
+                .and_then(|entry| entry.or_insert(input))
+                .map(|value| value.get().len());
+            assert_eq!(result, expected);
+        }
+        root.validate().unwrap();
+        assert!(!store.is_poisoned());
+    }
+
+    let mut borrowed = [0; 128];
+    let mut consumed = borrowed;
+    run(&mut borrowed, true);
+    run(&mut consumed, false);
+    assert_eq!(borrowed, consumed);
+}
+
+#[cfg(not(feature = "verify-on-load"))]
+#[test]
+fn borrowed_and_consuming_entry_admission_match_source_errors() {
+    let mut initial = [0; 128];
+    Account::initialize(&mut SliceStore::new(&mut initial), init()).unwrap();
+    let view = View::load_trusted::<Account>(&initial, Account::DISCRIMINATOR).unwrap();
+    let count = view.field(1).unwrap().base() as usize;
+    initial[count..count + 4].copy_from_slice(&u32::MAX.to_le_bytes());
+
+    let mut errors = Vec::new();
+    for borrowed in [true, false] {
+        let mut bytes = initial;
+        let mut store = SliceStore::new(&mut bytes);
+        let mut root = Account::load_trusted_mut(&mut store).unwrap();
+        let mut map = root.texts_mut();
+        let result = if borrowed {
+            map.entry(1)
+        } else {
+            map.into_entry(1)
+        };
+        errors.push(result.unwrap_err());
+        assert!(store.is_poisoned());
+        assert_eq!(store.bytes(), initial);
+    }
+    assert_eq!(errors[0], errors[1]);
+}
+
+#[test]
 fn entry_debug_uses_ordinal_without_decoding_values() {
     let mut room = [0; 256];
     let mut store = SliceStore::new(&mut room);

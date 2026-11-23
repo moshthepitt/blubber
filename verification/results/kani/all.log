@@ -1,13 +1,13 @@
 Kani 0.68.0; CBMC 6.11.0; nightly-2026-08-21; worker counts in per-cohort reports; timeout=600s/harness
 All default safety, overflow, pointer, bounds and unwinding checks enabled
-arithmetic::*: PASS; 6 harnesses; report-sha256: 03f4968a73c1862cfef617a7f64ea8cd1e90b3a11829d8fd29adbfa5e237348f
-leaf::*: PASS; 29 harnesses; report-sha256: dff1300a8e91e40bf58cb2522e9736879f69d8e497c558935a3ebd49ed2051d0
-derive_encode::*: PASS; 15 harnesses; report-sha256: 36fae8f0e92044e784e4b060818cfce26f4590caf8dd33a7290e027b7723eace
-error_codes::*: PASS; 3 harnesses; report-sha256: 56dbb3571379851efe7a98d575e3b8e90b356dcf28479682d59552290497e919
-map_key::*: PASS; 23 harnesses; report-sha256: 6970e2b285d3b2914df90c5e6233aa9a3ef3b8320e71fe6e2370d283cf7c9a4e
-fixed_struct::*: PASS; 5 harnesses; report-sha256: 0e175f76cbdbf6d39bdfc18facc78229c835612de73ff2b04d527de78a2f1a6b
-record::*: PASS; 259 harnesses; report-sha256: 6136ea0d5eba948404106681a967311153d2cf06bcd99f996984e772718186ba
-typed_plan::*: PASS; 21 harnesses; report-sha256: f813648a8c9cfe91abc9cc2005d9a52288fd75cd52e8727066dd8b57e21a3468
+arithmetic::*: PASS; 6 harnesses; report-sha256: 388eaeffcee96b9463e0336a18a542ffc1220fdb22c66bb076e7ff70e4b15b6f
+leaf::*: PASS; 29 harnesses; report-sha256: be61a45a4d610469aef9f394948b116a082ab2add8766b69344018844b2a07bd
+derive_encode::*: PASS; 15 harnesses; report-sha256: 816d68ad70b0026f409ba431d3f74f16eefd8501d7de669dfa2f093ab63c6232
+error_codes::*: PASS; 3 harnesses; report-sha256: 3feda823133ce2f34d2a7a4cd003d0753cd2c49513394a3b11cbb36668bb8f5e
+map_key::*: PASS; 23 harnesses; report-sha256: 311e7ae6baf736aa96920abe882cae8c1fd431142b9db2c546e3eb729d5a0bb1
+fixed_struct::*: PASS; 5 harnesses; report-sha256: 8a5ffe03cd8c70105bf3fcf1ad5bc31ca949e068b578eac732cbc5405b1d81eb
+record::*: PASS; 259 harnesses; report-sha256: d53f856e19685bd980f05f645fb11d6cf46bd0257f34b39a59e6849429b754c0
+typed_plan::*: PASS; 21 harnesses; report-sha256: 1d95064d4e39dacd7f75088327f9d76e6709abef680954088d14bd7ac1c9c53d
 Total: 361 passed; 0 failed; 0 timeout/OOM/unknown; all explicit inventories matched
 List/map/batched iterator states: bounded Kani cases; other variable typed paths use Verus + bounded-exhaustive tests + Miri; see ASSURANCE.md
 Model-checking exclusions: successful tail compositions; see ASSURANCE.md; not model-checked

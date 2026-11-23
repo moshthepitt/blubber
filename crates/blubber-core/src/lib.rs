@@ -1,4 +1,4 @@
-//! `blubber-core` is the allocator-free byte kernel for layout tables, [`validate`], encoding and byte moves. Most programs should use [`blubber`](https://docs.rs/blubber/0.1.0/blubber/) instead, because raw kernel functions require you to uphold their layout premises.
+//! `blubber-core` is the allocator-free byte kernel for layout tables, [`validate`], encoding and byte moves. Most programs should use [`blubber`](https://docs.rs/blubber/latest/blubber/) instead, because raw kernel functions require you to uphold their layout premises.
 //!
 //! ## Validate bytes
 //!

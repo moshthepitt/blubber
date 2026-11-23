@@ -6,13 +6,13 @@ Thread model: posix
 libfuzzer-sys 0.4.13; AddressSanitizer; overflow/debug assertions enabled
 fixtures: 32 representative schemas; descriptor depth <=8; histories <=32 commands
 forbid(unsafe_code): library, two targets, seed example, replay crate, derive output
-validate: PASS; 1880754 executions; 301 seconds; 0 crashes
+validate: PASS; 1702586 executions; 301 seconds; 0 crashes
 validate: max_len=65536; seed=34; timeout=30; rss_limit_mb=2048; workers=1
-validate-raw-sha256: df4149b7c5df1d21fbca3d6d90208efec1f775f26e0894630d45c1bec0bbf228
-edit: PASS; 31084 executions; 301 seconds; 0 crashes
+validate-raw-sha256: 36ca46694c2a52dbde5ae304a4f3920211d9ed22a215ef4aa40289c13465b858
+edit: PASS; 40321 executions; 301 seconds; 0 crashes
 edit: max_len=65536; seed=34; timeout=30; rss_limit_mb=2048; workers=1
-edit-raw-sha256: aed4ecab5efec2d58ad46f16907d1ea7f7f5af3fc5d51762dabd8ee87198ae4c
+edit-raw-sha256: 383b3a105f32bc5ba6f0650079a0980051fd8a7f76250c54dc0c6cf86bd2cc00
 replay: PASS; 3 tests; 0 failed/ignored
-replay-raw-sha256: 5e7f83de5b464af0772894d702eeebaf186482e6721ad30e4a42de46b20c12c4
-source-and-corpus-sha256: c3c1132cd55e0e5fa8cde83236fa4c68251fec606375d50b8203b952f9ce6b07
-fuzz-lock-sha256: ef7a851aee89168abda54c544bbfaa36716d23821ee28a12c8f8668470269a14
+replay-raw-sha256: faf633a30e89d703def2ef8a71fe2a1ec0dd1099e3cdfb8531062197884e23ce
+source-and-corpus-sha256: adfdfcf57a6361900675871e0e4187ba951ec88b53019807b57e6de1a27d1ef6
+fuzz-lock-sha256: db076240bc8d7726208f96d4ee0b31d6322fb71b8eb117539f68b48adf681b9d

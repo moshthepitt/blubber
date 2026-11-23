@@ -1,6 +1,7 @@
 """Resolve documentation figures from source rows."""
 import csv
 from decimal import Decimal, ROUND_HALF_UP
+import hashlib
 import io
 from pathlib import Path
 import re
@@ -82,7 +83,7 @@ def observed(source, rule, sources):
     path, selector = rule['source'], rule['selector']
     field, _, conversion = rule['field'].partition(':')
     if path.endswith('.csv'):
-        conditions = dict(token.split('=', 1) for token in selector.split(','))
+        conditions = {} if selector == '@all' else dict(token.split('=', 1) for token in selector.split(','))
         hits = [(line, row[field.removeprefix('?')]) for line, row in sources[path]
                 if all(row[key] == value for key, value in conditions.items())]
     else:
@@ -90,6 +91,10 @@ def observed(source, rule, sources):
         text = source.read(path)
         hits = [(text.count('\n', 0, hit.start(field)) + 1, hit[field])
                 for hit in pattern.finditer(text)]
+    if conversion == 'count':
+        if not hits or any(not re.fullmatch(r'\d+', value) for _, value in hits):
+            raise ValueError(f'{rule["id"]}: expected populated integer observations in {path}')
+        return str(len(hits)), f'{path}:{hits[0][0]}-{hits[-1][0]}'
     if field.startswith('?'):
         if not hits:
             return '', f'{path} ({selector})'
@@ -102,6 +107,16 @@ def observed(source, rule, sources):
         value = str(len(value.encode()))
     elif conversion == 'kib':
         value = format(Decimal(value) / 1024, 'f')
+    elif conversion.startswith('round='):
+        step = Decimal(1).scaleb(-int(conversion.removeprefix('round=')))
+        value = format(Decimal(value).quantize(step, rounding=ROUND_HALF_UP), 'f')
+    elif conversion.startswith('preview='):
+        # A measured preview applies only while the prior publication is in place.
+        prior, preview = conversion.removeprefix('preview=').split(',')
+        if not re.fullmatch(r'[0-9a-f]{64}', prior) or not re.fullmatch(r'\d+', preview):
+            raise ValueError(f'{rule["id"]}: expected a SHA-256 and an integer preview')
+        if hashlib.sha256(source.read(path).encode()).hexdigest() == prior:
+            return preview, f'docs/facts/number-sources.tsv (preview for {path}:{line})'
     elif conversion:
         raise ValueError(f'{rule["id"]}: unknown unit conversion {conversion}')
     return value.replace(',', ''), f'{path}:{line}'
@@ -142,29 +157,34 @@ def resolve_numbers(source, rules):
             raise ValueError(f'Invalid or duplicate number ID: {key}')
         if path is None:
             value, where = rule['value'], 'verification/docs-inputs.json'
+        elif path == '@literal':
+            value, where = rule['selector'], 'docs/facts/number-sources.tsv'
         elif path == '@calculate':
-            left_id, right_id = rule['selector'].split(',')
-            left, right = facts[left_id], facts[right_id]
-            where = f'{left["location"]}; {right["location"]}'
+            operands = [facts[operand] for operand in rule['selector'].split(',')]
+            where = '; '.join(operand['location'] for operand in operands)
             value = ''
-            if left['value'] and right['value']:
-                a, b = Decimal(left['value']), Decimal(right['value'])
-                mode, _, precision = rule['field'].partition(':')
-                if mode == 'difference':
-                    result = a - b
-                elif mode == 'difference_rounded':
-                    step = Decimal(precision)
-                    if step <= 0 or step != step.to_integral_value():
-                        raise ValueError(f'{key}: expected a positive integer rounding step')
-                    steps = int(((a - b) / step).quantize(Decimal(1), rounding=ROUND_HALF_UP))
-                    result = Decimal(steps) * step
-                    precision = '0'
-                elif mode == 'ratio':
-                    result = a / b
-                elif mode == 'percent_above':
-                    result = 100 * (a - b) / b
+            mode, _, precision = rule['field'].partition(':')
+            if all(operand['value'] for operand in operands):
+                values = [Decimal(operand['value']) for operand in operands]
+                if mode == 'sum':
+                    result = sum(values)
                 else:
-                    raise ValueError(f'Unknown calculation: {mode}')
+                    a, b = values
+                    if mode == 'difference':
+                        result = a - b
+                    elif mode == 'difference_rounded':
+                        step = Decimal(precision)
+                        if step <= 0 or step != step.to_integral_value():
+                            raise ValueError(f'{key}: expected a positive integer rounding step')
+                        steps = int(((a - b) / step).quantize(Decimal(1), rounding=ROUND_HALF_UP))
+                        result = Decimal(steps) * step
+                        precision = '0'
+                    elif mode == 'ratio':
+                        result = a / b
+                    elif mode == 'percent_above':
+                        result = 100 * (a - b) / b
+                    else:
+                        raise ValueError(f'Unknown calculation: {mode}')
                 value = format(result, f'.{int(precision or "0")}f')
         else:
             if path.endswith('.csv') and path not in tables:

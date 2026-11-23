@@ -4,7 +4,7 @@
 
 ## Work with encoded bytes
 
-This crate has `validate`, `validate_utf8` and the shared `Error` and `ErrorKind` types, which report the error kind and byte offset. `validate_utf8` checks a byte slice in constant space without allocating. See the validation example in [crate rustdoc](https://docs.rs/blubber-core/0.1.0/blubber_core/#validate-bytes).
+This crate has `validate`, `validate_utf8` and the shared `Error` and `ErrorKind` types, which report the error kind and byte offset. `validate_utf8` checks a byte slice in constant space without allocating. See the validation example in [crate rustdoc](https://docs.rs/blubber-core/latest/blubber_core/#validate-bytes).
 
 ## Depend on `blubber` in program code
 

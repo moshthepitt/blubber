@@ -466,7 +466,7 @@ dependencies = [
 
 [[package]]
 name = "blubber"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "blubber-core",
  "blubber-derive",
@@ -484,7 +484,7 @@ dependencies = [
 
 [[package]]
 name = "blubber-borrow-resize"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "blubber",
  "pinocchio",
@@ -492,7 +492,7 @@ dependencies = [
 
 [[package]]
 name = "blubber-core"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "blubber-model",
  "solana-program-error",
@@ -501,7 +501,7 @@ dependencies = [
 
 [[package]]
 name = "blubber-cu-fixture"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "blubber",
  "blubber-core",
@@ -511,14 +511,14 @@ dependencies = [
 
 [[package]]
 name = "blubber-demo"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "blubber",
 ]
 
 [[package]]
 name = "blubber-derive"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "blubber",
  "proc-macro-crate",
@@ -529,14 +529,14 @@ dependencies = [
 
 [[package]]
 name = "blubber-doc-examples"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "blubber",
 ]
 
 [[package]]
 name = "blubber-fuzz-replay"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "blubber",
  "blubber-core",
@@ -551,18 +551,18 @@ dependencies = [
 
 [[package]]
 name = "blubber-ide-consumer"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "blubber",
 ]
 
 [[package]]
 name = "blubber-model"
-version = "0.1.0"
+version = "0.1.1"
 
 [[package]]
 name = "blubber-mollusk"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "blubber",
  "blubber-borrow-resize",
@@ -586,7 +586,7 @@ dependencies = [
 
 [[package]]
 name = "blubber-policy"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "blubber",
  "blubber-core",
@@ -595,7 +595,7 @@ dependencies = [
 
 [[package]]
 name = "blubber-quickstart"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "blubber",
  "pinocchio-system",
@@ -603,7 +603,7 @@ dependencies = [
 
 [[package]]
 name = "blubber-stack-matrix"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "blubber",
  "pinocchio",

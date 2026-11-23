@@ -271,6 +271,9 @@ fn stage_checked_map<'key, const ENTRY: bool, R, E: FnOnce(&mut [u8])>(
     let input = measure()?;
     let prepared =
         resolved.prepare_map_checked(operation, key, input, u32::MAX, hint, access.poisoned);
+    #[cfg(not(feature = "max-depth-16"))]
+    let prepared = prepared?;
+    let prepared = ListPreparation(prepared);
     let limits = (access.hard_limit, access.limit, access.limit_error);
     match (blubber_core::MAX_DEPTH, core::mem::size_of::<R>()) {
         (8, 0..=256) => finish_checked_map_small::<ENTRY, _, _>(
@@ -300,7 +303,7 @@ fn stage_checked_map<'key, const ENTRY: bool, R, E: FnOnce(&mut [u8])>(
     inline(always)
 )]
 fn finish_checked_map_small<'key, const ENTRY: bool, R, E: FnOnce(&mut [u8])>(
-    prepared: Result<blubber_core::raw::CheckedListPrepared<'_, 'key>>,
+    prepared: ListPreparation<'_, 'key>,
     limits: (usize, usize, ErrorKind),
     #[cfg(feature = "pinocchio")] preflight: crate::storage::private::Preflight<'_>,
     poisoned: &mut bool,
@@ -349,7 +352,7 @@ fn finish_checked_map_small<'key, const ENTRY: bool, R, E: FnOnce(&mut [u8])>(
 )]
 #[cfg_attr(target_feature = "static-syscalls", inline(always))]
 fn finish_checked_entry_map<'key, R, E: FnOnce(&mut [u8])>(
-    prepared: Result<blubber_core::raw::CheckedListPrepared<'_, 'key>>,
+    prepared: ListPreparation<'_, 'key>,
     limits: (usize, usize, ErrorKind),
     #[cfg(feature = "pinocchio")] preflight: crate::storage::private::Preflight<'_>,
     poisoned: &mut bool,
@@ -366,6 +369,13 @@ fn finish_checked_entry_map<'key, R, E: FnOnce(&mut [u8])>(
         stage,
     )
 }
+
+// At depth sixteen, the outlined finish consumes the Result in its own frame.
+#[repr(transparent)]
+struct ListPreparation<'a, 'key>(
+    #[cfg(feature = "max-depth-16")] Result<blubber_core::raw::CheckedListPrepared<'a, 'key>>,
+    #[cfg(not(feature = "max-depth-16"))] blubber_core::raw::CheckedListPrepared<'a, 'key>,
+);
 
 struct ListStage<R, E> {
     removed: Result<R>,
@@ -447,6 +457,9 @@ fn stage_checked_list<R, E: FnOnce(&mut [u8])>(
     let operation = operation.checked(count)?;
     let input = measure()?;
     let prepared = resolved.prepare_list_checked(operation, input, u32::MAX, access.poisoned);
+    #[cfg(not(feature = "max-depth-16"))]
+    let prepared = prepared?;
+    let prepared = ListPreparation(prepared);
     let limits = (access.hard_limit, access.limit, access.limit_error);
     // Small values at the default depth share the existing staging frame.
     // Wider values and deeper paths need separate decoding/movement frames.
@@ -474,7 +487,7 @@ fn stage_checked_list<R, E: FnOnce(&mut [u8])>(
 
 #[cfg_attr(target_os = "solana", inline(never))]
 fn finish_checked_list<'key, R, E: FnOnce(&mut [u8])>(
-    prepared: Result<blubber_core::raw::CheckedListPrepared<'_, 'key>>,
+    prepared: ListPreparation<'_, 'key>,
     limits: (usize, usize, ErrorKind),
     #[cfg(feature = "pinocchio")] preflight: crate::storage::private::Preflight<'_>,
     poisoned: &mut bool,
@@ -494,14 +507,17 @@ fn finish_checked_list<'key, R, E: FnOnce(&mut [u8])>(
 
 #[inline(always)]
 fn finish_list_body<'key, const SPLIT: bool, R, E: FnOnce(&mut [u8])>(
-    prepared: Result<blubber_core::raw::CheckedListPrepared<'_, 'key>>,
+    prepared: ListPreparation<'_, 'key>,
     (hard_limit, limit, limit_error): (usize, usize, ErrorKind),
     #[cfg(feature = "pinocchio")] preflight: crate::storage::private::Preflight<'_>,
     poisoned: &mut bool,
     read_removed: impl FnOnce(Option<Span>, &[u8]) -> Result<R>,
     stage: &mut ListStage<R, E>,
 ) -> Result<Option<blubber_core::raw::CheckedListPlan<'key>>> {
-    let prepared = prepared?;
+    #[cfg(feature = "max-depth-16")]
+    let prepared = prepared.0?;
+    #[cfg(not(feature = "max-depth-16"))]
+    let prepared = prepared.0;
     let required = prepared.prepared_len() as usize;
     if required > hard_limit {
         prepared.check_before_error(poisoned)?;

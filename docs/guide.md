@@ -6,9 +6,9 @@ If you are deciding whether Blubber fits your program, see the [README](../READM
 
 ## Create an account
 
-The crates require Rust 1.89.0<!-- num:release.rust.minimum --> or newer. Add `blubber` 0.1.0<!-- num:release.blubber.version --> with the `pinocchio` feature to your program crate:
+The crates require Rust 1.89.0<!-- num:release.rust.minimum --> or newer. Add `blubber` 0.1.1<!-- num:release.blubber.version --> with the `pinocchio` feature to your program crate:
 
-`cargo add blubber@0.1.0 --features pinocchio`<!-- num-code:"cargo add blubber@{{num:release.blubber.version}} --features pinocchio" -->
+`cargo add blubber@0.1.1 --features pinocchio`<!-- num-code:"cargo add blubber@{{num:release.blubber.version}} --features pinocchio" -->
 
 The crate is `no_std` by default and leaves heap allocation off. The default `derive` feature re-exports `#[blubber::schema]` and `#[derive(blubber::Fixed)]`. Enabling `pinocchio` adds the Pinocchio `AccountView` guards, account creation helpers, sizing options and rent settlement. Enable `alloc` if you need `VecStore` or owned values.
 
@@ -127,7 +127,7 @@ Mark an account root with `#[blubber::schema(account)]` and a nested schema with
 
 `Str`, `List<T>` and `Map<K, V>` are schema markers for UTF-8 strings, ordered lists and sorted maps. `Address` is the fixed-size 32<!-- num:wire.address.bytes -->-byte address type. Built-in schemas cover unsigned and signed integers, `bool`, `[u8; N]`, `Address`, `Fixed` structs, `Str`, `Option<T>`, `List<T>` and `Map<K, V>`.
 
-In a `Map<K, V>`, keys stay in sorted order so lookups can binary-search the key table without scanning every entry. Map keys must have an ordered encoding of fixed positive width (`MapKey`, implemented for integers, `bool`, `[u8; N]` and `Address`). Strings and variable-size types cannot be map keys in 0.1.0<!-- num:release.blubber.version -->.
+In a `Map<K, V>`, keys stay in sorted order so lookups can binary-search the key table without scanning every entry. Map keys must have an ordered encoding of fixed positive width (`MapKey`, implemented for integers, `bool`, `[u8; N]` and `Address`). Strings and variable-size types cannot be map keys in 0.1.1<!-- num:release.blubber.version -->.
 
 Every type in a nested layout is a node. Schema depth counts the nodes from the account root to a leaf, inclusive. By default, schemas support a depth of 8<!-- num:schema.default.depth --> nodes. Enable `max-depth-16` to raise the limit to 16<!-- num:schema.depth16.depth --> nodes without changing the encoded bytes. When you change a schema on an existing deployment, see [Migrate an account](trust-model.md#migrate-an-account).
 
@@ -209,7 +209,7 @@ Once you have checked the address and owner, pass the byte slice to `Queue::load
 
 ## Fix a version mismatch
 
-Blubber 0.1.0<!-- num:release.blubber.version --> builds on Pinocchio 0.12. With the `pinocchio` feature, Blubber re-exports the SDK as `blubber::pinocchio_sdk`. Import the entrypoint macros, `AccountView`, `Address` and CPI types from there so your program uses the same Pinocchio as Blubber.
+Blubber 0.1.1<!-- num:release.blubber.version --> builds on Pinocchio 0.12. With the `pinocchio` feature, Blubber re-exports the SDK as `blubber::pinocchio_sdk`. Import the entrypoint macros, `AccountView`, `Address` and CPI types from there so your program uses the same Pinocchio as Blubber.
 
 Rust treats two copies of a crate at different major versions as different types, even when the type has the same name. Run `cargo tree -d` to list the duplicate crates.
 

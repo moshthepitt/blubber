@@ -567,8 +567,8 @@ impl<'a, T: Schema> ListMut<'a, T> {
     ///
     /// For loops over many elements, use [`Self::cursor_mut`],
     /// [`Self::try_for_each_mut`] or [`Self::fill`] to avoid repeating selection.
-    /// At n=1000, a fixed-list `get_mut(i)` + `set` loop costs about 856 CU/item
-    /// in the mixed-program benchmark; scoped setters cost about 8.2 CU/item.
+    /// At n=1000, a fixed-list `get_mut(i)` + `set` loop costs about 864<!-- num:rustdoc.list_fixed.manual_set --> CU/item
+    /// in the mixed-program benchmark; scoped setters cost about 8.1<!-- num:rustdoc.list_fixed.scoped_set --> CU/item.
     /// Selection cost per call stays constant as the fixed list grows.
     pub fn get_mut(mut self, index: usize) -> Result<Option<T::Mut<'a>>> {
         let Some((selected, fixed)) = self.edit.select_source(|edit| {
@@ -689,7 +689,7 @@ impl<'a, T: Schema> ListMut<'a, T> {
     /// A callback cannot retain its child or reads from it between calls.
     ///
     /// Growing each element in place through callbacks has no fast path on
-    /// indexed lists: about 12,000 CU/item at n=1000. Use [`Self::fill`] or
+    /// indexed lists: about 12,000<!-- num:rustdoc.list_indexed.growing_callback --> CU/item at n=1000. Use [`Self::fill`] or
     /// [`Self::rewrite_from`]. For old-value-dependent edits, stage independent
     /// replacements in caller storage, end all reads, then rewrite. Staging
     /// adds caller storage and CU; inputs cannot borrow this destination.
@@ -846,8 +846,8 @@ impl<'a, K: MapKey, V: Schema> MapMut<'a, K, V> {
     ///
     /// For hot indexed-map reads, use [`Self::try_for_each_mut`] or
     /// [`Self::cursor_mut`]. At 1,000 entries, diagnostic read passes cost
-    /// 158,109 CU for callbacks and 176,229 for cursors, versus this iterator's
-    /// 660,767/657,767 CU on v0/v3; all three have overhead subtracted.
+    /// 233,069<!-- num:rustdoc.map_indexed.callback_read --> CU for callbacks and 241,117<!-- num:rustdoc.map_indexed.cursor_read --> for cursors, versus this iterator's
+    /// 510,444<!-- num:rustdoc.map_indexed.iter_read_v0 -->/510,450<!-- num:rustdoc.map_indexed.iter_read_v3 --> CU on v0/v3; all three have overhead subtracted.
     pub fn try_iter(&self) -> Result<TryMapIter<'_, K, V>> {
         Ok(self.read()?.try_iter())
     }
@@ -1218,7 +1218,7 @@ impl<'a, K: MapKey, V: Schema> MapMut<'a, K, V> {
     /// maps use the admission policy described by [`Self::cursor_mut`].
     ///
     /// Growing each value in place through callbacks has no fast path on
-    /// indexed maps: about 17,000 CU/item at n=1000. Use [`Self::fill_values`]
+    /// indexed maps: about 17,000<!-- num:rustdoc.map_indexed.growing_callback --> CU/item at n=1000. Use [`Self::fill_values`]
     /// or [`Self::rewrite_values`]. For old-value-dependent edits, stage
     /// independent replacement values in caller storage, end all
     /// reads, then rewrite in the existing sorted key order. Staging adds caller

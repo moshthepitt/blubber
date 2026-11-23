@@ -2,7 +2,7 @@
 //!
 //! ## Try it on the host
 //!
-//! Host storage runs off-chain in tests and tools. [`SliceStore`] wraps a mutable byte slice. [`VecStore`](https://docs.rs/blubber/0.1.0/blubber/struct.VecStore.html) wraps a growable vector when you enable `alloc`.
+//! Host storage runs off-chain in tests and tools. [`SliceStore`] wraps a mutable byte slice. [`VecStore`](https://docs.rs/blubber/latest/blubber/struct.VecStore.html) wraps a growable vector when you enable `alloc`.
 //!
 //! ```
 //! # #[cfg(feature = "derive")]
@@ -31,7 +31,7 @@
 //!
 //! ## Use it in a Solana program
 //!
-//! The crate is `no_std`, keeps allocation opt-in, and requires Rust 1.89.0 or newer. `derive` is on by default and re-exports [`#[blubber::schema]`](https://docs.rs/blubber-derive/0.1.0/blubber_derive/attr.schema.html) and [`#[derive(blubber::Fixed)]`](https://docs.rs/blubber-derive/0.1.0/blubber_derive/derive.Fixed.html). Enable `pinocchio` for the [`pinocchio`](https://docs.rs/blubber/0.1.0/blubber/pinocchio/index.html) module's account guards, rent top-ups, sizing options and creation helpers. Adding `max-depth-16` raises the nested schema walk limit from 8 nodes to 16 with the same byte layout. A Blubber fault carries an [`ErrorKind`] and a byte offset when the fault has a byte location. [`Error`] can also carry an SDK error code.
+//! The crate is `no_std`, keeps allocation opt-in, and requires Rust 1.89.0 or newer. `derive` is on by default and re-exports [`#[blubber::schema]`](https://docs.rs/blubber-derive/latest/blubber_derive/attr.schema.html) and [`#[derive(blubber::Fixed)]`](https://docs.rs/blubber-derive/latest/blubber_derive/derive.Fixed.html). Enable `pinocchio` for the [`pinocchio`](https://docs.rs/blubber/latest/blubber/pinocchio/index.html) module's account guards, rent top-ups, sizing options and creation helpers. Adding `max-depth-16` raises the nested schema walk limit from 8 nodes to 16 with the same byte layout. A Blubber fault carries an [`ErrorKind`] and a byte offset when the fault has a byte location. [`Error`] can also carry an SDK error code.
 //!
 //! See the [crate README](https://github.com/moshthepitt/blubber/blob/main/crates/blubber/README.md#check-the-handler), the [guide](https://github.com/moshthepitt/blubber/blob/main/docs/guide.md#create-an-account) and the [trust model](https://github.com/moshthepitt/blubber/blob/main/docs/trust-model.md#choose-a-load).
 
