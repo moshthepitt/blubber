@@ -3,49 +3,49 @@
     "arch": "v3",
     "case": "list_fixed_n1000_ref_iter_plain",
     "observed_cu": 10794,
-    "published_cu": 10797,
-    "relative_error": 0.0002778549597110308
+    "published_cu": 10794,
+    "relative_error": 0.0
   },
   {
     "arch": "v3",
     "case": "list_fixed_n1000_callback_equal_set_plain",
-    "observed_cu": 8116,
-    "published_cu": 8119,
-    "relative_error": 0.0003695036334523956
+    "observed_cu": 8127,
+    "published_cu": 8127,
+    "relative_error": 0.0
   },
   {
     "arch": "v3",
     "case": "map_fixed_n1000_ref_iter_plain",
     "observed_cu": 91131,
-    "published_cu": 91134,
-    "relative_error": 0.000032918559483836984
+    "published_cu": 91131,
+    "relative_error": 0.0
   },
   {
     "arch": "v3",
     "case": "map_fixed_n1000_callback_equal_set_plain",
-    "observed_cu": 65943,
-    "published_cu": 65946,
-    "relative_error": 0.00004549176599035575
+    "observed_cu": 65954,
+    "published_cu": 65954,
+    "relative_error": 0.0
   },
   {
     "arch": "v3",
     "case": "list_indexed_n1000_fill_plain",
-    "observed_cu": 52983,
-    "published_cu": 52993,
-    "relative_error": 0.0001887041684750816
+    "observed_cu": 52947,
+    "published_cu": 52947,
+    "relative_error": 0.0
   },
   {
     "arch": "v3",
     "case": "map_indexed_n1000_fill_plain",
-    "observed_cu": 74133,
-    "published_cu": 74130,
-    "relative_error": 0.00004046944556859571
+    "observed_cu": 74096,
+    "published_cu": 74096,
+    "relative_error": 0.0
   },
   {
     "arch": "v3",
     "case": "map_indexed_n1000_map_grow_from_old_values_plain",
-    "observed_cu": 482728,
-    "published_cu": 485729,
-    "relative_error": 0.006178342244337892
+    "observed_cu": 482689,
+    "published_cu": 482689,
+    "relative_error": 0.0
   }
 ]

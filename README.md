@@ -67,10 +67,10 @@ Other in-place libraries exist too, including Star Frame and [Zeropod](https://g
 
 | Operation (1,000 items, SBF v0) | Blubber (lazy load) | Blubber (checked load) | Borsh | Fastest other library |
 | --- | --- | --- | --- | --- |
-| Sum a `List<u64>` | 10,566<!-- num:cmp.v0.n1000.list_sum.lazy --> CU | 10,854<!-- num:cmp.v0.n1000.list_sum.checked --> CU | 27,481<!-- num:cmp.v0.n1000.list_sum.borsh --> CU | 10,295<!-- num:cmp.v0.n1000.list_sum.bytemuck --> CU (`bytemuck`) |
-| Look up one key in a `Map` | 974<!-- num:cmp.v0.n1000.map_lookup.lazy --> CU | 22,401<!-- num:cmp.v0.n1000.map_lookup.checked --> CU | 188,944<!-- num:cmp.v0.n1000.map_lookup.borsh --> CU | 426<!-- num:cmp.v0.n1000.map_lookup.zeropod --> CU (Zeropod) |
-| Push one `u64` to a `List<u64>` | 1,446<!-- num:cmp.v0.n1000.list_push.lazy --> CU | 1,781<!-- num:cmp.v0.n1000.list_push.checked --> CU | 50,642<!-- num:cmp.v0.n1000.list_push.borsh --> CU | 389<!-- num:cmp.v0.n1000.list_push.anchor_slab --> CU (Anchor slab) |
-| Set every string in a `List<Str>` to a longer string | 45,153<!-- num:cmp.v0.n1000.list_grow_constant.lazy --> CU | 49,169<!-- num:cmp.v0.n1000.list_grow_constant.checked --> CU | 397,094<!-- num:cmp.v0.n1000.list_grow_constant.borsh --> CU | 202,917<!-- num:cmp.v0.n1000.list_grow_constant.star_frame --> CU (Star Frame) |
+| Sum a `List<u64>` | 10,565<!-- num:cmp.v0.n1000.list_sum.lazy --> CU | 10,854<!-- num:cmp.v0.n1000.list_sum.checked --> CU | 27,481<!-- num:cmp.v0.n1000.list_sum.borsh --> CU | 10,295<!-- num:cmp.v0.n1000.list_sum.bytemuck --> CU (`bytemuck`) |
+| Look up one key in a `Map` | 973<!-- num:cmp.v0.n1000.map_lookup.lazy --> CU | 22,401<!-- num:cmp.v0.n1000.map_lookup.checked --> CU | 188,944<!-- num:cmp.v0.n1000.map_lookup.borsh --> CU | 426<!-- num:cmp.v0.n1000.map_lookup.zeropod --> CU (Zeropod) |
+| Push one `u64` to a `List<u64>` | 1,403<!-- num:cmp.v0.n1000.list_push.lazy --> CU | 1,739<!-- num:cmp.v0.n1000.list_push.checked --> CU | 50,642<!-- num:cmp.v0.n1000.list_push.borsh --> CU | 356<!-- num:cmp.v0.n1000.list_push.anchor_slab --> CU (Anchor slab) |
+| Set every string in a `List<Str>` to a longer string | 45,110<!-- num:cmp.v0.n1000.list_grow_constant.lazy --> CU | 49,127<!-- num:cmp.v0.n1000.list_grow_constant.checked --> CU | 397,094<!-- num:cmp.v0.n1000.list_grow_constant.borsh --> CU | 202,917<!-- num:cmp.v0.n1000.list_grow_constant.star_frame --> CU (Star Frame) |
 
 A lazy load checks the account header up front and checks fields as you read them. A checked load scans the whole account before your code runs, so its cost grows with the account. That is why the checked lookup costs so much more than the lazy one.
 

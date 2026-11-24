@@ -1,15 +1,19 @@
 {
   "artifacts": {
-    "target/docs-assembly-compare/calibration-v0/blubber_cu_fixture.so": "ecb8fb4d84c61c8995d242353b6acb7539b9accc4b3a4e198ed5e05d027aa20f",
-    "target/docs-assembly-compare/calibration-v3/blubber_cu_fixture.so": "fece17b94107bc7cafa37816307949b3daa83cdf42e0abee0b5b5305d143a054",
-    "target/docs-assembly-compare/heap-v0/compare_program.so": "b20aa61ae38513d430a183e7ad72a582498bd63dde12d41f7c826421dd2f2ca0",
-    "target/docs-assembly-compare/heap-v0/compare_star.so": "39c8e20260ec4c4015a2b8515d1e95fc7157d82a87b5be01617923fa5fcca7f8",
-    "target/docs-assembly-compare/heap-v3/compare_program.so": "a03eab4050b34954202eb25fae9f7216ce666c69187bf79443a9e03e66cf20de",
-    "target/docs-assembly-compare/heap-v3/compare_star.so": "774f5c182e9b87d571cf5897dfce3cb067ac5bd0894457ba84ea5f5d17396ce3",
-    "target/docs-assembly-compare/v0/compare_program.so": "3304fc42eb311f84c5a41d7414a0501ab76d02f0b429cda6fc3577285458cecc",
-    "target/docs-assembly-compare/v0/compare_star.so": "1229eaa75c5d2ab2639b2930740e48e79410f1656556a1330a3b4d1b3355f399",
-    "target/docs-assembly-compare/v3/compare_program.so": "7c09687b31dc1265230f031c46ba89a095d28395895ca7c6cefef0cd8e4c75ff",
-    "target/docs-assembly-compare/v3/compare_star.so": "df9cd0454bc6886d9cd5af7bbdf260b1d1422b664b9a61c388988b67330efeb1"
+    "calibration-v0/blubber_cu_fixture.so": "93218fea93203a6be1576018878099a376b46626b29b4d89d627d847596dc5bf",
+    "calibration-v3/blubber_cu_fixture.so": "5dc47b1e14e6bb00ce7bd212f8ddd8de37235d6c980257b470e939c9768addb1",
+    "heap-v0/compare_program.so": "b6dd032d1c723cf235cd7106654aa88a257c85ffed862f13f9dfb97e69dd8b4e",
+    "heap-v0/compare_slab.so": "8dcb60d0ec9523093c39ae876b39a6f45b213608919f41f40aa335e973b2c716",
+    "heap-v0/compare_star.so": "5786d12e74aadd25048df8a12d2e54998153d2babc2eed89a6af1902a126f736",
+    "heap-v3/compare_program.so": "59bb88c5459f1382345249c39fdafddc4bf36369487fa11fca057030fff701e9",
+    "heap-v3/compare_slab.so": "ab6dd8bc328f6ff54ee1ee07e30852194079c5b16ad7532e170f70384bc0d458",
+    "heap-v3/compare_star.so": "e3474656ad4f45227df0b639ea66f2300a6b8ab67c2cb09fa999b8d7434f0652",
+    "v0/compare_program.so": "c8eb17f89840ed8e91508048cc6400a8d4e43fb4cb137c483a6a8e32c8d716f1",
+    "v0/compare_slab.so": "8b49666a030bc82084e22db43b1185131d0695d7d0011d89a4ab6676c9656c8f",
+    "v0/compare_star.so": "203e4bf369c25a5ff1f99e0c82fd6227f0352f4285b2e4e0ee44c92c94174ef9",
+    "v3/compare_program.so": "01445cc7f33f3fba267d18671fd5678166118846b7ac3af3ef8532cbad252014",
+    "v3/compare_slab.so": "4cda5a432b1609b0be219ec9729940f7c4a3ff490103b6851b1dce71c92353a5",
+    "v3/compare_star.so": "a4f75f1043a6a1948c7e6932777789e7d1bf94089d0d5d5b462b3aff40f2d6b0"
   },
   "competitors": {
     "anchor_slab": {
@@ -47,13 +51,6 @@
           "src/traits.rs": 2
         }
       },
-      "upstream_head": {
-        "api": "https://api.github.com/repos/otter-sec/anchor/commits?sha=anchor-next&per_page=1",
-        "branch": "anchor-next",
-        "commit": "602813667faa88d1c31b554a018a3fcc1b21e548",
-        "date": "2026-10-30T12:56:03Z",
-        "url": "https://github.com/otter-sec/anchor/commit/602813667faa88d1c31b554a018a3fcc1b21e548"
-      },
       "url": "https://github.com/otter-sec/anchor/tree/7d68eb325f297013a5e0903ddd698fe26218f5a3",
       "version": "2.0.0-rc.2"
     },
@@ -65,17 +62,17 @@
         "storage": "unsized borrowed",
         "validation": "raw reads: whole root including key order; authenticated mutable Store loads: lazy touched checks"
       },
-      "commit": "e906f7deca37a000d5fcd12de4a1937af20c01b7",
-      "commit_date": "2026-11-19",
+      "commit": "4a1b9af7e77a49a8d220a8f16488360355b26ad8",
+      "commit_date": "2026-11-24",
       "license": "MIT",
       "package": "blubber",
-      "source_sha256": "7554ec473dae4e5f43d7d641f4b389b1555b763e8838b0cb28417f2e9ca67aa0",
+      "source_sha256": "a1372f18ce763d090cfcca570d144388df620509f3f2c5731bdc83e83cc50047",
       "unsafe_syntax": {
         "count": 0,
         "files": {}
       },
       "url": "../README.md",
-      "version": "0.1.0"
+      "version": "0.1.1"
     },
     "blubber_checked": {
       "capabilities": {
@@ -85,17 +82,17 @@
         "storage": "unsized borrowed",
         "validation": "explicit checked reads and mutable loads: complete root, strict keys and UTF-8"
       },
-      "commit": "e906f7deca37a000d5fcd12de4a1937af20c01b7",
-      "commit_date": "2026-11-19",
+      "commit": "4a1b9af7e77a49a8d220a8f16488360355b26ad8",
+      "commit_date": "2026-11-24",
       "license": "MIT",
       "package": "blubber",
-      "source_sha256": "7554ec473dae4e5f43d7d641f4b389b1555b763e8838b0cb28417f2e9ca67aa0",
+      "source_sha256": "a1372f18ce763d090cfcca570d144388df620509f3f2c5731bdc83e83cc50047",
       "unsafe_syntax": {
         "count": 0,
         "files": {}
       },
       "url": "../README.md",
-      "version": "0.1.0"
+      "version": "0.1.1"
     },
     "blubber_trusted": {
       "capabilities": {
@@ -105,17 +102,17 @@
         "storage": "unsized borrowed",
         "validation": "O(1) envelope/discriminator; caller guarantees valid program-written bytes; touched paths checked lazily"
       },
-      "commit": "e906f7deca37a000d5fcd12de4a1937af20c01b7",
-      "commit_date": "2026-11-19",
+      "commit": "4a1b9af7e77a49a8d220a8f16488360355b26ad8",
+      "commit_date": "2026-11-24",
       "license": "MIT",
       "package": "blubber",
-      "source_sha256": "7554ec473dae4e5f43d7d641f4b389b1555b763e8838b0cb28417f2e9ca67aa0",
+      "source_sha256": "a1372f18ce763d090cfcca570d144388df620509f3f2c5731bdc83e83cc50047",
       "unsafe_syntax": {
         "count": 0,
         "files": {}
       },
       "url": "../README.md",
-      "version": "0.1.0"
+      "version": "0.1.1"
     },
     "borsh": {
       "capabilities": {
@@ -136,12 +133,6 @@
           "src/de/mod.rs": 4,
           "src/schema/container_ext/max_size.rs": 2
         }
-      },
-      "upstream_head": {
-        "api": "https://api.github.com/repos/near/borsh-rs/commits?per_page=1",
-        "commit": "0baa89c98d90d26f185801708469e0a81f78aaf5",
-        "date": "2026-10-23T00:44:44Z",
-        "url": "https://github.com/near/borsh-rs/commit/0baa89c98d90d26f185801708469e0a81f78aaf5"
       },
       "url": "https://github.com/near/borsh-rs/tree/fe778bec428d5b44cd4922c896af0a7c39a863dd",
       "version": "1.8.1"
@@ -177,12 +168,6 @@
           "src/zeroable_in_option.rs": 36
         }
       },
-      "upstream_head": {
-        "api": "https://api.github.com/repos/Lokathor/bytemuck/commits?per_page=1",
-        "commit": "ea3616110b0134e9991fdb66be8892dbc427c5ac",
-        "date": "2026-09-11T20:47:50Z",
-        "url": "https://github.com/Lokathor/bytemuck/commit/ea3616110b0134e9991fdb66be8892dbc427c5ac"
-      },
       "url": "https://github.com/Lokathor/bytemuck/tree/f363643e951a7ac9e4b9921de982f2b0918902e3",
       "version": "1.25.2"
     },
@@ -210,12 +195,6 @@
           "src/red_black_tree.rs": 6
         }
       },
-      "upstream_head": {
-        "api": "https://api.github.com/repos/Ellipsis-Labs/sokoban/commits?per_page=1",
-        "commit": "f8ecce2c50c12e6b8731b59ecdb3a1f43769a094",
-        "date": "2024-08-23T18:37:14Z",
-        "url": "https://github.com/Ellipsis-Labs/sokoban/commit/f8ecce2c50c12e6b8731b59ecdb3a1f43769a094"
-      },
       "url": "https://github.com/Ellipsis-Labs/sokoban/tree/f8ecce2c50c12e6b8731b59ecdb3a1f43769a094",
       "version": "0.3.3"
     },
@@ -235,12 +214,6 @@
       "unsafe_syntax": {
         "count": 0,
         "files": {}
-      },
-      "upstream_head": {
-        "api": "https://api.github.com/repos/Lightprotocol/light-protocol/commits?per_page=1",
-        "commit": "bec7b830250126e1f6a2993872599f45af6e0aa0",
-        "date": "2026-10-14T19:44:12Z",
-        "url": "https://github.com/Lightprotocol/light-protocol/commit/bec7b830250126e1f6a2993872599f45af6e0aa0"
       },
       "url": "https://github.com/Lightprotocol/light-protocol/tree/b0fe3f2ed33acaf4b2ad7e025a2dccefdd0e0515",
       "version": "0.6.0"
@@ -267,12 +240,6 @@
           "src/utils.rs": 5
         }
       },
-      "upstream_head": {
-        "api": "https://api.github.com/repos/Bonasa-Tech/manifest/commits?per_page=1",
-        "commit": "ff62612100a82a46babb646fc312ab9ceea041db",
-        "date": "2026-10-29T00:47:16Z",
-        "url": "https://github.com/Bonasa-Tech/manifest/commit/ff62612100a82a46babb646fc312ab9ceea041db"
-      },
       "url": "https://github.com/CKS-Systems/manifest/tree/5f4272ec067459dc6ed761331319678edcd25f51",
       "version": "1.2.0"
     },
@@ -297,12 +264,6 @@
           "src/red_black_tree.rs": 1,
           "src/utils.rs": 5
         }
-      },
-      "upstream_head": {
-        "api": "https://api.github.com/repos/Bonasa-Tech/manifest/commits?per_page=1",
-        "commit": "ff62612100a82a46babb646fc312ab9ceea041db",
-        "date": "2026-10-29T00:47:16Z",
-        "url": "https://github.com/Bonasa-Tech/manifest/commit/ff62612100a82a46babb646fc312ab9ceea041db"
       },
       "url": "https://github.com/CKS-Systems/manifest/tree/5f4272ec067459dc6ed761331319678edcd25f51",
       "version": "1.2.0"
@@ -332,12 +293,6 @@
           "src/traits.rs": 40
         }
       },
-      "upstream_head": {
-        "api": "https://api.github.com/repos/pina-rs/pinapod/commits?per_page=1",
-        "commit": "23ec6efe815ac5ebe2678be0fcc5db65c2b5d855",
-        "date": "2026-10-29T16:28:19Z",
-        "url": "https://github.com/pina-rs/pinapod/commit/23ec6efe815ac5ebe2678be0fcc5db65c2b5d855"
-      },
       "url": "https://github.com/pina-rs/pinapod/tree/c1b89cc19693f0952eb9990e23e48acbd992f2c7",
       "version": "0.4.7"
     },
@@ -364,12 +319,6 @@
           "src/node_allocator.rs": 2,
           "src/red_black_tree.rs": 6
         }
-      },
-      "upstream_head": {
-        "api": "https://api.github.com/repos/Ellipsis-Labs/sokoban/commits?per_page=1",
-        "commit": "f8ecce2c50c12e6b8731b59ecdb3a1f43769a094",
-        "date": "2024-08-23T18:37:14Z",
-        "url": "https://github.com/Ellipsis-Labs/sokoban/commit/f8ecce2c50c12e6b8731b59ecdb3a1f43769a094"
       },
       "url": "https://github.com/Ellipsis-Labs/sokoban/tree/f8ecce2c50c12e6b8731b59ecdb3a1f43769a094",
       "version": "0.3.3"
@@ -420,12 +369,6 @@
           "src/util.rs": 5
         }
       },
-      "upstream_head": {
-        "api": "https://api.github.com/repos/staratlasmeta/star_frame/commits?per_page=1",
-        "commit": "d13c1f13a76e7fb106ab62876989899b300e4727",
-        "date": "2026-10-27T16:50:11Z",
-        "url": "https://github.com/staratlasmeta/star_frame/commit/d13c1f13a76e7fb106ab62876989899b300e4727"
-      },
       "url": "https://github.com/staratlasmeta/star_frame/tree/6936d582a942760b67728059be651473645ee099",
       "version": "0.30.0"
     },
@@ -470,12 +413,6 @@
           "src/schema/mod.rs": 47
         }
       },
-      "upstream_head": {
-        "api": "https://api.github.com/repos/anza-xyz/wincode/commits?per_page=1",
-        "commit": "70a904c555c7d07f8e72eb02b886f695577b475e",
-        "date": "2026-10-28T17:45:07Z",
-        "url": "https://github.com/anza-xyz/wincode/commit/70a904c555c7d07f8e72eb02b886f695577b475e"
-      },
       "url": "https://github.com/anza-xyz/wincode/tree/2d9cc7a2e974d726ced31ac1ad3c645113f685f0",
       "version": "0.6.3"
     },
@@ -509,52 +446,41 @@
           "src/zc.rs": 3
         }
       },
-      "upstream_head": {
-        "api": "https://api.github.com/repos/blueshift-gg/zeropod/commits?per_page=1",
-        "commit": "8a607caf7861c932786e3f7d8759a7c066671b25",
-        "date": "2026-10-14T06:30:44Z",
-        "url": "https://github.com/blueshift-gg/zeropod/commit/8a607caf7861c932786e3f7d8759a7c066671b25"
-      },
       "url": "https://github.com/blueshift-gg/zeropod/tree/8a607caf7861c932786e3f7d8759a7c066671b25",
       "version": "0.4.0"
     }
   },
   "compute_unit_limit": 40000000,
   "handwritten_unsafe_syntax": 0,
-  "harness_sha256": "14e26443e35d066f2d80e8d133de43d0ff098ea2ab3163a45aa42bfcc28457ce",
+  "harness_sha256": "8a1abe28404eb7de9642fd29a9a45ddfb034bc72085d169d620312c7d48606ff",
   "heap_limit": 262144,
-  "lock_sha256": "60fad3eadcfd6f3a3fb9c001963186a930b9d0c254fc11956a5d3ca5ef4c7e8c",
+  "lock_sha256": "dde0168a58f04edd2cb9879324b22842607e24b101582c1aa118797fc63ac2a9",
   "platform_tools": "v1.53",
   "profile": {
     "codegen-units": 1,
     "lto": "fat",
     "overflow-checks": true
   },
-  "recorded_utc": "2026-11-19T15:00:17.330164+00:00",
-  "reports": {
-    "README.md": "3ecb91cd9b9c8fa517d3598e1e63178fd91510ddf2d8ec4da21509f6fde3d573",
-    "benchmarks/COMPARE.md": "1dc8686ac9b3aac1f767ba76119aac136835d317220a53ab039dc7be4c6ff4d0",
-    "benchmarks/compare/GAPS.md": "2f14a69d01710630a81a052cf4f74dfa70851d3a4c7335e1f81e59ff4e89734d",
-    "crates/blubber-anchor/README.md": "6e6d6516f6c92a5a4ba71f50808d5bf17cca5ab1010fa3b54e67b2aa5f3921ee"
-  },
+  "recorded_utc": "2026-11-24T07:28:02.111540+00:00",
   "result_files": {
-    "benchmarks/compare/results/all.csv": "61ad537d489f1a83c6d3e61c7294c0db55b8cc0366e730727161f14d69a4d5e3",
-    "benchmarks/compare/results/all.json": "8dbb99395baf273ec00c31831591d7c2404efe8038e25c02938b4aac40ec7152",
-    "benchmarks/compare/results/calibration-v0.json": "b8575a2cbe96e773d12023d9e4497eefb20a217886d9a426eea396dc6fa4f8d5",
-    "benchmarks/compare/results/calibration-v3.json": "c79d0871d02f9231d4c43a9616c9a6686db8f6316723c91560d83d36e8e2d9f8",
-    "benchmarks/compare/results/heap-v0.json": "05e4467cd5ada3cf9a35938399308ea1a3039b02158c12e78e737a403dec7b79",
-    "benchmarks/compare/results/heap-v3.json": "e46eaa28b199cb0767d2163ecf267711bb9bd963426baba866c0bd80db58b343",
-    "benchmarks/compare/results/v0.json": "6538b8004aade317e0fc09608e43074205e26d1950120f714b0466e8f48bb7f7",
-    "benchmarks/compare/results/v3.json": "145fe71c55851ddbf1f852fdd644e5c6edb3a443b8133c4cb17df49f544006c0"
+    "benchmarks/compare/results/all.csv": "010f8ce1301dc1783bdfde4e5f9919d9aed9e84ab440f4eb7e4f556d6c78400d",
+    "benchmarks/compare/results/all.json": "3bcf50041eeb5864d3ae4aa4b0d8e730936b47e9a740bce9865f7d6d49923ec2",
+    "benchmarks/compare/results/calibration-v0.json": "e2bb63ed1bdd6796cf5d9bd7ce4a00be82fb981cfb957775743805d5ac5b7637",
+    "benchmarks/compare/results/calibration-v3.json": "256dd1a2da284d420af08abccf2195651db55f9f9a156c92fcd6243c7a4ee531",
+    "benchmarks/compare/results/heap-v0.json": "b9372b5fc986c96848f66747229aece2fbf3f7f812b9a60d1d05a4c2259f8b58",
+    "benchmarks/compare/results/heap-v3.json": "1e304d148b3921b3f1015deca6c0271dc3045ab86ad92737abb12f6ca5de652b",
+    "benchmarks/compare/results/v0.json": "92394e8733ac85b4ff360a04861a382ac6b0e07ce362988a31603a1128e2104e",
+    "benchmarks/compare/results/v3.json": "e0a49760a465cb853fef5c23b904c43fea1359080fb986b4425c3086feabdc50"
   },
   "rows": 1740,
   "sbf_features": {
     "calibration": "mixed-operations",
-    "compare-program": "baselines,zeropod,wincode,pinapod,light,anchor-slab,manifest",
+    "compare-program": "baselines,zeropod,wincode,pinapod,light,manifest",
+    "compare-slab": "native entrypoint; shared helpers no-entrypoint",
     "compare-star": "native entrypoint; shared helpers no-entrypoint",
     "diagnostic": "heap"
   },
-  "source_sha256": "a14ad61dc7b0789602e90aa2fe132962272bd478f85e261e371ab12a621af5a8",
+  "source_sha256": "8d4f98f61d9e6981ae0061dea230dc72d20a71f82fcc3ccf45306ca30854b517",
   "tools": {
     "cargo-build-sbf": {
       "path": "sbf-builder/cargo-build-sbf",
@@ -563,13 +489,13 @@
     },
     "host-cargo": {
       "path": "host-rust/bin/cargo",
-      "sha256": "828980723df339d62434390e9fb8ef8831036583343ae2316b7ab5646b5c1953",
-      "version": "cargo 1.97.1 (c980f4866 2026-06-30)"
+      "sha256": "84d55d77232a921da96bcf2e1f78532ef5c5221803aae4448d9e220d48ebd808",
+      "version": "cargo 1.100.0 (3acc79c0c 2026-11-05)"
     },
     "host-rustc": {
       "path": "host-rust/bin/rustc",
-      "sha256": "d3a664c970a9fd8361b64194861bebc1ae37b9054e5ee3400dc1c9e691797eea",
-      "version": "rustc 1.97.1 (8bab26f4f 2026-07-14)"
+      "sha256": "5073422953727c9427a76b7fce03aa9404da46315e5a1e4965389512a41e8db0",
+      "version": "rustc 1.100.0 (0ef1bc386 2026-11-09)"
     },
     "sbf-rustc": {
       "path": "platform-tools/rust/bin/rustc",

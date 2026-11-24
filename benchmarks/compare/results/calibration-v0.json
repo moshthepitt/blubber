@@ -3,49 +3,49 @@
     "arch": "v0",
     "case": "list_fixed_n1000_ref_iter_plain",
     "observed_cu": 10798,
-    "published_cu": 10799,
-    "relative_error": 0.00009260116677470137
+    "published_cu": 10798,
+    "relative_error": 0.0
   },
   {
     "arch": "v0",
     "case": "list_fixed_n1000_callback_equal_set_plain",
-    "observed_cu": 8121,
-    "published_cu": 8122,
-    "relative_error": 0.00012312238364934746
+    "observed_cu": 8132,
+    "published_cu": 8132,
+    "relative_error": 0.0
   },
   {
     "arch": "v0",
     "case": "map_fixed_n1000_ref_iter_plain",
     "observed_cu": 91135,
-    "published_cu": 91136,
-    "relative_error": 0.000010972612359550561
+    "published_cu": 91135,
+    "relative_error": 0.0
   },
   {
     "arch": "v0",
     "case": "map_fixed_n1000_callback_equal_set_plain",
-    "observed_cu": 65948,
-    "published_cu": 65949,
-    "relative_error": 0.000015163232194574596
+    "observed_cu": 65959,
+    "published_cu": 65959,
+    "relative_error": 0.0
   },
   {
     "arch": "v0",
     "case": "list_indexed_n1000_fill_plain",
-    "observed_cu": 49008,
-    "published_cu": 49018,
-    "relative_error": 0.00020400669141947857
+    "observed_cu": 48972,
+    "published_cu": 48972,
+    "relative_error": 0.0
   },
   {
     "arch": "v0",
     "case": "map_indexed_n1000_fill_plain",
-    "observed_cu": 74149,
-    "published_cu": 74147,
-    "relative_error": 0.00002697344464374823
+    "observed_cu": 74113,
+    "published_cu": 74113,
+    "relative_error": 0.0
   },
   {
     "arch": "v0",
     "case": "map_indexed_n1000_map_grow_from_old_values_plain",
-    "observed_cu": 482747,
-    "published_cu": 485745,
-    "relative_error": 0.00617196265530268
+    "observed_cu": 482708,
+    "published_cu": 482708,
+    "relative_error": 0.0
   }
 ]
